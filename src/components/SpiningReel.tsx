@@ -87,7 +87,7 @@ function useSound(url: string, { volume = 1 } = {}) {
 const SpinningReel: React.FC<{ items: Item[]; onWin?: (item: Item) => void }> = ({ items, onWin }) => {
   const [spinning, setSpinning] = useState(false);
   const [winner, setWinner] = useState<Item | null>(null);
-  const [finalTranslate, setFinalTranslate] = useState(0);
+  const [finalTranslate, setFinalTranslate] = useState<number>(0);
   const [spinCount, setSpinCount] = useState(0);
   const [centeredIndex, setCenteredIndex] = useState<number | null>(null);
 
@@ -228,7 +228,7 @@ const SpinningReel: React.FC<{ items: Item[]; onWin?: (item: Item) => void }> = 
               transition: {
                 duration: spinning ? 3.5 : 0.2,
                 ease: spinning ? slowSpinEasing : "easeOut",
-              },
+              } as any,
             }}
             onUpdate={handleUpdate}
           >

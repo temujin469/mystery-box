@@ -1,8 +1,5 @@
 "use client"
 
-import { SpinningReel } from '@/components/Reel';
-import { SpinningReel2 } from '@/components/Reel2';
-import SpiningReel from '@/components/SpiningReel';
 import React from 'react'
 const items = [
   {
@@ -28,7 +25,7 @@ const items = [
 function Box() {
   return (
     <div>
-      <div>
+      {/* <div>
         <SpinningReel items={items}/>
       </div>
       <div>
@@ -36,7 +33,7 @@ function Box() {
       </div>
         <div>
         <SpiningReel items={items}/>
-      </div>
+      </div> */}
     </div>
   )
 }

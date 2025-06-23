@@ -12,7 +12,7 @@ type BoxesGridProps = {
 
 export default function BoxPage() {
   const [items, setItems] = useState(boxDetail.items);
-  const [isOddsHidden,setIsOddsHidden] = useState(true);
+  const [isOddsHidden, setIsOddsHidden] = useState(true);
   const [wonItem, setWonItem] = useState();
 
   const onWon = (item: any) => {
@@ -29,18 +29,19 @@ export default function BoxPage() {
         </div>
         <div className="flex items-center gap-2 mb-5">
           <p>Магадлал</p>
-          <Switch/>
+          <Switch />
         </div>
         <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-3 md:grid-cols-5 xl:grid-cols-6 gap-3">
           {items.map((item) => (
-            <ItemCard item={item} isDropRateHidden={isOddsHidden} />
+            <div id={item.id}>
+              <ItemCard item={item} isDropRateHidden={isOddsHidden} />
+            </div>
           ))}
         </div>
       </div>
     </div>
   );
 }
-
 
 function BoxSeparator({ label = "бүтээгдэхүүнүүд" }: { label?: string }) {
   return (
@@ -49,13 +50,19 @@ function BoxSeparator({ label = "бүтээгдэхүүнүүд" }: { label?: st
       <div className="flex-1 h-[1px] bg-gradient-to-r from-primary to-primary/50" />
 
       {/* Sharp ribbon with outward arrows, height = 25px */}
-      <div className="flex items-center mx-2 relative select-none z-10" style={{ height: 25 }}>
+      <div
+        className="flex items-center mx-2 relative select-none z-10"
+        style={{ height: 25 }}
+      >
         {/* Left outward sharp triangle arrow */}
-        <svg width="24" height="25" viewBox="0 0 24 25" className="-mr-1" style={{ display: 'block' }}>
-          <polygon
-            points="0,12.5 24,0 17,12.5 24,25"
-            fill="#4DB5DB"
-          />
+        <svg
+          width="24"
+          height="25"
+          viewBox="0 0 24 25"
+          className="-mr-1"
+          style={{ display: "block" }}
+        >
+          <polygon points="0,12.5 24,0 17,12.5 24,25" fill="#4DB5DB" />
         </svg>
 
         {/* Center Ribbon (narrow hexagon) */}
@@ -93,20 +100,21 @@ function BoxSeparator({ label = "бүтээгдэхүүнүүд" }: { label?: st
             lineHeight: "23px",
             display: "flex",
             alignItems: "center",
-            justifyContent: "center"
+            justifyContent: "center",
           }}
         >
-          <span className="text-foreground">
-            {label}
-          </span>
+          <span className="text-foreground">{label}</span>
         </div>
 
         {/* Right outward sharp triangle arrow */}
-        <svg width="24" height="25" viewBox="0 0 24 25" className="-ml-1" style={{ display: 'block' }}>
-          <polygon
-            points="24,12.5 0,0 7,12.5 0,25"
-            fill="#4DB5DB"
-          />
+        <svg
+          width="24"
+          height="25"
+          viewBox="0 0 24 25"
+          className="-ml-1"
+          style={{ display: "block" }}
+        >
+          <polygon points="24,12.5 0,0 7,12.5 0,25" fill="#4DB5DB" />
         </svg>
       </div>
 

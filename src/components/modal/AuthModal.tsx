@@ -45,7 +45,7 @@ const signupSchema = z
     password: z.string().min(6, "Нууц үг дор хаяж 6 тэмдэгт байх ёстой"),
     confirm: z.string(),
     country: z.string().min(1, "Улс сонгоно уу"),
-    agree: z.literal(true, {
+    agree: z.literal(false, {
       errorMap: () => ({
         message: "Үйлчилгээний нөхцөл зөвшөөрсөн байх ёстой",
       }),

@@ -1,14 +1,5 @@
 import { PromoBanner } from "@/components/banner";
-import { Footer, Header } from "@/components/layouts/common";
-import {
-  Banner,
-  BannerStats,
-  FaqSection,
-  HowItWorks,
-  MainSection,
-  StatsReview,
-} from "@/components/layouts/home";
-import Image from "next/image";
+import { FaqSection, HowItWorks, MainSection } from "@/components/layouts/home";
 
 export default function Home() {
   return (
