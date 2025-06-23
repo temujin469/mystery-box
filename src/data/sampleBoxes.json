@@ -1,0 +1,122 @@
+[
+  {
+    "id": "box-1",
+    "name": "iPhone Heaven",
+    "cost": 64790,
+    "price": 40000,
+    "description": "iPhone, AirPods, Apple-ийн бусад шагналтай нууцлаг хайрцаг.",
+    "available_from": "2025-06-01T00:00:00Z",
+    "available_to": "2025-12-31T23:59:59Z",
+    "is_featured": true,
+    "created_at": "2025-05-20T10:00:00Z",
+    "image_url": "/box1.webp"
+  },
+  {
+    "id": "box-2",
+    "name": "Samsung Universe",
+    "cost": 38900,
+    "price": 20000,
+    "description": "Samsung-ийн гар утас болон дагалдах хэрэгслийн хайрцаг.",
+    "available_from": "2025-06-01T00:00:00Z",
+    "available_to": "2025-12-31T23:59:59Z",
+    "is_featured": true,
+    "created_at": "2025-05-21T12:00:00Z",
+    "image_url": "/box2.webp"
+  },
+  {
+    "id": "box-3",
+    "name": "Macbook Mystery",
+    "cost": 152900,
+    "price": 60000,
+    "description": "Macbook болон холбогдох хэрэгслийн багц.",
+    "available_from": "2025-06-01T00:00:00Z",
+    "available_to": "2025-12-31T23:59:59Z",
+    "is_featured": false,
+    "created_at": "2025-05-22T14:00:00Z",
+    "image_url": "/box3.webp"
+  },
+  {
+    "id": "box-4",
+    "name": "AirPods Surprise",
+    "cost": 12900,
+    "price": 5000,
+    "description": "AirPods болон Bluetooth чихэвчний багц.",
+    "available_from": "2025-06-01T00:00:00Z",
+    "available_to": "2025-12-31T23:59:59Z",
+    "is_featured": false,
+    "created_at": "2025-05-23T16:00:00Z",
+    "image_url": "/box4.webp"
+  },
+  {
+    "id": "box-5",
+    "name": "Gamer's Dream",
+    "cost": 27900,
+    "price": 10000,
+    "description": "PlayStation, Xbox болон тоглоомын дагалдах хэрэгсэл.",
+    "available_from": "2025-06-01T00:00:00Z",
+    "available_to": "2025-12-31T23:59:59Z",
+    "is_featured": true,
+    "created_at": "2025-05-24T10:00:00Z",
+    "image_url": "/box5.webp"
+  },
+  {
+    "id": "box-6",
+    "name": "Luxury Watch Box",
+    "cost": 189900,
+    "price": 90000,
+    "description": "Rolex, Apple Watch болон ухаалаг цаг.",
+    "available_from": "2025-06-01T00:00:00Z",
+    "available_to": "2025-12-31T23:59:59Z",
+    "is_featured": false,
+    "created_at": "2025-05-25T11:00:00Z",
+    "image_url": "/box6.webp"
+  },
+  {
+    "id": "box-7",
+    "name": "Sneaker Vault",
+    "cost": 33900,
+    "price": 15000,
+    "description": "Nike, Adidas, Jordan брэндийн пүүзний хайрцаг.",
+    "available_from": "2025-06-01T00:00:00Z",
+    "available_to": "2025-12-31T23:59:59Z",
+    "is_featured": true,
+    "created_at": "2025-05-26T09:00:00Z",
+    "image_url": "/box7.webp"
+  },
+  {
+    "id": "box-8",
+    "name": "Fashion Mystery",
+    "cost": 8900,
+    "price": 290000,
+    "description": "Шинэ загварын хувцас болон аксесуар.",
+    "available_from": "2025-06-01T00:00:00Z",
+    "available_to": "2025-12-31T23:59:59Z",
+    "is_featured": false,
+    "created_at": "2025-05-27T13:00:00Z",
+    "image_url": "/box8.webp"
+  },
+   {
+    "id": "box-9",
+    "name": "Fashion Mystery",
+    "cost": 8900,
+    "price": 344000,
+    "description": "Шинэ загварын хувцас болон аксесуар.",
+    "available_from": "2025-06-01T00:00:00Z",
+    "available_to": "2025-12-31T23:59:59Z",
+    "is_featured": false,
+    "created_at": "2025-05-27T13:00:00Z",
+    "image_url": "/box9.webp"
+  },
+   {
+    "id": "box-10",
+    "name": "Fashion Mystery",
+    "cost": 8900,
+    "price": 120000,
+    "description": "Шинэ загварын хувцас болон аксесуар.",
+    "available_from": "2025-06-01T00:00:00Z",
+    "available_to": "2025-12-31T23:59:59Z",
+    "is_featured": false,
+    "created_at": "2025-05-27T13:00:00Z",
+    "image_url": "/box10.webp"
+  }
+]

@@ -1,0 +1,111 @@
+{
+  "box": {
+    "id": "box-5",
+    "name": "Gamer's Dream",
+    "cost": 27900,
+    "price": 10000,
+    "description": "PlayStation, Xbox болон тоглоомын дагалдах хэрэгслийн багц.",
+    "available_from": "2025-06-01T00:00:00Z",
+    "available_to": "2025-12-31T23:59:59Z",
+    "is_featured": true,
+    "created_at": "2025-05-24T10:00:00Z"
+  },
+  "items": [
+    {
+      "id": "item-1",
+      "name": "PlayStation 5",
+      "description": "Sony PlayStation 5 тоглоомын консол.",
+      "image_url": "/item.webp",
+      "price": 2000000,
+      "drop_rate": 0.005
+    },
+    {
+      "id": "item-2",
+      "name": "Xbox Series X",
+      "description": "Microsoft Xbox Series X консол.",
+      "image_url": "/item2.webp",
+      "price": 1800000,
+      "drop_rate": 0.006
+    },
+    {
+      "id": "item-3",
+      "name": "Nintendo Switch OLED",
+      "description": "Nintendo Switch OLED хувилбар.",
+     "image_url": "/item3.webp",
+      "price": 1200000,
+      "drop_rate": 0.01
+    },
+    {
+      "id": "item-4",
+      "name": "Razer BlackShark V2",
+      "description": "Razer BlackShark V2 тоглоомын чихэвч.",
+"image_url": "/item4.webp",
+      "price": 390000,
+      "drop_rate": 0.03
+    },
+    {
+      "id": "item-5",
+      "name": "Logitech G Pro X Superlight",
+      "description": "Logitech G Pro X Superlight тоглоомын хулгана.",
+     "image_url": "/item5.webp",
+      "price": 320000,
+      "drop_rate": 0.03
+    },
+    {
+      "id": "item-6",
+      "name": "Xbox Wireless Controller",
+      "description": "Xbox Series X/S албан ёсны хянагч.",
+     "image_url": "/item6.webp",
+      "price": 210000,
+      "drop_rate": 0.045
+    },
+    {
+      "id": "item-7",
+      "name": "PlayStation DualSense Controller",
+      "description": "PlayStation 5 DualSense хянагч.",
+   "image_url": "/item7.webp",
+      "price": 210000,
+      "drop_rate": 0.045
+    },
+    {
+      "id": "item-8",
+      "name": "Xbox Game Pass Ultimate (3 сар)",
+      "description": "Xbox Game Pass-ийн 3 сарын эрх.",
+     "image_url": "/item8.webp",
+      "price": 69000,
+      "drop_rate": 0.09
+    },
+    {
+      "id": "item-9",
+      "name": "PlayStation Plus (3 сар)",
+      "description": "PlayStation Plus үйлчилгээний 3 сарын эрх.",
+     "image_url": "/item9.webp",
+      "price": 69000,
+      "drop_rate": 0.09
+    },
+    {
+      "id": "item-10",
+      "name": "Steam Gift Card (50k)",
+      "description": "Steam 50,000₮-ийн бэлгийн карт.",
+     "image_url": "/item10.webp",
+      "price": 50000,
+      "drop_rate": 0.15
+    },
+    {
+      "id": "item-11",
+      "name": "RGB Gaming Mousepad",
+      "description": "Том хэмжээтэй RGB гэрэлтэй тоглоомын хулганын дэвсгэр.",
+     "image_url": "/item11.webp",
+      "price": 35000,
+      "drop_rate": 0.2
+    },
+    {
+      "id": "item-12",
+      "name": "Energy Drink (Monster, 2 ширхэг)",
+      "description": "Энергийн ундаа Monster, 2 ширхэг.",
+     "image_url": "/item12.webp",
+      "price": 8000,
+      "drop_rate": 0.35
+    }
+  ]
+}
