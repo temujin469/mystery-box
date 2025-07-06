@@ -59,7 +59,7 @@ export function ItemCard({ item, isDropRateHidden=true }: ItemCardProps) {
         className="w-full h-full bg-top"
       />
       <div
-        className={`w-full h-20 blur-3xl z-10 absolute top-0 right-[50%] translate-x-[50%] ${getDropRateColor(
+        className={`w-full h-20 blur-3xl z-0 absolute top-0 right-[50%] translate-x-[50%] ${getDropRateColor(
           item.drop_rate
         )}`}
       ></div>

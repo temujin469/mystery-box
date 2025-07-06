@@ -14,9 +14,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, signupSchema, LoginFormData, SignupFormData } from "@/schemas";
 import Image from "next/image";
+import { useLogin, useRegister } from "@/hooks/api";
 
 function GoogleIcon() {
   return <span className="text-xl">🌐</span>;
@@ -34,69 +35,29 @@ function SteamIcon() {
   return <span className="text-xl mr-2">🎮</span>;
 }
 
-const loginSchema = z.object({
-  email: z.string().email("Имэйл буруу байна"),
-  password: z.string().min(6, "Нууц үг дор хаяж 6 тэмдэгт байх ёстой"),
-});
-
-const signupSchema = z
-  .object({
-    email: z.string().email("Имэйл буруу байна"),
-    password: z.string().min(6, "Нууц үг дор хаяж 6 тэмдэгт байх ёстой"),
-    confirm: z.string(),
-    country: z.string().min(1, "Улс сонгоно уу"),
-    agree: z.literal(false, {
-      errorMap: () => ({
-        message: "Үйлчилгээний нөхцөл зөвшөөрсөн байх ёстой",
-      }),
-    }),
-  })
-  .refine((data) => data.password === data.confirm, {
-    message: "Нууц үг таарахгүй байна",
-    path: ["confirm"],
-  });
-
-async function apiLogin(data: { email: string; password: string }) {
-  await new Promise((r) => setTimeout(r, 800));
-  if (data.email !== "test@example.com" || data.password !== "password123") {
-    throw new Error("Имэйл эсвэл нууц үг буруу байна");
-  }
-  return { token: "mock-token" };
-}
-
-async function apiSignup(data: {
-  email: string;
-  password: string;
-  country: string;
-}) {
-  await new Promise((r) => setTimeout(r, 800));
-  if (data.email === "used@example.com") {
-    throw new Error("Энэ имэйл бүртгэлтэй байна");
-  }
-  return { token: "mock-token" };
-}
-
-export function AuthModal({
+export default function AuthModal({
   open,
   onOpenChange,
-  variant ="signup"
+  variant = "signup",
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  variant:"signin" | "signup"
+  variant: "signin" | "signup";
 }) {
   const [tab, setTab] = React.useState<"signin" | "signup">(variant);
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirm, setShowConfirm] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
   const [submitError, setSubmitError] = React.useState<string | null>(null);
+
+  const register = useRegister();
+  const login = useLogin();
 
   const {
     register: loginRegister,
     handleSubmit: handleLoginSubmit,
     formState: { errors: loginErrors },
     reset: resetLogin,
-  } = useForm<z.infer<typeof loginSchema>>({
+  } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
 
@@ -105,9 +66,9 @@ export function AuthModal({
     handleSubmit: handleSignupSubmit,
     formState: { errors: signupErrors },
     reset: resetSignup,
-  } = useForm<z.infer<typeof signupSchema>>({
+  } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
-    defaultValues: { country: "Монгол", agree: false },
+    defaultValues: { agree: false },
   });
 
   React.useEffect(() => {
@@ -116,37 +77,39 @@ export function AuthModal({
     resetSignup();
   }, [tab, open, resetLogin, resetSignup]);
 
-  async function onLogin(data: z.infer<typeof loginSchema>) {
-    setLoading(true);
-    setSubmitError(null);
+  async function onLogin(data: LoginFormData) {
     try {
-      await apiLogin(data);
+      setSubmitError(null);
+      await login.mutateAsync({
+        email: data.email,
+        password: data.password,
+      });
       onOpenChange(false);
-    } catch (e: any) {
-      setSubmitError(e.message || "Алдаа гарлаа");
-    } finally {
-      setLoading(false);
+    } catch (error: any) {
+      const message = error?.response?.data?.message || error?.message || "Нэвтрэхэд алдаа гарлаа";
+      setSubmitError(message);
     }
   }
 
-  async function onSignup(data: z.infer<typeof signupSchema>) {
-    setLoading(true);
-    setSubmitError(null);
+  async function onSignup(data: SignupFormData) {
     try {
-      await apiSignup(data);
+      setSubmitError(null);
+      await register.mutateAsync({
+        username: data.username,
+        email: data.email,
+        password: data.password,
+      });
       onOpenChange(false);
-    } catch (e: any) {
-      setSubmitError(e.message || "Алдаа гарлаа");
-    } finally {
-      setLoading(false);
+    } catch (error: any) {
+      console.log("error",error)
+      const message = error?.response?.data?.message || error?.message || "Бүртгэлд алдаа гарлаа";
+      setSubmitError(message);
     }
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className="max-w-lg w-full h-full sm:h-fit rounded-none border-none sm:rounded-xl p-6 bg-background text-foreground shadow-xl"
-      >
+      <DialogContent className="max-w-lg w-full h-full sm:h-fit rounded-none border-none sm:rounded-xl p-6 bg-background text-foreground shadow-xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold mb-2">
             {tab === "signin" ? "Нэвтрэх" : "Бүртгүүлэх"}
@@ -203,7 +166,7 @@ export function AuthModal({
                   />
                   <button
                     type="button"
-               className="absolute right-3 top-0 text-muted-foreground h-full flex items-center"
+                    className="absolute right-3 top-0 text-muted-foreground h-full flex items-center"
                     onClick={() => setShowPassword((s) => !s)}
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -216,16 +179,18 @@ export function AuthModal({
                 )}
               </div>
 
-              {submitError && (
-                <p className="text-sm text-red-500">{submitError}</p>
+              {(submitError || login.error) && (
+                <p className="text-sm text-red-500">
+                  {submitError || login.error?.message}
+                </p>
               )}
               <Button
                 type="submit"
                 className="w-full"
                 size="lg"
-                disabled={loading}
+                disabled={login.isPending}
               >
-                Нэвтрэх
+                {login.isPending ? "Нэвтэрч байна..." : "Нэвтрэх"}
               </Button>
             </form>
           </TabsContent>
@@ -255,6 +220,27 @@ export function AuthModal({
 
               <div>
                 <label
+                  htmlFor="signup-username"
+                  className="block mb-2 text-sm font-medium"
+                >
+                  Хэрэглэгчийн нэр
+                </label>
+                <Input
+                  id="signup-username"
+                  placeholder="Хэрэглэгчийн нэр"
+                  {...signupRegister("username")}
+                  className={cn({ "border-red-500": signupErrors.username })}
+                  autoComplete="username"
+                />
+                {signupErrors.username && (
+                  <p className="text-sm text-red-500">
+                    {signupErrors.username.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label
                   htmlFor="signup-password"
                   className="block mb-2 text-sm font-medium"
                 >
@@ -271,7 +257,7 @@ export function AuthModal({
                   />
                   <button
                     type="button"
-            className="absolute right-3 top-0 text-muted-foreground h-full flex items-center"
+                    className="absolute right-3 top-0 text-muted-foreground h-full flex items-center"
                     onClick={() => setShowPassword((s) => !s)}
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -344,16 +330,18 @@ export function AuthModal({
                 </p>
               )}
 
-              {submitError && (
-                <p className="text-sm text-red-500">{submitError}</p>
+              {(submitError || register.error) && (
+                <p className="text-sm text-red-500">
+                  {submitError || register.error?.message}
+                </p>
               )}
               <Button
                 type="submit"
                 size="lg"
                 className="w-full"
-                disabled={loading}
+                disabled={register.isPending}
               >
-                Бүртгүүлэх
+                {register.isPending ? "Бүртгэж байна..." : "Бүртгүүлэх"}
               </Button>
             </form>
           </TabsContent>
@@ -379,7 +367,6 @@ export function AuthModal({
               height={17}
             />
             <p>Facebook</p>
-
           </Button>
         </div>
       </DialogContent>

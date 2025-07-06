@@ -1,94 +1,279 @@
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import Link from "next/link"
+"use client";
+import {
+  useCurrentUserAddresses,
+  useCreateAddress,
+  useUpdateAddress,
+  useCurrentUser,
+  useSetDefaultAddress,
+  useDeleteAddress,
+} from "@/hooks/api";
+import { createAddressSchema, CreateAddressFormData } from "@/schemas";
+import { Address } from "@/types/address";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { useState, useRef, useEffect } from "react";
+import AddressList from "@/components/profile/shipments/AddressList";
+import AddressForm from "@/components/profile/shipments/AddressForm";
+import { HeaderWithIcon, ResponsiveDialog } from "@/components/common";
 
-export default function Shippment() {
+export default function Shipment() {
+  const { data: user } = useCurrentUser();
+  const {
+    data: addressesResponse,
+    isLoading,
+    error,
+  } = useCurrentUserAddresses({
+    page: 1,
+    limit: 50,
+  });
+  const createAddress = useCreateAddress();
+  const updateAddress = useUpdateAddress();
+  const setDefaultAddress = useSetDefaultAddress();
+  const deleteAddress = useDeleteAddress();
+
+  // Extract addresses array from the paginated response
+  const addresses = addressesResponse?.data || [];
+
+  // Form visibility and editing state
+  const [showForm, setShowForm] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const [deletingAddressId, setDeletingAddressId] = useState<number | null>(
+    null
+  );
+  const [settingDefaultId, setSettingDefaultId] = useState<number | null>(null);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [addressToDelete, setAddressToDelete] = useState<Address | null>(null);
+  const formRef = useRef<HTMLDivElement>(null);
+
+  // Track initial loading state
+  useEffect(() => {
+    if (!isLoading && (addressesResponse || error)) {
+      setIsInitialLoad(false);
+    }
+  }, [isLoading, addressesResponse, error]);
+
+  const form = useForm<CreateAddressFormData>({
+    resolver: zodResolver(createAddressSchema),
+    defaultValues: {
+      recipient_name: "",
+      full_address: "",
+      city: "",
+      district: "",
+      postal_code: "",
+      phone: "",
+      title: "Үндсэн хаяг",
+      is_default: false,
+      notes: "",
+    },
+  });
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors, isSubmitting, isSubmitSuccessful },
+  } = form;
+
+  // Function to show form for creating new address
+  const handleShowNewAddressForm = () => {
+    setEditingAddress(null);
+    reset();
+    setShowForm(true);
+    // Scroll to form after a short delay to allow for rendering
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 100);
+  };
+
+  // Function to show form for editing existing address
+  const handleEditAddress = (address: Address) => {
+    setEditingAddress(address);
+    // Populate form with existing address data
+    setValue("title", address.title || "");
+    setValue("recipient_name", address.recipient_name || "");
+    setValue("full_address", address.full_address || "");
+    setValue("city", address.city || "");
+    setValue("district", address.district || "");
+    setValue("postal_code", address.postal_code || "");
+    setValue("phone", address.phone || "");
+    setValue("notes", address.notes || "");
+    setValue("is_default", address.is_default || false);
+    setShowForm(true);
+    // Scroll to form after a short delay to allow for rendering
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 100);
+  };
+
+  // Function to handle address deletion
+  const handleDeleteAddress = async (address: Address) => {
+    if (address.is_default) {
+      toast.error(
+        "Үндсэн хаягийг устгах боломжгүй. Өөр хаягийг үндсэн болгосны дараа устгана уу."
+      );
+      return;
+    }
+
+    setAddressToDelete(address);
+    setShowDeleteDialog(true);
+  };
+
+  // Function to confirm address deletion
+  const handleConfirmDelete = async () => {
+    if (!addressToDelete) return;
+
+    setDeletingAddressId(addressToDelete.id);
+    try {
+      await deleteAddress.mutateAsync(addressToDelete.id);
+      toast.success("Хаяг амжилттай устгагдлаа");
+      setShowDeleteDialog(false);
+      setAddressToDelete(null);
+    } catch (error: any) {
+      toast.error(
+        error?.response?.data?.message || "Хаяг устгахад алдаа гарлаа"
+      );
+    } finally {
+      setDeletingAddressId(null);
+    }
+  };
+
+  // Function to cancel address deletion
+  const handleCancelDelete = () => {
+    setShowDeleteDialog(false);
+    setAddressToDelete(null);
+  };
+
+  // Function to handle setting default address
+  const handleSetDefaultAddress = async (address: Address) => {
+    if (address.is_default) {
+      toast.info("Энэ хаяг аль хэдийн үндсэн хаяг байна");
+      return;
+    }
+
+    setSettingDefaultId(address.id);
+    try {
+      await setDefaultAddress.mutateAsync(address.id);
+      toast.success(`"${address.title}" хаяг үндсэн хаяг болгогдлоо`);
+    } catch (error: any) {
+      toast.error(
+        error?.response?.data?.message ||
+          "Үндсэн хаяг тохируулахад алдаа гарлаа"
+      );
+    } finally {
+      setSettingDefaultId(null);
+    }
+  };
+
+  const onSubmit = async (data: CreateAddressFormData) => {
+    if (!user?.id) {
+      toast.error("Нэвтрэх шаардлагатай");
+      return;
+    }
+
+    try {
+      if (editingAddress) {
+        // Update existing address
+        await updateAddress.mutateAsync({
+          id: editingAddress.id,
+          data: {
+            ...data,
+            title: data.title || "Үндсэн хаяг",
+            is_default: data.is_default || false,
+          },
+        });
+        toast.success("Хаяг амжилттай шинэчлэгдлээ");
+      } else {
+        // Create new address
+        await createAddress.mutateAsync({
+          ...data,
+          title: data.title || "Үндсэн хаяг",
+          is_default: data.is_default || false,
+          user_id: user.id,
+        });
+        toast.success("Хаяг амжилттай нэмэгдлээ");
+      }
+      reset();
+      setShowForm(false);
+      setEditingAddress(null);
+    } catch (error: any) {
+      const message = editingAddress
+        ? "Хаяг шинэчлэхэд алдаа гарлаа"
+        : "Хаяг нэмэхэд алдаа гарлаа";
+      toast.error(error?.response?.data?.message || message);
+    }
+  };
+
+  const onCancel = () => {
+    reset();
+    setShowForm(false);
+    setEditingAddress(null);
+  };
   return (
     <div className="min-h-screen bg-background text-foreground py-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3">
-          <span className="text-3xl">📬</span>
-          <h1 className="text-2xl font-bold">Хүргэлтийн хаяг</h1>
-        </div>
-        <Link href="/profile/shipping/new" className="text-base underline font-medium flex items-center gap-2 hover:text-primary">
-          <span className="text-xl">＋</span>
-          Шинэ хаяг нэмэх
-        </Link>
-      </div>
+      <div>
+        <HeaderWithIcon
+          icon="📬"
+          title="Хүргэлтийн хаяг"
+          actionButton={{
+            label: "Шинэ хаяг нэмэх",
+            onClick: handleShowNewAddressForm,
+            variant: "secondary",
+            icon: "＋",
+          }}
+        />
 
-      {/* Form */}
-      <form className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-        {/* Name */}
-        <div>
-          <label className="block mb-2 font-semibold text-base" htmlFor="name">Нэр</label>
-          <Input
-            id="name"
-            placeholder="Хүлээн авагчийн нэр"
-            className="bg-secondary text-lg placeholder:text-muted-foreground border-0"
-          />
-        </div>
-        {/* Address */}
-        <div>
-          <label className="block mb-2 font-semibold text-base" htmlFor="address">Хаяг</label>
-          <Input
-            id="address"
-            placeholder="Гудамж, байрны дугаар"
-            className="bg-secondary text-lg placeholder:text-muted-foreground border-0"
-          />
-        </div>
-        {/* City */}
-        <div>
-          <label className="block mb-2 font-semibold text-base" htmlFor="city">Хот/Сум</label>
-          <Input
-            id="city"
-            placeholder="Хот эсвэл сум"
-            className="bg-secondary text-lg placeholder:text-muted-foreground border-0"
-          />
-        </div>
-        {/* State */}
-        <div>
-          <label className="block mb-2 font-semibold text-base" htmlFor="state">Аймаг/Дүүрэг</label>
-          <Input
-            id="state"
-            placeholder="Аймаг эсвэл дүүрэг"
-            className="bg-secondary text-lg placeholder:text-muted-foreground border-0"
-          />
-        </div>
-        {/* Country */}
-        <div>
-          <label className="block mb-2 font-semibold text-base" htmlFor="country">Улс</label>
-          <Input
-            id="country"
-            placeholder="Улс"
-            className="bg-secondary text-lg placeholder:text-muted-foreground border-0"
-          />
-        </div>
-        {/* Postcode */}
-        <div>
-          <label className="block mb-2 font-semibold text-base" htmlFor="postcode">Шуудангийн код</label>
-          <Input
-            id="postcode"
-            placeholder="Шуудангийн код эсвэл zip"
-            className="bg-secondary text-lg placeholder:text-muted-foreground border-0"
-          />
-        </div>
-        {/* Phone */}
-        <div>
-          <label className="block mb-2 font-semibold text-base" htmlFor="phone">Утас</label>
-          <Input
-            id="phone"
-            placeholder="Утасны дугаар"
-            className="bg-secondary text-lg placeholder:text-muted-foreground border-0"
-          />
-        </div>
-        {/* Buttons */}
-        <div className="flex gap-4 items-end md:col-span-1">
-          <Button type="submit" size="lg" className=" text-lg font-semibold bg-white text-black px-12">Нэмэх</Button>
-          <Button type="button" size="lg" variant="outline" className=" text-lg font-semibold border-white text-white px-12">Цуцлах</Button>
-        </div>
-      </form>
-      <hr className="border-muted mt-10"/>
+        <AddressList
+          addresses={addresses}
+          isLoading={isLoading}
+          error={error}
+          onShowNewForm={handleShowNewAddressForm}
+          onEditAddress={handleEditAddress}
+          onSetDefaultAddress={handleSetDefaultAddress}
+          onDeleteAddress={handleDeleteAddress}
+          settingDefaultId={settingDefaultId}
+          deletingAddressId={deletingAddressId}
+          isInitialLoading={isInitialLoad}
+        />
+
+        <AddressForm
+          isVisible={showForm}
+          editingAddress={editingAddress}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
+          formRef={formRef}
+          form={form}
+          isSubmitting={isSubmitting}
+          createPending={createAddress.isPending}
+          updatePending={updateAddress.isPending}
+          isSubmitSuccessful={isSubmitSuccessful}
+        />
+
+        <ResponsiveDialog
+          open={showDeleteDialog}
+          onOpenChange={setShowDeleteDialog}
+          title="Хаяг устгах"
+          description={
+            addressToDelete
+              ? `"${addressToDelete.title}" хаягийг устгахдаа итгэлтэй байна уу?`
+              : ""
+          }
+          confirmText="Устгах"
+          cancelText="Цуцлах"
+          confirmVariant="destructive"
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+          isLoading={deletingAddressId === addressToDelete?.id}
+        />
+      </div>
     </div>
-  )
+  );
 }

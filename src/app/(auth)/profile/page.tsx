@@ -1,11 +1,9 @@
-import React from 'react'
+import React from "react";
 
-type Props = {}
+type Props = {};
 
-function Items({}: Props) {
-  return (
-    <div>Items</div>
-  )
+function Profile({}: Props) {
+  return <div>Items</div>;
 }
 
-export default Items
+export default Profile;

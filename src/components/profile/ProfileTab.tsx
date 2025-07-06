@@ -7,14 +7,14 @@ import { usePathname } from "next/navigation"
 
 // Mongolian tab labels and corresponding route paths
 const tabs = [
-  { label: "Эд зүйлс", href: "/profile/items" },
-  { label: "Нээсэн хайрцаг", href: "/profile/boxes" },
+  { label: "Эд зүйл", href: "/profile/items" },
+  { label: "Хайрцаг", href: "/profile/boxes" },
   { label: "Хүргэлт", href: "/profile/shipments" },
-  { label: "Шагнал урамшуулал", href: "/profile/rewards" },
+  { label: "Шагнал", href: "/profile/rewards" },
   { label: "Тохиргоо", href: "/profile/settings" },
 ];
 
-export function ProfileTab() {
+export default function ProfileTab() {
   const pathname = usePathname()
   // find active tab by route
   const activeTab = tabs.find(tab => pathname == tab.href)?.href ?? tabs[0].href

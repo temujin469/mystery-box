@@ -70,7 +70,7 @@ export function BoxCard({ box }: Props) {
       {/* Glow circle */}
       <div className="relative">
         <div
-          className={clsx("duration-200 group-hover:w-[75%] group-hover:h-[75%] blur-2xl rounded-full w-[60%] h-[60%] z-10 absolute top-[12%] right-[50%] translate-x-[50%]",priceStyles.tag)}
+          className={clsx("duration-200 group-hover:w-[75%] group-hover:h-[75%] blur-2xl rounded-full w-[60%] h-[60%] z-0 absolute top-[12%] right-[50%] translate-x-[50%]",priceStyles.tag)}
         ></div>
      {/* Box image & title */}
         <CardHeader className="flex flex-col overflow-hidden px-4 md:px-6">
