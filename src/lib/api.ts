@@ -5,7 +5,7 @@ import { safeLocalStorage } from "./localStorage";
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://51.20.252.58:3002",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
