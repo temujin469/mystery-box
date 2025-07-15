@@ -7,6 +7,7 @@ import {
   UpdateUserData,
 } from "../../types/auth";
 import { ApiResponse } from "../../types/api";
+import { safeLocalStorage } from "@/lib/localStorage";
 
 /**
  * Authentication API Service
@@ -27,11 +28,12 @@ export class AuthService {
     );
 
     // Store tokens in localStorage
-    if (typeof window !== "undefined") {
-      localStorage.setItem("access_token", response.data.access_token);
-      localStorage.setItem("refresh_token", response.data.refresh_token);
-      // localStorage.setItem('user', JSON.stringify(response.data.user));
-    }
+    safeLocalStorage.setItem("access_token", response.data.access_token);
+    safeLocalStorage.setItem("refresh_token", response.data.refresh_token);
+    // localStorage.setItem('user', JSON.stringify(response.data.user));
+
+    // Dispatch custom event to notify token change
+    window.dispatchEvent(new Event("auth-token-changed"));
 
     return response.data;
   }
@@ -48,11 +50,12 @@ export class AuthService {
     );
 
     // Store tokens in localStorage after successful registration
-    if (typeof window !== "undefined") {
-      localStorage.setItem("access_token", response.data.access_token);
-      localStorage.setItem("refresh_token", response.data.refresh_token);
-      // localStorage.setItem('user', JSON.stringify(response.data.user));
-    }
+    safeLocalStorage.setItem("access_token", response.data.access_token);
+    safeLocalStorage.setItem("refresh_token", response.data.refresh_token);
+    // localStorage.setItem('user', JSON.stringify(response.data.user));
+
+    // Dispatch custom event to notify token change
+    window.dispatchEvent(new Event("auth-token-changed"));
 
     return response.data;
   }
@@ -71,11 +74,12 @@ export class AuthService {
       console.warn("Logout server call failed:", error);
     } finally {
       // Always clear local storage
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-        // localStorage.removeItem("user");
-      }
+      safeLocalStorage.removeItem("access_token");
+      safeLocalStorage.removeItem("refresh_token");
+      // localStorage.removeItem("user");
+      
+      // Dispatch custom event to notify token change
+      window.dispatchEvent(new Event("auth-token-changed"));
     }
   }
 
@@ -84,10 +88,7 @@ export class AuthService {
    * @returns Promise<AuthResponse>
    */
   async refreshToken(): Promise<AuthResponse> {
-    const refreshToken =
-      typeof window !== "undefined"
-        ? localStorage.getItem("refresh_token")
-        : null;
+    const refreshToken = safeLocalStorage.getItem("refresh_token");
 
     if (!refreshToken) {
       throw new Error("No refresh token available");
@@ -98,11 +99,12 @@ export class AuthService {
     });
 
     // Update stored tokens
-    if (typeof window !== "undefined") {
-      localStorage.setItem("access_token", response.data.access_token);
-      localStorage.setItem("refresh_token", response.data.refresh_token);
-      // localStorage.setItem('user', JSON.stringify(response.data.user));
-    }
+    safeLocalStorage.setItem("access_token", response.data.access_token);
+    safeLocalStorage.setItem("refresh_token", response.data.refresh_token);
+    // localStorage.setItem('user', JSON.stringify(response.data.user));
+
+    // Dispatch custom event to notify token change
+    window.dispatchEvent(new Event("auth-token-changed"));
 
     return response.data;
   }
@@ -200,8 +202,7 @@ export class AuthService {
    * @returns string | null
    */
   getAccessToken(): string | null {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem("access_token");
+    return safeLocalStorage.getItem("access_token");
   }
 
   /**
@@ -209,19 +210,16 @@ export class AuthService {
    * @returns string | null
    */
   getRefreshToken(): string | null {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem("refresh_token");
+    return safeLocalStorage.getItem("refresh_token");
   }
 
   /**
    * Clear all stored authentication data
    */
   clearAuthData(): void {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      // localStorage.removeItem("user");
-    }
+    safeLocalStorage.removeItem("access_token");
+    safeLocalStorage.removeItem("refresh_token");
+    // localStorage.removeItem("user");
   }
 
   /**
@@ -236,6 +234,14 @@ export class AuthService {
       this.clearAuthData();
       return false;
     }
+  }
+
+  /**
+   * Check if user has a valid access token
+   * @returns boolean
+   */
+  hasToken(): boolean {
+    return !!this.getAccessToken();
   }
 }
 

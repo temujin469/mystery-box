@@ -8,7 +8,7 @@ import {
 import {
   AddressQuery,
   AddressOrderByField,
-} from "../../services/api/address.service.new";
+} from "../../services/api/address.service";
 import { PaginatedResponse } from "../../types/api";
 import { useCurrentUser } from "./useAuth";
 

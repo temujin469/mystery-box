@@ -42,7 +42,7 @@ export default function AuthModal({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  variant: "signin" | "signup";
+  variant?: "signin" | "signup";
 }) {
   const [tab, setTab] = React.useState<"signin" | "signup">(variant);
   const [showPassword, setShowPassword] = React.useState(false);
@@ -51,6 +51,11 @@ export default function AuthModal({
 
   const register = useRegister();
   const login = useLogin();
+
+  // Update tab when variant changes
+  React.useEffect(() => {
+    setTab(variant);
+  }, [variant]);
 
   const {
     register: loginRegister,

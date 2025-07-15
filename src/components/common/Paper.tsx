@@ -31,7 +31,7 @@ interface PaperProps {
  */
 const Paper = React.forwardRef<HTMLDivElement, PaperProps>(
   ({ children, className, variant = "default", animated = false, ...props }, ref) => {
-    const baseClasses = "bg-card rounded-xl border shadow-sm";
+    const baseClasses = "bg-gradient-to-br from-card/95 via-card/90 to-card/95 backdrop-blur-xl rounded-xl shadow-2xl";
     
     const variantClasses = {
       default: "p-4 sm:p-8",

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { categoryService } from '../../services/api';
 import { Category, CreateCategoryData, UpdateCategoryData } from '../../types/category';
-import { CategoryQuery, CategoryOrderByField } from '../../services/api/category.service.new';
+import { CategoryQuery, CategoryOrderByField } from '../../services/api/category.service';
 import { PaginatedResponse } from '../../types/api';
 
 // Query Keys

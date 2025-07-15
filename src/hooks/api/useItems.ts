@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { itemService } from "../../services/api";
 import { CreateItemData, UpdateItemData } from "../../types/item";
-import { ItemQuery } from "../../services/api/item.service.new";
+import { ItemQuery } from "../../services/api/item.service";
 import { useCurrentUser } from "./useAuth";
 
 // Query Keys

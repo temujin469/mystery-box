@@ -3,64 +3,63 @@ import { Button } from "@/components/ui/button";
 import { Info } from "lucide-react";
 import { useCurrentUser } from "@/hooks/api";
 import { Paper } from "@/components/common";
+import { useModalStore } from "@/stores/modal.store";
 
 export default function UserProfileCard() {
   const { data: user, isLoading, error } = useCurrentUser();
-
-  if (isLoading) {
+  const openTopup = useModalStore((state) => state.openTopup);  if (isLoading) {
     return (
-      <Paper className="text-muted-foreground flex-1 md:w-xs shadow-xl space-y-6">
+      <Paper className="text-muted-foreground flex-1 md:w-sm shadow-2xl space-y-6 bg-card backdrop-blur-xl border border-primary/20 relative overflow-hidden">
+        {/* Enhanced Background decorative elements */}
+        <div className="absolute inset-0 bg-primary/5 opacity-60 rounded-lg"></div>
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-accent to-primary"></div>
+        
         {/* Profile Header Skeleton */}
-        <div className="flex items-center gap-4 w-full">
+        <div className="flex items-center gap-4 w-full relative z-10">
           <div className="relative">
-            {/* Avatar Skeleton */}
-            <div className="w-16 h-16 rounded-full bg-muted animate-pulse border-4 border-muted/50" />
+            {/* Avatar Skeleton with solid color */}
+            <div className="w-16 h-16 rounded-full bg-muted animate-pulse border-2 border-primary/20 shadow-xl ring-2 ring-primary/20" />
             {/* Badge Skeleton */}
-            <div className="absolute bottom-0 right-0 w-7 h-7 bg-muted animate-pulse rounded-full border-2 border-background" />
+            <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-muted animate-pulse rounded-full border-2 border-card ring-1 ring-primary/30" />
           </div>
           <div className="flex-1">
             {/* Name Skeleton */}
-            <div className="w-32 h-5 bg-muted animate-pulse rounded mb-1" />
+            <div className="w-32 h-5 bg-muted animate-pulse rounded mb-2" />
             {/* ID Skeleton */}
             <div className="w-20 h-3 bg-muted animate-pulse rounded" />
           </div>
         </div>
 
-        {/* Progress Bar Skeleton */}
-        <div className="space-y-2">
-          {/* Progress bar */}
-          <div className="w-full h-2 bg-muted animate-pulse rounded-full" />
-          {/* Level info */}
+        {/* Enhanced Progress Bar Skeleton */}
+        <div className="space-y-2 relative z-10">
+          <div className="w-full h-3 bg-muted/60 animate-pulse rounded-full border border-primary/20" />
           <div className="flex justify-between">
             <div className="w-16 h-3 bg-muted animate-pulse rounded" />
-            <div className="w-24 h-3 bg-muted animate-pulse rounded" />
+            <div className="w-32 h-3 bg-muted animate-pulse rounded" />
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="w-full h-px bg-muted animate-pulse rounded" />
-
-        {/* Credits Section Skeleton */}
-        <div className="space-y-2">
-          {/* Gaming Credit Row */}
-          <div className="flex justify-between items-center">
-            <div className="w-28 h-4 bg-muted animate-pulse rounded" />
-            <div className="w-16 h-4 bg-muted animate-pulse rounded" />
+        {/* Enhanced Gaming divider skeleton */}
+        <div className="relative z-10">
+          <div className="h-px bg-muted animate-pulse rounded" />
+          <div className="flex justify-center -mt-1">
+            <div className="w-2 h-2 bg-muted animate-pulse rounded-full" />
           </div>
-          {/* Withdrawable Row */}
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-1">
-              <div className="w-24 h-4 bg-muted animate-pulse rounded" />
-              <div className="w-4 h-4 bg-muted animate-pulse rounded" />
+        </div>
+
+        {/* Enhanced Credits Section Skeleton */}
+        <div className="space-y-3 relative z-10">
+          <div className="p-4 rounded-xl bg-muted/50 border border-border animate-pulse backdrop-blur-sm">
+            <div className="flex justify-between items-center">
+              <div className="w-28 h-4 bg-muted animate-pulse rounded" />
+              <div className="w-20 h-5 bg-muted animate-pulse rounded" />
             </div>
-            <div className="w-16 h-4 bg-muted animate-pulse rounded" />
           </div>
         </div>
 
-        {/* Action Buttons Skeleton */}
-        <div className="space-y-2">
-          {/* Top-up Button */}
-          <div className="w-full h-14 bg-muted animate-pulse rounded-lg" />
+        {/* Enhanced Action Button Skeleton */}
+        <div className="space-y-2 relative z-10">
+          <div className="w-full h-14 bg-muted animate-pulse rounded-xl border border-border ring-1 ring-primary/20" />
         </div>
       </Paper>
     );
@@ -107,74 +106,114 @@ export default function UserProfileCard() {
   };
 
   return (
-    <Paper className="text-muted-foreground flex-1 md:w-xs shadow-xl space-y-6">
+    <Paper className="text-muted-foreground flex-1 md:w-sm shadow-2xl space-y-6 bg-card backdrop-blur-xl border border-primary/20 relative overflow-hidden">
+      {/* Enhanced Background decorative elements */}
+      <div className="absolute inset-0 bg-primary/5 opacity-60 rounded-lg"></div>
+      <div className="absolute inset-0 bg-accent/3 opacity-50 rounded-lg"></div>
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-accent to-primary shadow-lg"></div>
+
       {/* Profile Header */}
-      <div className="flex items-center gap-4 w-full">
-        <div className="relative">
-          {/* Avatar */}
-          <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-primary to-cyan-400 border-4 border-cyan-400 flex items-center justify-center text-4xl font-semibold text-white">
+      <div className="flex items-center gap-4 w-full relative z-10">        <div className="relative group">
+          {/* Enhanced Avatar with theme colors */}
+          <div className="relative w-16 h-16 rounded-full bg-primary border-2 border-primary/40 flex items-center justify-center text-xl font-bold text-primary-foreground shadow-2xl ring-2 ring-primary/30">
             {getInitials(user.username, user.firstname, user.lastname)}
+
+            {/* Enhanced inner glow */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-b from-card/30 via-card/10 to-transparent"></div>
+            
+            {/* Outer glow ring */}
+            <div className="absolute -inset-1 rounded-full bg-primary/20 blur-sm"></div>
           </div>
-          {/* Badge */}
-          <div className="absolute bottom-0 right-0 w-7 h-7 bg-cyan-400 rounded-full border-2 border-background flex items-center justify-center text-white font-bold text-sm">
+
+          {/* Enhanced Level badge */}
+          <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-gradient-to-r from-accent to-primary rounded-full border-2 border-card/40 flex items-center justify-center text-accent-foreground font-bold text-xs shadow-xl ring-1 ring-accent/50">
             {currentLevel}
           </div>
         </div>
-        <div>
-          <div className="font-semibold text-lg text-white leading-tight">
+
+        <div className="flex-1">
+          <div className="font-bold text-lg leading-tight bg-gradient-to-r from-foreground via-primary to-accent bg-clip-text text-transparent drop-shadow-sm">
             {user.firstname && user.lastname
               ? `${user.firstname} ${user.lastname}`
               : user.username}
           </div>
-          <div className="text-xs text-muted-foreground font-medium">
+          <div className="text-xs text-primary font-medium tracking-wider flex items-center gap-1">
+            <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
             ID: {user.id.slice(-6).toUpperCase()}
           </div>
         </div>
       </div>
 
-      {/* Progress Bar */}
-      <div>
-        <div className="w-full h-2 bg-muted-foreground/20 rounded-full mb-2">
+      {/* Enhanced Progress Bar */}
+      <div className="relative z-10">
+        <div className="w-full h-3 bg-muted/60 rounded-full mb-2 border border-primary/20 overflow-hidden backdrop-blur-sm">
           <div
-            className="h-2 bg-cyan-400 rounded-full transition-all duration-300"
+            className="h-full bg-gradient-to-r from-primary via-accent to-primary rounded-full transition-all duration-500 shadow-[0_0_15px_hsl(var(--primary)/0.6)] relative"
             style={{ width: `${Math.min(xpProgress, 100)}%` }}
-          ></div>
+          >
+            <div className="h-full bg-gradient-to-b from-card/40 via-card/20 to-transparent rounded-full"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-card/20 to-transparent animate-pulse"></div>
+          </div>
         </div>
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Түвшин {currentLevel}</span>
-          <span>
+        <div className="flex justify-between text-xs font-medium">
+          <span className="text-primary flex items-center gap-1">
+            <span className="w-1 h-1 bg-primary rounded-full"></span>
+            Түвшин {currentLevel}
+          </span>
+          <span className="text-muted-foreground">
             {xpToNextLevel > 0
-              ? `${xpToNextLevel} XP ${currentLevel + 1} түвшин хүрэх`
+              ? `${xpToNextLevel} XP → Түвшин ${currentLevel + 1}`
               : "Хамгийн дээд түвшин"}
           </span>
         </div>
       </div>
 
-      <hr className="border-muted-foreground/20" />
-
-      {/* Credits */}
-      <div className="space-y-2">
-        <div className="flex justify-between items-center">
-          <span className="text-base">Тоглоомын кредит</span>
-          <span className="font-bold text-base text-white">
-            {user.coins?.toLocaleString() || 0} ₮
-          </span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-base flex items-center gap-1">
-            Татах боломжтой
-            <Info className="w-4 h-4 opacity-50" />
-          </span>
-          <span className="font-bold text-base text-white">
-            {Math.floor((user.coins || 0) * 0.8).toLocaleString()} ₮
-          </span>
+      {/* Enhanced Gaming-style divider */}
+      <div className="relative z-10">
+        <div className="h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
+        <div className="flex justify-center -mt-1">
+          <div className="w-2 h-2 bg-gradient-to-r from-primary to-accent rounded-full shadow-lg"></div>
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="space-y-2">
-        <Button className="w-full text-base font-medium rounded-lg py-6">
-          Цэнэглэх
+      {/* Enhanced Gaming Credits Section with theme colors */}
+      <div className="space-y-3 relative z-10">
+        <div className="relative overflow-hidden p-4 rounded-xl bg-accent/20 border border-accent/30 backdrop-blur-sm shadow-lg">
+          {/* Card background pattern */}
+          <div className="absolute inset-0 bg-accent/10 rounded-xl"></div>
+          
+          <div className="flex justify-between items-center relative z-10">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 bg-gradient-to-r from-accent to-primary rounded-full shadow-lg"></div>
+              <span className="text-base font-semibold text-accent tracking-wide flex items-center gap-2">
+                Тоглоомын кредит
+                <Info className="w-4 h-4 opacity-70 hover:opacity-100 transition-all duration-200 hover:text-primary" />
+              </span>
+            </div>
+            <span className="font-bold text-xl text-accent drop-shadow-lg">
+              {user.coins?.toLocaleString() || 0} ₮
+            </span>
+          </div>
+          
+          {/* Subtle shine effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-card/5 to-transparent -skew-x-12 translate-x-full animate-pulse"></div>
+        </div>
+      </div>      {/* Enhanced Action Button with theme colors */}
+      <div className="space-y-2 relative z-10">
+        <Button
+          className="w-full text-base font-bold rounded-xl py-6 bg-primary hover:bg-primary/90 border border-primary/40 shadow-2xl hover:shadow-primary/30 transition-all duration-300 group relative overflow-hidden ring-1 ring-primary/20 hover:ring-primary/40 text-primary-foreground"
+          onClick={() => openTopup()}
+        >
+          {/* Enhanced button glow effect */}
+          <div className="absolute inset-0 bg-primary/30 opacity-0 group-hover:opacity-100 transition-all duration-300 blur-sm"></div>
+          
+          {/* Animated shine effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-card/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+
+          {/* Button content */}
+          <span className="relative z-10 flex items-center justify-center gap-2 text-primary-foreground drop-shadow-lg">
+            💎 Цэнэглэх
+          </span>
         </Button>
       </div>
 

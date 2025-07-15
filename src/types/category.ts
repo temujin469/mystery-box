@@ -1,4 +1,4 @@
-import { BaseQuery } from './api';
+import { BaseQuery } from "./api";
 
 export interface Category {
   id: number;
@@ -38,12 +38,12 @@ export interface CategoryQuery extends BaseQuery {
 }
 
 export enum CategoryOrderByField {
-  ID = 'id',
-  NAME = 'name',
-  IS_ACTIVE = 'is_active',
-  IS_FEATURED = 'is_featured',
-  CREATED_AT = 'created_at',
-  UPDATED_AT = 'updated_at',
+  ID = "id",
+  NAME = "name",
+  IS_ACTIVE = "is_active",
+  IS_FEATURED = "is_featured",
+  CREATED_AT = "created_at",
+  UPDATED_AT = "updated_at",
 }
 
 // Category-Box relationship
@@ -60,7 +60,7 @@ export interface CategoryBox {
 // Category management actions
 export interface CategoryBulkAction {
   category_ids: number[];
-  action: 'activate' | 'deactivate' | 'feature' | 'unfeature' | 'delete';
+  action: "activate" | "deactivate" | "feature" | "unfeature" | "delete";
   data?: any;
 }
 

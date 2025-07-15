@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import clsx from "clsx";
+import { Box } from "@/types";
 
 const getPriceClasses = (price: number) => {
   if (price < 20000)
@@ -52,7 +53,7 @@ export function BoxCard({ box }: Props) {
       {/* Price Label */}
       <div
         className={clsx(
-          "absolute top-2 right-[-28] text-[11px] z-10 flex items-center justify-center w-28 h-8 rotate-45 border-1",
+          "absolute top-2 right-[-28] text-[11px] z-20 flex items-center justify-center w-28 h-8 rotate-45 border-1",
           priceStyles.border,
           priceStyles.text
         )}
@@ -73,7 +74,7 @@ export function BoxCard({ box }: Props) {
           className={clsx("duration-200 group-hover:w-[75%] group-hover:h-[75%] blur-2xl rounded-full w-[60%] h-[60%] z-0 absolute top-[12%] right-[50%] translate-x-[50%]",priceStyles.tag)}
         ></div>
      {/* Box image & title */}
-        <CardHeader className="flex flex-col overflow-hidden px-4 md:px-6">
+        <CardHeader className="flex flex-col overflow-hidden px-4 md:px-6 z-10">
           <div className="mb-2 aspect-square w-full h-full relative overflow-hidden">
             <Image
               src={box.image_url}

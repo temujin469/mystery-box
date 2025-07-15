@@ -1,4 +1,4 @@
-import { BaseQuery, OrderDirection } from './api';
+import { BaseQuery, OrderDirection } from "./api";
 
 export interface Item {
   id: number;
@@ -45,24 +45,59 @@ export interface ItemQuery extends BaseQuery {
 }
 
 export enum ItemOrderByField {
-  ID = 'id',
-  NAME = 'name',
-  PRICE = 'price',
-  SELL_VALUE = 'sell_value',
-  CREATED_AT = 'created_at',
-  UPDATED_AT = 'updated_at',
+  ID = "id",
+  NAME = "name",
+  PRICE = "price",
+  SELL_VALUE = "sell_value",
+  CREATED_AT = "created_at",
+  UPDATED_AT = "updated_at",
 }
 
-// User-Item relationship
+// User-Item relationship (updated to match backend implementation with quantity support)
 export interface UserItem {
-  id: number;
+  id: number; // Added primary key
   user_id: string;
   item_id: number;
-  quantity: number;
-  acquired_at: string;
+  quantity: number; // Added quantity support
+  redeemed_at: string;
+  updated_at: string; // Added updated timestamp
   // Relations
   user?: any; // User type from auth.ts
   item?: Item;
+}
+
+// Inventory related types
+export interface UserInventory {
+  items: Array<{
+    item: Item;
+    quantity: number; // Added quantity
+    redeemed_at: string;
+    updated_at: string; // Added updated timestamp
+  }>;
+  total: number; // Now represents total quantity, not item count
+}
+
+export interface AddItemToInventoryResponse {
+  message: string;
+  userItem: UserItem;
+}
+
+export interface AddItemsToInventoryResponse {
+  message: string;
+  addedItems: UserItem[];
+}
+
+export interface AddItemToInventoryData {
+  item_id: number;
+  quantity?: number; // Added optional quantity support
+}
+
+export interface AddItemsToInventoryData {
+  item_ids: number[];
+}
+
+export interface RemoveItemFromInventoryData {
+  quantity?: number; // Added optional quantity support
 }
 
 // Item transfer/trade related types
@@ -74,7 +109,7 @@ export interface ItemTransferData {
 
 export interface ItemBulkAction {
   item_ids: number[];
-  action: 'delete' | 'update' | 'transfer';
+  action: "delete" | "update" | "transfer";
   data?: any;
 }
 

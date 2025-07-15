@@ -1,5 +1,7 @@
-import { BaseQuery, OrderDirection } from './api';
-import { User } from './auth';
+import { BaseQuery, OrderDirection } from "./api";
+import { User } from "./auth";
+import { Category } from "./category";
+import { Item } from "./item";
 
 export interface Box {
   id: number;
@@ -7,17 +9,34 @@ export interface Box {
   coin: number;
   price: number;
   commission_rate: number;
-  description?: string;
   image_url: string;
   is_featured: boolean;
-  available_from?: string;
-  available_to?: string;
+  available_from?: string | null;
+  available_to?: string | null;
   created_at: string;
   updated_at: string;
   // Relations (when included)
-  items?: any[]; // BoxItem[]
+  items?: BoxItem[]; 
   categories?: any[]; // CategoryBox[]
   boxCount?: number;
+}
+
+export type BoxItem = {
+  box_id: number;
+  item_id: number;
+  drop_rate: number;
+  created_at: string;
+  updated_at: string;
+  // Relations
+  item?: Item;
+};
+
+export interface CategoryBox {
+  category_id: number;
+  box_id: number;
+  // Relations
+  category?: Category;
+  box?: Box;
 }
 
 export interface CreateBoxData {
@@ -25,7 +44,6 @@ export interface CreateBoxData {
   coin: number;
   price: number;
   commission_rate: number;
-  description?: string;
   is_featured: boolean;
   image_url: string;
   available_from?: string;
@@ -37,7 +55,6 @@ export interface UpdateBoxData {
   coin?: number;
   price?: number;
   commission_rate?: number;
-  description?: string;
   is_featured?: boolean;
   image_url?: string;
   available_from?: string;
@@ -47,6 +64,7 @@ export interface UpdateBoxData {
 export interface BoxQuery extends BaseQuery {
   orderBy?: BoxOrderByField;
   name?: string;
+  categoryId?: number;
   minCoin?: number;
   maxCoin?: number;
   minPrice?: number;
@@ -56,16 +74,16 @@ export interface BoxQuery extends BaseQuery {
 }
 
 export enum BoxOrderByField {
-  ID = 'id',
-  NAME = 'name',
-  COIN = 'coin',
-  PRICE = 'price',
-  COMMISSION_RATE = 'commission_rate',
-  IS_FEATURED = 'is_featured',
-  AVAILABLE_FROM = 'available_from',
-  AVAILABLE_TO = 'available_to',
-  CREATED_AT = 'created_at',
-  UPDATED_AT = 'updated_at',
+  ID = "id",
+  NAME = "name",
+  COIN = "coin",
+  PRICE = "price",
+  COMMISSION_RATE = "commission_rate",
+  IS_FEATURED = "is_featured",
+  AVAILABLE_FROM = "available_from",
+  AVAILABLE_TO = "available_to",
+  CREATED_AT = "created_at",
+  UPDATED_AT = "updated_at",
 }
 
 export interface BoxOpenResult {

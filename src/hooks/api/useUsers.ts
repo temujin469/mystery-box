@@ -1,21 +1,35 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { userService } from '../../services/api';
-import { User, RegisterData, UpdateUserData, UpdateCoinsData, UpdateExperienceData, UserStats } from '../../types/auth';
-import { UserQuery, UserOrderByField } from '../../services/api/user.service.new';
-import { PaginatedResponse } from '../../types/api';
-import { authKeys } from './useAuth';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { userService } from "../../services/api";
+import {
+  User,
+  RegisterData,
+  UpdateUserData,
+  UpdateCoinsData,
+  UpdateExperienceData,
+  UserStats,
+} from "../../types/auth";
+import { UserQuery, UserOrderByField } from "../../services/api/user.service";
+import { PaginatedResponse } from "../../types/api";
+import { authKeys, useCurrentUser } from "./useAuth";
 
 // Query Keys
 export const userKeys = {
-  all: ['users'] as const,
-  lists: () => [...userKeys.all, 'list'] as const,
+  all: ["users"] as const,
+  lists: () => [...userKeys.all, "list"] as const,
   list: (query?: UserQuery) => [...userKeys.lists(), query] as const,
-  details: () => [...userKeys.all, 'detail'] as const,
+  details: () => [...userKeys.all, "detail"] as const,
   detail: (id: string) => [...userKeys.details(), id] as const,
-  stats: (id: string) => [...userKeys.detail(id), 'stats'] as const,
-  search: () => [...userKeys.all, 'search'] as const,
-  searchByEmail: (email: string) => [...userKeys.search(), 'email', email] as const,
-  searchByUsername: (username: string) => [...userKeys.search(), 'username', username] as const,
+  stats: (id: string) => [...userKeys.detail(id), "stats"] as const,
+  search: () => [...userKeys.all, "search"] as const,
+  searchByEmail: (email: string) =>
+    [...userKeys.search(), "email", email] as const,
+  searchByUsername: (username: string) =>
+    [...userKeys.search(), "username", username] as const,
+  // Inventory keys
+  inventory: (id: string) => [...userKeys.detail(id), "inventory"] as const,
+  inventoryCount: (id: string) => [...userKeys.inventory(id), "count"] as const,
+  hasItem: (userId: string, itemId: number) =>
+    [...userKeys.inventory(userId), "has", itemId] as const,
 };
 
 // Query Hooks
@@ -55,7 +69,10 @@ export const useFindUserByEmail = (email: string, enabled: boolean = false) => {
   });
 };
 
-export const useFindUserByUsername = (username: string, enabled: boolean = false) => {
+export const useFindUserByUsername = (
+  username: string,
+  enabled: boolean = false
+) => {
   return useQuery({
     queryKey: userKeys.searchByUsername(username),
     queryFn: () => userService.findByUsername(username),
@@ -86,7 +103,7 @@ export const useUpdateUser = () => {
     onSuccess: (updatedUser) => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
       queryClient.setQueryData(userKeys.detail(updatedUser.id), updatedUser);
-      
+
       // Also update the current user's profile cache if this is the current user
       // This ensures useCurrentUser reflects the updated data immediately
       queryClient.invalidateQueries({ queryKey: authKeys.profile() });
@@ -94,36 +111,63 @@ export const useUpdateUser = () => {
   });
 };
 
-export const useUpdateUserCoins = () => {
+const updateCurrentUser = () => {
+  const { data: user } = useCurrentUser();
+  const updateUser = useUpdateUser();
+};
+
+export const useUpdateCurrentUserCoins = () => {
   const queryClient = useQueryClient();
+  const { data: user } = useCurrentUser();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateCoinsData }) =>
-      userService.updateUserCoins(id, data),
+    mutationFn: ({ data }: { data: UpdateCoinsData }) => {
+      if (!user) {
+        throw new Error("Current user not found!");
+      }
+      return userService.updateUserCoins(user.id, data);
+    },
     onSuccess: (updatedUser) => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
       queryClient.setQueryData(userKeys.detail(updatedUser.id), updatedUser);
-      queryClient.invalidateQueries({ queryKey: userKeys.stats(updatedUser.id) });
-      
+      queryClient.invalidateQueries({
+        queryKey: userKeys.stats(updatedUser.id),
+      });
+
       // Also update the current user's profile cache if this is the current user
       queryClient.invalidateQueries({ queryKey: authKeys.profile() });
+    },
+    onError: (error) => {
+      console.error("Failed to update user coins", error);
+      // Optionally show a toast or notification
     },
   });
 };
 
-export const useUpdateUserExperience = () => {
+export const useUpdateCurrentUserExperience = () => {
   const queryClient = useQueryClient();
+  const { data: user } = useCurrentUser();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateExperienceData }) =>
-      userService.updateUserExperience(id, data),
+    mutationFn: ({ data }: { data: UpdateExperienceData }) => {
+      if (!user) {
+        throw new Error("Current user not found!");
+      }
+      return userService.updateUserExperience(user.id, data);
+    },
     onSuccess: (updatedUser) => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
       queryClient.setQueryData(userKeys.detail(updatedUser.id), updatedUser);
-      queryClient.invalidateQueries({ queryKey: userKeys.stats(updatedUser.id) });
-      
+      queryClient.invalidateQueries({
+        queryKey: userKeys.stats(updatedUser.id),
+      });
+
       // Also update the current user's profile cache if this is the current user
       queryClient.invalidateQueries({ queryKey: authKeys.profile() });
+    },
+    onError: (error) => {
+      console.error("Failed to update user experience", error);
+      // Optionally show a toast or notification
     },
   });
 };
@@ -161,6 +205,10 @@ export const useDeleteUser = () => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
       queryClient.removeQueries({ queryKey: userKeys.detail(deletedId) });
       queryClient.removeQueries({ queryKey: userKeys.stats(deletedId) });
+      queryClient.removeQueries({ queryKey: userKeys.inventory(deletedId) });
+      queryClient.removeQueries({
+        queryKey: userKeys.inventoryCount(deletedId),
+      });
     },
   });
 };

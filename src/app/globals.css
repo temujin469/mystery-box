@@ -43,6 +43,7 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* OLD THEME - COMMENTED OUT
 :root {
   --radius: 0.625rem;
   --background: #1D2020;
@@ -78,7 +79,46 @@
   --sidebar-border: #312E81;
   --sidebar-ring: #7C3AED;
 }
+*/
 
+/* NEW MODERN THEME - VIBRANT & GLASSMORPHIC */
+:root {
+  --radius: 0.75rem;
+  --background: #0f0f23;
+  --secondary-background: #1a1a2e;
+  --foreground: #ffffff;
+  --card: #16213e;
+  --card-foreground: #f8fafc;
+  --popover: #1e293b;
+  --popover-foreground: #f8fafc;
+  --primary: #06b6d4;
+  --primary-foreground: #ffffff;
+  --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
+  --accent: #7fc8ff;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --border: #334155;
+  --input: #1e293b;
+  --ring: #06b6d4;
+  --chart-1: #10b981;
+  --chart-2: #3b82f6;
+  --chart-3: #8b5cf6;
+  --chart-4: #f59e0b;
+  --chart-5: #ec4899;
+  --sidebar: #0f172a;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #8b5cf6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ec4899;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #1e293b;
+  --sidebar-ring: #8b5cf6;
+}
+
+/* OLD DARK THEME - COMMENTED OUT
 .dark {
   --background: #120f26;
   --foreground: #fafcff;
@@ -111,6 +151,42 @@
   --sidebar-accent-foreground: #191733;
   --sidebar-border: #23204a;
   --sidebar-ring: #a78bfa;
+}
+*/
+
+/* NEW DARK THEME - ENHANCED MODERN */
+.dark {
+  --background: #030712;
+  --foreground: #f9fafb;
+  --card: #111827;
+  --card-foreground: #f9fafb;
+  --popover: #1f2937;
+  --popover-foreground: #f9fafb;
+  --primary: #22d3ee;
+  --primary-foreground: #0f172a;
+  --secondary: #374151;
+  --secondary-foreground: #f9fafb;
+  --muted: #4b5563;
+  --muted-foreground: #9ca3af;
+  --accent: #a855f7;
+  --accent-foreground: #f9fafb;
+  --destructive: #f87171;
+  --border: #374151;
+  --input: #1f2937;
+  --ring: #22d3ee;
+  --chart-1: #10b981;
+  --chart-2: #3b82f6;
+  --chart-3: #a855f7;
+  --chart-4: #f59e0b;
+  --chart-5: #ec4899;
+  --sidebar: #0f172a;
+  --sidebar-foreground: #f9fafb;
+  --sidebar-primary: #a855f7;
+  --sidebar-primary-foreground: #f9fafb;
+  --sidebar-accent: #ec4899;
+  --sidebar-accent-foreground: #f9fafb;
+  --sidebar-border: #374151;
+  --sidebar-ring: #a855f7;
 }
 
 @layer base {
@@ -147,9 +223,104 @@
     background-image: url('/img/inspiration-geometry.png');
     animation: moveBg 120s linear infinite;
   }
+  
+  /* Gaming-style triangle pointers */
+  .clip-path-triangle {
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  }
+  
+  /* Gaming scan line effect */
+  .scan-lines {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .scan-lines::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      transparent 0%,
+      rgba(0, 255, 255, 0.03) 49%,
+      rgba(0, 255, 255, 0.08) 50%,
+      rgba(0, 255, 255, 0.03) 51%,
+      transparent 100%
+    );
+    background-size: 100% 4px;
+    animation: scanLines 2s linear infinite;
+    pointer-events: none;
+    z-index: 10;
+  }
+  
+  @keyframes scanLines {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+  }
+  
+  /* Triangle pointer effects */
+  .triangle-pointer {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.8));
+  }
+  
+  .triangle-pointer.top {
+    top: -12px;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 16px solid #00ffff;
+  }
+  
+  .triangle-pointer.bottom {
+    bottom: -12px;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 16px solid #00ffff;
+  }
+  
+  /* Gaming glow animation */
+  .gaming-glow {
+    animation: gaming-glow 2s ease-in-out infinite alternate;
+  }
+  
+  /* Holographic effect for rare items */
+  .holographic {
+    background: linear-gradient(
+      45deg,
+      rgba(255, 0, 150, 0.1),
+      rgba(0, 255, 255, 0.1),
+      rgba(255, 0, 150, 0.1)
+    );
+    background-size: 200% 200%;
+    animation: holographic 3s ease-in-out infinite;
+  }
 }
 
 @keyframes moveBg {
   0% { background-position-x: -1000px; }
   100% { background-position-x: 0px; }
+}
+
+@keyframes gaming-glow {
+  0% { 
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
+    filter: brightness(1);
+  }
+  100% { 
+    box-shadow: 0 0 30px rgba(34, 211, 238, 0.6);
+    filter: brightness(1.1);
+  }
+}
+
+@keyframes holographic {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }

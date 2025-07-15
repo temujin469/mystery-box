@@ -1,10 +1,11 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
+import { safeLocalStorage } from "./localStorage";
 
 // DRY API client using Axios
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://51.20.252.58:3002",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
@@ -16,12 +17,10 @@ const api: AxiosInstance = axios.create({
 // If 401 error: Redirects to login automatically
 api.interceptors.request.use(
   (config) => {
-    // Only access localStorage in browser environment
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("access_token");
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+    // Use safe localStorage access
+    const token = safeLocalStorage.getItem("access_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -44,7 +43,7 @@ api.interceptors.response.use(
 
       try {
         // Try to refresh the token
-        const refreshToken = localStorage.getItem("refresh_token");
+        const refreshToken = safeLocalStorage.getItem("refresh_token");
         if (refreshToken) {
           const response = await axios.post(
             `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
@@ -57,19 +56,17 @@ api.interceptors.response.use(
           );
 
           const { access_token } = response.data;
-          localStorage.setItem("access_token", access_token);
+          safeLocalStorage.setItem("access_token", access_token);
 
           // Retry the original request with new token
           originalRequest.headers.Authorization = `Bearer ${access_token}`;
           return api(originalRequest);
         }
       } catch (refreshError) {
-        // Refresh failed, redirect to login
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("refresh_token");
-        //   window.location.href = "/login";
-        }
+        // Refresh failed, clear tokens
+        safeLocalStorage.removeItem("access_token");
+        safeLocalStorage.removeItem("refresh_token");
+        // window.location.href = "/login";
       }
     }
 

@@ -6,6 +6,9 @@ export * from './useAuth';
 // User hooks
 export * from './useUsers';
 
+// Inventory hooks
+export * from './useInventory';
+
 // Box hooks
 export * from './useBoxes';
 

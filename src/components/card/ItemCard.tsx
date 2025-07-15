@@ -1,13 +1,17 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import Image from "next/image";
+import { BoxItem, Item } from "@/types";
+import { cn } from "@/lib/utils";
 
 type ItemCardProps = {
-  item: Item;
+  boxItem: BoxItem;
   isDropRateHidden: boolean;
 };
 
-export function ItemCard({ item, isDropRateHidden=true }: ItemCardProps) {
+export function ItemCard({ boxItem, isDropRateHidden = true }: ItemCardProps) {
+  const item: Item = boxItem.item as Item;
+  
   function getDropRateColor(rate: number): string {
     if (rate < 0.01) {
       return `bg-red-500`; //extreme
@@ -44,12 +48,29 @@ export function ItemCard({ item, isDropRateHidden=true }: ItemCardProps) {
     }
   }
 
+  // Function to format drop rate range
+  function formatDropRateRange(rate: number) {
+    const numRate = Number(rate) || 0;
+    const percentage = numRate * 100;
+    const lowerBound = (100 - percentage);
+    const upperBound = 100;
+    return `${lowerBound.toFixed(2)} ~ ${upperBound.toFixed(2)}`;
+  }
+
+  // Function to format odds percentage
+  function formatOdds(rate: number) {
+    const numRate = Number(rate) || 0;
+    const percentage = numRate * 100;
+    return `${percentage.toFixed(2)}%`;
+  }
+
   return (
     <Card
       key={item.name}
-      className={`border-0 border-t-4 rounded-none relative overflow-hidden bg-card shadow-lg transition-all duration-100 group ${getDropRateColorBorder(
-        item.drop_rate
-      )}`}
+      className={cn(
+        "border-0 border-t-4 rounded-none relative overflow-hidden bg-card shadow-lg transition-all duration-100 group",
+        getDropRateColorBorder(boxItem.drop_rate)
+      )}
     >
       <Image
         src="/img/dots.png"
@@ -59,9 +80,10 @@ export function ItemCard({ item, isDropRateHidden=true }: ItemCardProps) {
         className="w-full h-full bg-top"
       />
       <div
-        className={`w-full h-20 blur-3xl z-0 absolute top-0 right-[50%] translate-x-[50%] ${getDropRateColor(
-          item.drop_rate
-        )}`}
+        className={cn(
+          "w-full h-20 blur-3xl z-0 absolute top-0 right-[50%] translate-x-[50%]",
+          getDropRateColor(boxItem.drop_rate)
+        )}
       ></div>
       <CardHeader className="flex flex-col items-center">
         <div className="mb-2 aspect-square w-full h-full relative">
@@ -79,11 +101,19 @@ export function ItemCard({ item, isDropRateHidden=true }: ItemCardProps) {
       </CardHeader>
       <CardContent className="flex flex-col items-center">
         <div
-          className={`font-bold rounded px-3 py-[2px] ${getDropRateColorBg(
-            item.drop_rate
-          )}`}
+          className={cn(
+            "rounded px-3 py-[2px] text-center",
+            getDropRateColorBg(boxItem.drop_rate)
+          )}
         >
-          {isDropRateHidden ? <>{item.price} ₮</> : <>{item.drop_rate} %</>}
+          {isDropRateHidden ? (
+            <div className="text-xs font-bold">{item.price} ₮</div>
+          ) : (
+            <div className="space-y-1 text-[8px] whitespace-nowrap">
+              <div>% ХҮРЭЭ: {formatDropRateRange(boxItem.drop_rate)}</div>
+              <div>МАГАДЛАЛ: {formatOdds(boxItem.drop_rate)}</div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
