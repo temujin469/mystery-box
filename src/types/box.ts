@@ -31,13 +31,17 @@ export type BoxItem = {
   item?: Item;
 };
 
+// Category-Box relationship
 export interface CategoryBox {
+  id: number;
   category_id: number;
   box_id: number;
+  created_at: string;
   // Relations
   category?: Category;
-  box?: Box;
+  box?: any; // Box type from box.ts
 }
+
 
 export interface CreateBoxData {
   name: string;

@@ -1,4 +1,5 @@
 import { BaseQuery } from "./api";
+import { CategoryBox } from "./box";
 
 export interface Category {
   id: number;
@@ -46,16 +47,6 @@ export enum CategoryOrderByField {
   UPDATED_AT = "updated_at",
 }
 
-// Category-Box relationship
-export interface CategoryBox {
-  id: number;
-  category_id: number;
-  box_id: number;
-  created_at: string;
-  // Relations
-  category?: Category;
-  box?: any; // Box type from box.ts
-}
 
 // Category management actions
 export interface CategoryBulkAction {
