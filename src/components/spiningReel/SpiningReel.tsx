@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import SpinReelController from "./SpinReelController";
+import { useSpinningReelStore } from "@/stores/spinningReel.store";
 
 // Types
 export interface SpiningItem {
@@ -178,12 +179,14 @@ function useSound(url: string, { volume = 1 } = {}) {
 const SpinningReel: React.FC<{
   items: SpiningItem[];
   boxPrice: number;
-  onWin?: (item: SpiningItem) => void; // Callback when winner is determined
-}> = ({ items, boxPrice, onWin }) => {
+}> = ({ items, boxPrice }) => {
   const [spinning, setSpinning] = useState(false);
-  const [winner, setWinner] = useState<SpiningItem | null>(null);
   const [spinCount, setSpinCount] = useState(0);
   const [isInitialized, setIsInitialized] = useState(false);
+
+  // Get winner and spin type from store
+  const winner = useSpinningReelStore((state) => state.winnerItem);
+  const lastSpinType = useSpinningReelStore((state) => state.lastSpinType);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const lastTickTimeRef = useRef<number>(0);
@@ -354,13 +357,31 @@ const SpinningReel: React.FC<{
     recordReset,
   ]);
 
-  const spin = useCallback(() => {
+  const spin = useCallback(async () => {
     if (spinning || !containerRef.current || reel.length === 0) return;
-    setWinner(null);
+    useSpinningReelStore.getState().setWinnerItem(null);
 
-    // Pick winner based on drop rates
-    const rand = Math.random();
-    const winItem = pickItem(items, rand);
+    let winItem: SpiningItem;
+
+    // Handle winner selection based on spin type
+    if (lastSpinType === "trial") {
+      // For trial spins, pick winner internally based on drop rates
+      const rand = Math.random();
+      winItem = pickItem(items, rand);
+      console.log("🎰 Trial spin - winner selected internally:", winItem.name);
+    } else if (lastSpinType === "paid") {
+      // For paid spins, winner will be determined by the API
+      // We'll use a placeholder item for animation and update it when API responds
+      const rand = Math.random();
+      winItem = pickItem(items, rand);
+      console.log("🎰 Paid spin - placeholder winner for animation:", winItem.name);
+      console.log("🎰 Actual winner will be determined by API");
+    } else {
+      // Fallback to internal selection if spin type is unknown
+      const rand = Math.random();
+      winItem = pickItem(items, rand);
+      console.log("🎰 Unknown spin type - fallback to internal selection:", winItem.name);
+    }
 
     const containerWidth = containerRef.current.offsetWidth;
     const itemsPerScreen = Math.ceil(containerWidth / ITEM_WIDTH);
@@ -515,26 +536,37 @@ const SpinningReel: React.FC<{
     setSpinCount((c) => c + 1);
     setFinalTranslate(newFinalTranslate);
 
-    // After animation completes, set the winner
+    // After animation completes, handle winner based on spin type
     setTimeout(() => {
       setSpinning(false);
       setCenteredIndex(winnerPosition);
       setFinalTranslate(0); // Reset for CSS centering
 
       setTimeout(() => {
-        setWinner(winItem);
-        playWin();
-
-        // Call handleWin immediately after winner is determined
-        onWin?.(winItem);
+        if (lastSpinType === "trial") {
+          // For trial spins, set the winner immediately
+          useSpinningReelStore.getState().setWinnerItem(winItem);
+          playWin();
+          console.log("🎰 Trial spin complete - winner set:", winItem.name);
+        } else if (lastSpinType === "paid") {
+          // For paid spins, the winner will be set by the API response
+          // The business logic hook will handle the API call and set the real winner
+          playWin();
+          console.log("🎰 Paid spin animation complete - waiting for API response");
+        } else {
+          // Fallback for unknown spin types
+          useSpinningReelStore.getState().setWinnerItem(winItem);
+          playWin();
+          console.log("🎰 Unknown spin type - fallback winner set:", winItem.name);
+        }
       }, 100);
     }, SPIN_CONFIG.duration);
-  }, [spinning, items, reel, playWin, finalTranslate, centeredIndex]);
+  }, [spinning, items, reel, playWin, finalTranslate, centeredIndex, lastSpinType]);
 
   // Handler for resetting winner state - pure UI logic
   // Used for both dismissing and after quick sell completion
   const handleResetWinner = useCallback(() => {
-    setWinner(null);
+    useSpinningReelStore.getState().setWinnerItem(null);
     setFinalTranslate(0); // Reset for CSS centering
   }, []);
 
@@ -862,15 +894,15 @@ const SpinningReel: React.FC<{
 
       <SpinReelController
         spinning={spinning}
-        boxPrice={boxPrice}
-        winner={winner}
         onSpin={spin}
         onResetWinner={handleResetWinner}
       />
       {/* Note: SpinReelController handles business logic including:
           - Spin type tracking (paid vs trial)
           - Quick sell eligibility based on spin type
-          - Authentication and modal management */}
+          - Authentication and modal management
+          - Box data fetching using boxId from store
+          - Winner item management from store */}
     </div>
   );
 };

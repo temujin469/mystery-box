@@ -1,7 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { boxService } from '../../services/api';
-import { Box, CreateBoxData, UpdateBoxData, BoxQuery } from '../../types/box';
+import { 
+  Box, 
+  CreateBoxData, 
+  UpdateBoxData, 
+  BoxQuery,
+  BoxOpenResponse,
+  BoxOpenHistory,
+  BoxOpenHistoryQuery
+} from '../../types/box';
 import { PaginatedResponse } from '../../types/api';
+import { useCurrentUser } from './useAuth';
 
 // Query Keys
 export const boxKeys = {
@@ -13,6 +22,10 @@ export const boxKeys = {
   search: (name: string) => [...boxKeys.all, 'search', name] as const,
   details: () => [...boxKeys.all, 'detail'] as const,
   detail: (id: string) => [...boxKeys.details(), id] as const,
+  // Box Opening History Keys
+  history: () => [...boxKeys.all, 'history'] as const,
+  userHistory: (query?: BoxOpenHistoryQuery) => 
+    [...boxKeys.history(), 'user', query] as const,
 };
 
 // Query Hooks
@@ -111,3 +124,54 @@ export const useDeleteBox = () => {
     },
   });
 };
+
+// ================= BOX OPENING HOOKS =================
+
+/**
+ * Hook to get user's box opening history with pagination
+ */
+export const useUserBoxOpenHistory = (
+  query?: BoxOpenHistoryQuery,
+  enabled: boolean = true
+) => {
+  return useQuery({
+    queryKey: boxKeys.userHistory(query),
+    queryFn: () => boxService.getMyBoxOpenHistory(query),
+    enabled: enabled,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+};
+
+// ================= CONVENIENCE HOOKS FOR CURRENT USER =================
+
+/**
+ * Convenience hook to open a box for the current user
+ */
+export const useOpenMyBox = () => {
+  const { data: user } = useCurrentUser();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (boxId: number) =>
+      boxService.openBox(boxId, user!.id),
+    onSuccess: (data) => {
+      if (!user?.id) return;
+      
+      // Invalidate user's box opening history
+      queryClient.invalidateQueries({ 
+        queryKey: boxKeys.history() 
+      });
+      
+      // Invalidate user's inventory and stats if those hooks exist
+      queryClient.invalidateQueries({ 
+        queryKey: ['users', user.id, 'inventory'] 
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: ['users', user.id, 'stats'] 
+      });
+    },
+    // Only enable if user is logged in
+    mutationKey: ['openMyBox', user?.id],
+  });
+};
+

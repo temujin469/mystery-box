@@ -64,8 +64,7 @@ export interface UpdateExperienceData {
 }
 
 export interface UserStats {
-  user: User;
-  totalTransactions: number;
+  totalDeposits: number;
   totalItems: number;
   totalAddresses: number;
   totalBoxesOpened: number;

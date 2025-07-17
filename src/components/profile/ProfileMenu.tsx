@@ -32,11 +32,15 @@ function UserAvatar({ level }: { level?: number }) {
   return (
     <div className="rounded-full relative">
       {/* Main avatar */}
-      <div className="relative rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center w-10 h-10">
-        <User2 className="text-zinc-400 w-6 h-6" />
+      <div className="relative rounded-full bg-zinc-900 border border-zinc-700 w-10 h-10">
+        <img 
+          src="https://cdnb.artstation.com/p/assets/images/images/038/230/905/large/ak-graphics-media-mrx1.jpg?1622540592"
+          alt="User avatar"
+          className="w-full h-full object-cover rounded-full over"
+        />
         
         {/* Level badge */}
-        <div className="absolute -bottom-1 -right-1 bg-zinc-700 text-zinc-200 text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center border-2 border-zinc-900">
+        <div className="absolute -bottom-1 -right-1 z-10 bg-green-500 text-zinc-200 text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center border-2 border-zinc-900">
           {level ?? 0}
         </div>
       </div>
@@ -136,162 +140,97 @@ export default function ProfileMenu() {
 
   const mobileMenuContent = (
     <>
-      {/* Header section - only on mobile */}
-      <div className="p-6 border-b border-zinc-700">
-        <div className="flex items-center gap-4">
+      {/* Minimal header section */}
+      <div className="px-4 py-4 border-b border-border/50">
+        <div className="flex items-center gap-4 bg-primary/10 rounded-2xl p-5">
           <UserAvatar level={user?.level} />
-          <div>
-            <h3 className="font-semibold text-zinc-200 text-base">
+          <div className="flex-1">
+            <h3 className="font-medium text-foreground text-lg">
               {user?.username}
             </h3>
-            <p className="text-sm text-zinc-500">Level {user?.level ?? 0}</p>
+            {/* Modern progress bar */}
+            <div className="mt-2 space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Түвшин {user?.level ?? 0}</span>
+              </div>
+              <div className="w-full bg-muted/30 rounded-full h-1.5 overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${((user?.level ?? 0) * 15) % 100}%` }}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
       
-      {/* Menu items with mobile padding */}
-      <div className="p-4">
-        <div className="flex flex-col gap-2">
+      {/* Clean menu items */}
+      <div className="px-4 py-4">
+        <div className="space-y-1">
           <MenuItem
-            icon={<User2 className="mr-4 w-5 h-5" />}
+            icon={<User2 className="w-5 h-5" />}
             href="/profile/items"
-            activeColor="text-blue-500"
-            hoverColor="group-hover:text-blue-500"
+            activeColor="text-primary"
+            hoverColor="group-hover:text-primary"
             isMobile={true}
             onClick={handleMenuItemClick}
           >
             Нүүр хуудас
           </MenuItem>
           <MenuItem
-            icon={<BoxIcon className="mr-4 w-5 h-5" />}
+            icon={<BoxIcon className="w-5 h-5" />}
             href="/profile/boxes"
-            activeColor="text-purple-500"
-            hoverColor="group-hover:text-purple-500"
+            activeColor="text-primary"
+            hoverColor="group-hover:text-primary"
             isMobile={true}
             onClick={handleMenuItemClick}
           >
             Нээсэн хайрцаг
           </MenuItem>
           <MenuItem
-            icon={<Truck className="mr-4 w-5 h-5" />}
+            icon={<Truck className="w-5 h-5" />}
             href="/profile/shipments"
-            activeColor="text-green-500"
-            hoverColor="group-hover:text-green-500"
+            activeColor="text-primary"
+            hoverColor="group-hover:text-primary"
             isMobile={true}
             onClick={handleMenuItemClick}
           >
             Хүргэлт
           </MenuItem>
           <MenuItem
-            icon={<Gift className="mr-4 w-5 h-5" />}
+            icon={<Gift className="w-5 h-5" />}
             href="/profile/rewards"
-            activeColor="text-yellow-500"
-            hoverColor="group-hover:text-yellow-500"
+            activeColor="text-primary"
+            hoverColor="group-hover:text-primary"
             isMobile={true}
             onClick={handleMenuItemClick}
           >
             Шагнал урамшуулал
           </MenuItem>
           <MenuItem
-            icon={<Settings className="mr-4 w-5 h-5" />}
+            icon={<Settings className="w-5 h-5" />}
             href="/profile/settings"
-            activeColor="text-gray-500"
-            hoverColor="group-hover:text-gray-500"
+            activeColor="text-primary"
+            hoverColor="group-hover:text-primary"
             isMobile={true}
             onClick={handleMenuItemClick}
           >
             Тохиргоо
           </MenuItem>
-          
-          {/* Mobile divider */}
-          <div className="my-2 h-px bg-zinc-700"></div>
-
-          {/* Mobile logout button with red styling */}
-          <Button
-            onClick={handleLogout}
-            variant="ghost"
-            className="flex justify-start items-center px-4 py-4 rounded-lg transition-colors hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 text-base group"
-          >
-            <LogOut className="mr-4 w-5 h-5 text-red-400 group-hover:text-red-300 transition-colors" />
-            Гарах
-          </Button>
         </div>
-      </div>
-    </>
-  );
+        
+        {/* Minimal divider */}
+        <div className="my-6 h-px bg-border/50"></div>
 
-  const menuContent = (
-    <>
-      {/* Header section */}
-      <div className="p-4 border-b border-zinc-700">
-        <div className="flex items-center gap-3">
-          <UserAvatar level={user?.level} />
-          <div>
-            <h3 className="font-semibold text-zinc-200 text-sm">
-              {user?.username}
-            </h3>
-            <p className="text-xs text-zinc-500">Level {user?.level ?? 0}</p>
-          </div>
-        </div>
-      </div>
-      
-      {/* Menu items */}
-      <div className="p-2">
-        <div className="flex flex-col gap-1">
-          <MenuItem
-            icon={<User2 className="mr-3 w-4 h-4" />}
-            href="/profile/items"
-            activeColor="text-blue-500"
-            hoverColor="group-hover:text-blue-500"
-          >
-            Нүүр хуудас
-          </MenuItem>
-          <MenuItem
-            icon={<BoxIcon className="mr-3 w-4 h-4" />}
-            href="/profile/boxes"
-            activeColor="text-purple-500"
-            hoverColor="group-hover:text-purple-500"
-          >
-            Нээсэн хайрцаг
-          </MenuItem>
-          <MenuItem
-            icon={<Truck className="mr-3 w-4 h-4" />}
-            href="/profile/shipments"
-            activeColor="text-green-500"
-            hoverColor="group-hover:text-green-500"
-          >
-            Хүргэлт
-          </MenuItem>
-          <MenuItem
-            icon={<Gift className="mr-3 w-4 h-4" />}
-            href="/profile/rewards"
-            activeColor="text-yellow-500"
-            hoverColor="group-hover:text-yellow-500"
-          >
-            Шагнал урамшуулал
-          </MenuItem>
-          <MenuItem
-            icon={<Settings className="mr-3 w-4 h-4" />}
-            href="/profile/settings"
-            activeColor="text-gray-500"
-            hoverColor="group-hover:text-gray-500"
-          >
-            Тохиргоо
-          </MenuItem>
-          
-          {/* Simple divider */}
-          <div className="my-1 h-px bg-zinc-700"></div>
-
-          {/* Logout button */}
-          <Button
-            onClick={handleLogout}
-            variant="ghost"
-            className="flex justify-start items-center px-3 py-2 rounded-md transition-colors hover:bg-zinc-800 text-zinc-500 hover:text-zinc-300 text-sm group"
-          >
-            <LogOut className="mr-3 w-4 h-4 group-hover:text-red-400 transition-colors" />
-            Гарах
-          </Button>
-        </div>
+        {/* Modern logout button */}
+        <Button
+          onClick={handleLogout}
+          variant="ghost"
+          className="w-full justify-start gap-4 px-4 py-4 h-auto rounded-xl bg-destructive"
+        >
+          <LogOut className="w-5 h-5" />
+          <span className="text-base font-medium">Гарах</span>
+        </Button>
       </div>
     </>
   );
@@ -325,11 +264,11 @@ export default function ProfileMenu() {
         <DrawerTrigger asChild>
           {triggerButton}
         </DrawerTrigger>
-        <DrawerContent className="bg-zinc-900 border-zinc-700">
+        <DrawerContent className="bg-background border-border/50">
           <DrawerHeader className="sr-only">
             <DrawerTitle>Profile Menu</DrawerTitle>
           </DrawerHeader>
-          <div className="pb-4">
+          <div className="pb-6">
             {mobileMenuContent}
           </div>
         </DrawerContent>
@@ -347,7 +286,7 @@ export default function ProfileMenu() {
       <PopoverContent
         align="end"
         sideOffset={8}
-        className="w-64 p-0 bg-zinc-900 border border-zinc-700 rounded-lg shadow-lg"
+        className="w-64 p-0 bg-card border-border/30 rounded-lg shadow-lg"
       >
         {desktopMenuContent}
       </PopoverContent>
@@ -379,23 +318,25 @@ function MenuItem({
   const isActive = pathname === href;
   
   const mobileStyles = isMobile 
-    ? "px-4 py-4 text-base rounded-lg" 
-    : "px-3 py-2 text-sm rounded-md";
+    ? "flex items-center gap-4 px-4 py-4 text-base rounded-xl transition-all duration-200" 
+    : "flex items-center px-3 py-2 text-sm rounded-md";
   
   return (
     <Link
       href={href}
       onClick={onClick}
-      className={`flex items-center transition-colors group ${
+      className={`transition-all duration-200 group ${
         isActive 
-          ? "text-zinc-200 bg-zinc-800" 
-          : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800"
-      } ${mobileStyles} ${className}`}
+          ? "text-foreground bg-primary/10 border-primary/20" 
+          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+      } ${mobileStyles} ${
+        isMobile ? "border border-transparent hover:border-primary/10" : ""
+      } ${className}`}
     >
-      <div className={`transition-colors ${isActive ? activeColor : hoverColor}`}>
+      <div className={`transition-colors duration-200 ${isActive ? activeColor : hoverColor}`}>
         {icon}
       </div>
-      {children}
+      <span className={isMobile ? "font-medium" : ""}>{children}</span>
     </Link>
   );
 }

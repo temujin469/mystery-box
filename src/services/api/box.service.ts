@@ -4,6 +4,10 @@ import {
   CreateBoxData,
   UpdateBoxData,
   BoxQuery,
+  BoxOpenRequest,
+  BoxOpenResponse,
+  BoxOpenHistory,
+  BoxOpenHistoryQuery,
 } from '../../types/box';
 import { PaginatedResponse } from '../../types/api';
 
@@ -109,6 +113,39 @@ export class BoxService {
    */
   async deleteBox(id: number): Promise<void> {
     await api.delete(`${this.baseUrl}/${id}`);
+  }
+
+  // ================= BOX OPENING METHODS =================
+
+  /**
+   * Open a box for a user
+   * @param boxId - Box ID to open
+   * @param userId - User ID who is opening the box
+   * @returns Promise<BoxOpenResponse>
+   */
+  async openBox(boxId: number, userId: string): Promise<BoxOpenResponse> {
+    const requestData: BoxOpenRequest = { userId };
+    const response = await api.post<BoxOpenResponse>(
+      `${this.baseUrl}/${boxId}/open`,
+      requestData
+    );
+    return response.data;
+  }
+
+  /**
+   * Get user's box opening history with pagination
+   * @param userId - User ID
+   * @param query - Query parameters for pagination
+   * @returns Promise<PaginatedResponse<BoxOpenHistory>>
+   */
+  async getMyBoxOpenHistory(
+    query?: BoxOpenHistoryQuery
+  ): Promise<PaginatedResponse<BoxOpenHistory>> {
+    const response = await api.get<PaginatedResponse<BoxOpenHistory>>(
+      `${this.baseUrl}/me/history`,
+      { params: query }
+    );
+    return response.data;
   }
 }
 

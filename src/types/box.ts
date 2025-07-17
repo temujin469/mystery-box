@@ -96,3 +96,32 @@ export interface BoxOpenResult {
   success: boolean;
   message?: string;
 }
+
+// Box Opening History Types
+export interface BoxOpenHistory {
+  id: string;
+  user_id: string;
+  box_id: string;
+  item_id: string;
+  opened_at: string;
+  // Relations
+  box?: Box;
+  item?: Item;
+  user?: User;
+}
+
+export interface BoxOpenRequest {
+  userId: string;
+}
+
+export interface BoxOpenResponse {
+  success: boolean;
+  receivedItem: Item;
+  boxOpenHistory: BoxOpenHistory;
+  message: string;
+}
+
+export interface BoxOpenHistoryQuery {
+  page?: number;
+  limit?: number;
+}

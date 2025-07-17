@@ -1,15 +1,16 @@
 "use client";
 import Link from "next/link";
-import { use, useState } from "react";
+import { use, useState, useEffect } from "react";
 import { ChevronLeft } from "lucide-react";
 import SpinningReel, {
   SpiningItem,
 } from "@/components/spiningReel/SpiningReel";
 import { ItemCard } from "@/components/card";
+import { ItemDetailSlide } from "@/components/ItemDetailSlide";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useBox } from "@/hooks/api";
-import { useSpinBusinessLogic } from "@/hooks/useSpinBusinessLogic";
+import { useSpinningReelStore } from "@/stores/spinningReel.store";
 
 export default function BoxPage({
   params,
@@ -17,15 +18,28 @@ export default function BoxPage({
   params: Promise<{ id: string }>;
 }) {
   const [isOddsHidden, setIsOddsHidden] = useState(true);
-  const [wonItem, setWonItem] = useState<SpiningItem | null>(null);
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
+  const [isSlideOpen, setIsSlideOpen] = useState(false);
 
   const boxId = Number(use(params).id);
   const { data: box, isPending, error } = useBox(boxId);
 
-  // Get handleWin function from business logic hook
-  const { handleWin } = useSpinBusinessLogic();
+  // Set boxId in store when component mounts or boxId changes
+  useEffect(() => {
+    useSpinningReelStore.getState().setBoxId(boxId);
+  }, [boxId]);
 
   const boxItems = box?.items || [];
+
+  const handleItemClick = (itemId: number) => {
+    setSelectedItemId(itemId);
+    setIsSlideOpen(true);
+  };
+
+  const handleCloseSlide = () => {
+    setIsSlideOpen(false);
+    setSelectedItemId(null);
+  };
 
   // Transform box items to spinning items with proper type safety
   const spiningItems: SpiningItem[] = boxItems
@@ -155,11 +169,7 @@ export default function BoxPage({
 
         {/* Spinning Reel Section */}
         <div className="relative">
-          <SpinningReel
-            items={spiningItems}
-            boxPrice={box.price}
-            onWin={handleWin}
-          />
+          <SpinningReel items={spiningItems} boxPrice={box.price} />
         </div>
 
         {/* Items Section */}
@@ -190,24 +200,19 @@ export default function BoxPage({
             <div className="hidden md:block absolute inset-0 bg-gradient-to-br from-gray-900/50 via-transparent to-gray-900/50 rounded-2xl" />
 
             <div className="relative md:p-6 md:rounded-2xl md:border md:border-gray-700/30 md:bg-gray-800/20 md:backdrop-blur-sm">
-              <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2">
                 {boxItems.map((boxItem, index) => (
                   <div
                     key={`${boxItem.box_id}-${boxItem.item_id}`}
                     className="relative group"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    {/* Card Glow Effect */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-pink-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm" />
-
                     {/* Item Card */}
                     <ItemCard
                       boxItem={boxItem}
                       isDropRateHidden={isOddsHidden}
+                      onClick={handleItemClick}
                     />
-
-                    {/* Rarity Border Effect */}
-                    <div className="absolute inset-0 rounded-lg border border-transparent group-hover:border-gradient-to-r group-hover:from-blue-400/30 group-hover:via-purple-400/30 group-hover:to-pink-400/30 pointer-events-none transition-all duration-300" />
                   </div>
                 ))}
               </div>
@@ -215,6 +220,13 @@ export default function BoxPage({
           </div>
         </div>
       </div>
+
+      {/* Item Detail Slide */}
+      <ItemDetailSlide
+        isOpen={isSlideOpen}
+        onClose={handleCloseSlide}
+        itemId={selectedItemId}
+      />
     </div>
   );
 }

@@ -9,20 +9,20 @@ type Props = {};
 export function PromoBanner({}: Props) {
   return (
     <div className="moving-bg relative w-full flex bg-primary/10 overflow-hidden rounded-lg p-8 py-12 bg-[url('/img/inspiration-geometry.png')] mb-10">
-        <div className="absolute left-[-50%] top-[-50%] h-[600px] w-[70%] bg-[#233237] blur-3xl"></div>
+        <div className="absolute left-[-50%] top-[-50%] h-[600px] w-[80%] bg-[#0E1F34] blur-3xl"></div>
       <div className="w-full z-[10]">
-        <h1 className="text-4xl font-bold mb-8">
+        <h1 className="text-2xl md:text-4xl font-bold mb-8">
           <span className="text-primary">Нууцлаг хайрцаг</span> нээж,
           <br /> Бүтээгдэхүүн хожоорой
         </h1>
-        <p className="mb-7 text-gray-300">
-          Ил тод, шударга бөгөөд хайрцаг нээх бүрт нэмэлт урамшуулалтай <br />{" "}
+        <p className="mb-7 text-gray-300 text-sm md:text-md">
+          Ил тод, шударга бөгөөд хайрцаг нээх бүрт нэмэлт урамшуулалтай <br className="hidden sm:block"/>{" "}
           азын хүрд эргэсний дараа хэн ч хоосон үлддэггүй
         </p>
         <Button size="lg">Бүртгүүлэх</Button>
       </div>
 
-      <div className="relative w-full">
+      <div className="relative sm:w-full">
         <motion.div
           animate={{
             opacity: [0.3, 1, 0.5],
@@ -36,7 +36,7 @@ export function PromoBanner({}: Props) {
           style={{
             display: "inline-block",
           }}
-          className="h-50 w-50 rounded-full blur-3xl bg-primary absolute bottom-[-100px] md:top-[35%] md:right-[150px]"
+          className="h-50 w-50 rounded-full blur-3xl bg-primary absolute bottom-[-100px] md:top-[35%] right-[-60px] md:right-[150px]"
         ></motion.div>
 
         <div className="hidden sm:block">

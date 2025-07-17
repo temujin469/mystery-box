@@ -7,44 +7,45 @@ import { cn } from "@/lib/utils";
 type ItemCardProps = {
   boxItem: BoxItem;
   isDropRateHidden: boolean;
+  onClick?: (itemId: number) => void;
 };
 
-export function ItemCard({ boxItem, isDropRateHidden = true }: ItemCardProps) {
+export function ItemCard({ boxItem, isDropRateHidden = true, onClick }: ItemCardProps) {
   const item: Item = boxItem.item as Item;
   
   function getDropRateColor(rate: number): string {
     if (rate < 0.01) {
-      return `bg-red-500`; //extreme
+      return `bg-red-400`; //extreme
     } else if (rate < 0.04) {
-      return `bg-yellow-500`;
+      return `bg-yellow-400`;
     } else if (rate < 0.09) {
-      return `bg-blue-500`;
+      return `bg-blue-400`;
     } else {
-      return `bg-green-500`;
+      return `bg-green-400`;
     }
   }
 
   function getDropRateColorBorder(rate: number): string {
     if (rate < 0.01) {
-      return `border-red-500`; //extreme
+      return `border-red-400`; //extreme
     } else if (rate < 0.04) {
-      return `border-yellow-500`;
+      return `border-yellow-400`;
     } else if (rate < 0.09) {
-      return `border-blue-500`;
+      return `border-blue-400`;
     } else {
-      return `border-green-500`;
+      return `border-green-400`;
     }
   }
 
-  function getDropRateColorBg(rate: number): string {
+  function getDropRateColorTxt(rate: number): string {
     if (rate < 0.01) {
-      return `bg-red-500/10 text-red-500`; //extreme
+      return `text-red-400`; //extreme
     } else if (rate < 0.04) {
-      return `bg-yellow-500/10 text-yellow-500`;
+      return `text-yellow-400`;
     } else if (rate < 0.09) {
-      return `bg-blue-500/10 text-blue-500`;
+      return `text-blue-400`;
     } else {
-      return `bg-green-500/10 text-green-500`;
+      return `text-green-400`;
     }
   }
 
@@ -68,9 +69,10 @@ export function ItemCard({ boxItem, isDropRateHidden = true }: ItemCardProps) {
     <Card
       key={item.name}
       className={cn(
-        "border-0 border-t-4 rounded-none relative overflow-hidden bg-card shadow-lg transition-all duration-100 group",
+        "border-0 border-t-2 rounded-none relative overflow-hidden bg-transparent shadow-lg group cursor-pointer",
         getDropRateColorBorder(boxItem.drop_rate)
       )}
+      onClick={() => onClick?.(item.id)}
     >
       <Image
         src="/img/dots.png"
@@ -95,7 +97,7 @@ export function ItemCard({ boxItem, isDropRateHidden = true }: ItemCardProps) {
             className="z-10 w-full h-full transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
           />
         </div>
-        <CardTitle className="text-center h-full w-full text-ellipsis text-card-foreground font-semibold whitespace-nowrap overflow-hidden">
+        <CardTitle className="text-center h-full w-full text-ellipsis text-card-foreground text-[11px] sm:text-[14px] font-semibold whitespace-nowrap overflow-hidden">
           {item.name}
         </CardTitle>
       </CardHeader>
@@ -103,13 +105,13 @@ export function ItemCard({ boxItem, isDropRateHidden = true }: ItemCardProps) {
         <div
           className={cn(
             "rounded px-3 py-[2px] text-center",
-            getDropRateColorBg(boxItem.drop_rate)
+            getDropRateColorTxt(boxItem.drop_rate)
           )}
         >
           {isDropRateHidden ? (
-            <div className="text-xs font-bold">{item.price} ₮</div>
+            <div className="font-bold text-[11px] sm:text-[14px] whitespace-nowrap">{item.price} ₮</div>
           ) : (
-            <div className="space-y-1 text-[8px] whitespace-nowrap">
+            <div className="space-y-1 text-[7px] sm:text-[8px] whitespace-nowrap">
               <div>% ХҮРЭЭ: {formatDropRateRange(boxItem.drop_rate)}</div>
               <div>МАГАДЛАЛ: {formatOdds(boxItem.drop_rate)}</div>
             </div>

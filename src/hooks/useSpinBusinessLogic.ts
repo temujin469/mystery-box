@@ -9,6 +9,7 @@ import {
   useRemoveItemFromCurrentUserInventory,
 } from "@/hooks/api/useInventory";
 import { useModalStore } from "@/stores/modal.store";
+import { useSpinningReelStore } from "@/stores/spinningReel.store";
 import { SpiningItem } from "@/components/spiningReel/SpiningReel";
 import { toast } from "sonner";
 import {
@@ -16,6 +17,7 @@ import {
   formatCurrency,
   hasSufficientBalance,
 } from "@/lib/currency";
+import { useOpenMyBox } from "@/hooks/api/useBoxes";
 
 /*
  * Business logic hook for the spinning reel
@@ -31,6 +33,7 @@ export const useSpinBusinessLogic = () => {
   const updateUserExperience = useUpdateCurrentUserExperience();
   const addItemToInventory = useAddItemToCurrentUserInventory();
   const removeItemFromInventory = useRemoveItemFromCurrentUserInventory();
+  const openMyBox = useOpenMyBox();
 
   const openAuth = useModalStore((state) => state.openAuth);
   const openTopup = useModalStore((state) => state.openTopup);
@@ -39,6 +42,9 @@ export const useSpinBusinessLogic = () => {
   const [lastSpinType, setLastSpinType] = useState<"paid" | "trial" | null>(
     null
   );
+  
+  // Track the current box ID for box opening API
+  const [currentBoxId, setCurrentBoxId] = useState<number | null>(null);
 
   //useCallback is used to memoize functions to prevent unnecessary re-renders
   // Check if user can perform a paid spin
@@ -97,13 +103,19 @@ export const useSpinBusinessLogic = () => {
   const handlePaidSpinRequest = useCallback(
     async (
       onSpin: () => void,
-      boxPrice: number | string
+      boxPrice: number | string,
+      boxId?: number
     ): Promise<"paid" | null> => {
       try {
         // Authentication check first
         if (!isAuthenticated) {
           openAuth("signin");
           return null;
+        }
+
+        // Store the box ID for the box opening API
+        if (boxId) {
+          setCurrentBoxId(boxId);
         }
 
         // Business rule validation
@@ -176,9 +188,42 @@ export const useSpinBusinessLogic = () => {
 
         // Mark this as a paid spin
         setLastSpinType("paid");
+        useSpinningReelStore.getState().setLastSpinType("paid");
 
         // All checks passed, perform the spin
         onSpin();
+
+        // For paid spins, call the box opening API to get the actual winner
+        if (boxId) {
+          try {
+            toast.loading("Opening box...", { id: "box-opening" });
+            
+            const result = await openMyBox.mutateAsync(boxId);
+            
+            // Convert the API response item to SpiningItem format
+            const winnerItem: SpiningItem = {
+              id: result.receivedItem.id,
+              name: result.receivedItem.name,
+              image_url: result.receivedItem.image_url,
+              sell_value: result.receivedItem.sell_value || 0,
+              drop_rate: 0, // Drop rate is not relevant for the actual winner
+            };
+            
+            // Set the actual winner from the API response
+            useSpinningReelStore.getState().setWinnerItem(winnerItem);
+            
+            toast.success(`Box opened! You received ${result.receivedItem.name}!`, {
+              id: "box-opening",
+            });
+
+            console.log(
+              `🎰 Paid spin API response - actual winner: ${result.receivedItem.name} (ID: ${result.receivedItem.id})`
+            );
+          } catch (apiError) {
+            console.error("Failed to open box:", apiError);
+            toast.error("Failed to open box. Please try again.", { id: "box-opening" });
+          }
+        }
 
         return "paid";
       } catch (error) {
@@ -211,6 +256,7 @@ export const useSpinBusinessLogic = () => {
 
         // Reset spin type on error to prevent inconsistent state
         setLastSpinType(null);
+        useSpinningReelStore.getState().resetSpinType();
         return null;
       }
     },
@@ -222,6 +268,7 @@ export const useSpinBusinessLogic = () => {
       updateUserCoins,
       updateUserExperience,
       user?.coins,
+      setCurrentBoxId,
     ]
   );
 
@@ -241,6 +288,7 @@ export const useSpinBusinessLogic = () => {
 
       // Mark this as a trial spin
       setLastSpinType("trial");
+      useSpinningReelStore.getState().setLastSpinType("trial");
       // All checks passed, perform the spin
       onSpin();
       return "trial";
@@ -346,25 +394,44 @@ export const useSpinBusinessLogic = () => {
           "Spin type:",
           lastSpinType,
           "Authenticated:",
-          isAuthenticated
+          isAuthenticated,
+          "Box ID:",
+          currentBoxId
         );
 
         // Only process inventory for paid spins and authenticated users
         if (lastSpinType === "paid" && isAuthenticated) {
-          // Add item to inventory immediately
-          toast.loading(`Adding ${item.name} to inventory...`, {
-            id: "add-to-inventory",
-          });
+          // Use box opening API if we have a box ID
+          if (currentBoxId) {
+            toast.loading(`Opening box...`, {
+              id: "box-opening",
+            });
 
-          await addItemToInventory.mutateAsync({ itemId: item.id });
+            const result = await openMyBox.mutateAsync(currentBoxId);
 
-          toast.success(`${item.name} added to your inventory!`, {
-            id: "add-to-inventory",
-          });
+            toast.success(`Box opened! You received ${result.receivedItem.name}!`, {
+              id: "box-opening",
+            });
 
-          console.log(
-            `Item ${item.name} (ID: ${item.id}) successfully added to inventory`
-          );
+            console.log(
+              `Box ${currentBoxId} opened successfully. Item received: ${result.receivedItem.name} (ID: ${result.receivedItem.id})`
+            );
+          } else {
+            // Fallback to direct inventory manipulation (legacy support)
+            toast.loading(`Adding ${item.name} to inventory...`, {
+              id: "add-to-inventory",
+            });
+
+            await addItemToInventory.mutateAsync({ itemId: item.id });
+
+            toast.success(`${item.name} added to your inventory!`, {
+              id: "add-to-inventory",
+            });
+
+            console.log(
+              `Item ${item.name} (ID: ${item.id}) successfully added to inventory`
+            );
+          }
         } else if (lastSpinType === "trial") {
           // For trial spins, show what they would have won
           toast.info(`Trial win: ${item.name}`, {
@@ -381,6 +448,7 @@ export const useSpinBusinessLogic = () => {
               isAuthenticated,
               item: item.name,
               user: user?.id || "no user",
+              currentBoxId,
               timestamp: new Date().toISOString(),
             }
           );
@@ -391,19 +459,38 @@ export const useSpinBusinessLogic = () => {
             console.log(
               "Assuming paid spin due to authenticated user with no spin type"
             );
-            toast.loading(`Adding ${item.name} to inventory...`, {
-              id: "add-to-inventory",
-            });
+            
+            // Use box opening API if we have a box ID
+            if (currentBoxId) {
+              toast.loading(`Opening box...`, {
+                id: "box-opening",
+              });
 
-            await addItemToInventory.mutateAsync({ itemId: item.id });
+              const result = await openMyBox.mutateAsync(currentBoxId);
 
-            toast.success(`${item.name} added to your inventory!`, {
-              id: "add-to-inventory",
-            });
+              toast.success(`Box opened! You received ${result.receivedItem.name}!`, {
+                id: "box-opening",
+              });
 
-            console.log(
-              `Item ${item.name} (ID: ${item.id}) successfully added to inventory (fallback)`
-            );
+              console.log(
+                `Box ${currentBoxId} opened successfully (fallback). Item received: ${result.receivedItem.name} (ID: ${result.receivedItem.id})`
+              );
+            } else {
+              // Fallback to direct inventory manipulation
+              toast.loading(`Adding ${item.name} to inventory...`, {
+                id: "add-to-inventory",
+              });
+
+              await addItemToInventory.mutateAsync({ itemId: item.id });
+
+              toast.success(`${item.name} added to your inventory!`, {
+                id: "add-to-inventory",
+              });
+
+              console.log(
+                `Item ${item.name} (ID: ${item.id}) successfully added to inventory (fallback)`
+              );
+            }
           }
         }
 
@@ -416,7 +503,8 @@ export const useSpinBusinessLogic = () => {
       } catch (error) {
         console.error("Failed to process win:", error);
 
-        // Dismiss loading toast
+        // Dismiss loading toasts
+        toast.dismiss("box-opening");
         toast.dismiss("add-to-inventory");
 
         // Show user-friendly error message
@@ -454,7 +542,7 @@ export const useSpinBusinessLogic = () => {
         });
       }
     },
-    [lastSpinType, isAuthenticated, addItemToInventory, user?.id]
+    [lastSpinType, isAuthenticated, addItemToInventory, user?.id, openMyBox, currentBoxId]
   );
 
   // Handle quick sell business logic
@@ -554,6 +642,8 @@ export const useSpinBusinessLogic = () => {
   // Reset spin type when winner is dismissed
   const resetSpinType = useCallback(() => {
     setLastSpinType(null);
+    setCurrentBoxId(null);
+    useSpinningReelStore.getState().resetSpinType();
   }, []);
 
   return {

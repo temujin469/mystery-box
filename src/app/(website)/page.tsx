@@ -10,7 +10,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
         <PromoBanner />
         <MainSection />
-        <FreePlay/>
+        {/* <FreePlay/> */}
         <HowItWorks />
         {/* <StatsReview /> */}
         <FaqSection />

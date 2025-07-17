@@ -2,35 +2,42 @@ import React, { useEffect } from "react";
 import { Button } from "../ui/button";
 import { FastForward } from "lucide-react";
 import { useSpinBusinessLogic } from "@/hooks/useSpinBusinessLogic";
+import { useSpinningReelStore } from "@/stores/spinningReel.store";
+import { useBox } from "@/hooks/api/useBoxes";
 import { SpiningItem } from "./SpiningReel";
 
 interface SpinReelControllerProps {
-  boxPrice: number;
   spinning: boolean;
-  winner: SpiningItem | null;
   onSpin: () => void;
   onResetWinner: () => void;
 }
 
 const SpinReelController: React.FC<SpinReelControllerProps> = ({
   spinning,
-  boxPrice,
-  winner,
   onSpin,
   onResetWinner,
 }) => {
+  // Get boxId and winnerItem from store directly
+  const boxId = useSpinningReelStore((state) => state.boxId);
+  const canQuickSell = useSpinningReelStore((state) => state.canQuickSell);
+  const winner = useSpinningReelStore((state) => state.winnerItem);
+  
+  // Fetch box data using the boxId from store
+  const { data: box, isLoading: isBoxLoading } = useBox(boxId || 0, !!boxId);
+
   // Business logic hook - handles authentication, modal management, and business rules
   const {
     handlePaidSpinRequest,
     handleTrialSpinRequest,
     handleQuickSell,
     resetSpinType,
-    canQuickSell,
   } = useSpinBusinessLogic();
 
   // Handler functions that delegate to business logic hook
   const handlePaidSpin = () => {
-    handlePaidSpinRequest(onSpin, boxPrice);
+    if (box && boxId) {
+      handlePaidSpinRequest(onSpin, box.price, boxId);
+    }
   };
 
   const handleTrialSpin = () => {
@@ -47,6 +54,15 @@ const SpinReelController: React.FC<SpinReelControllerProps> = ({
     resetSpinType(); // Reset the spin type tracking
     onResetWinner(); // Parent component handler - resets winner state
   };
+
+  // Don't render if box is not loaded yet
+  if (!box || isBoxLoading) {
+    return (
+      <div className="flex w-full justify-center gap-2 sm:gap-4 py-8 px-4">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex w-full justify-center gap-2 sm:gap-4 py-8 px-4">
@@ -94,10 +110,10 @@ const SpinReelController: React.FC<SpinReelControllerProps> = ({
             disabled={spinning}
           >
             <span className="relative z-10 sm:hidden truncate">
-              {spinning ? "..." : `${boxPrice} ₮`}
+              {spinning ? "..." : `${box.price} ₮`}
             </span>
             <span className="relative z-10 hidden sm:block truncate">
-              {spinning ? "PROCESSING..." : `Нээх • ${boxPrice} ₮`}
+              {spinning ? "PROCESSING..." : `Нээх • ${box.price} ₮`}
             </span>
             {!spinning && (
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-500 rounded-xl" />

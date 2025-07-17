@@ -50,6 +50,17 @@ export const useUser = (id: string, enabled: boolean = true) => {
   });
 };
 
+export const useCurrentUserStats = (enabled: boolean = true) => {
+  const { data: user } = useCurrentUser();
+  
+  return useQuery({
+    queryKey: userKeys.stats(user?.id || ""),
+    queryFn: () => userService.getUserStats(user!.id),
+    enabled: enabled && !!user?.id,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+};
+
 export const useUserStats = (id: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: userKeys.stats(id),
@@ -109,11 +120,6 @@ export const useUpdateUser = () => {
       queryClient.invalidateQueries({ queryKey: authKeys.profile() });
     },
   });
-};
-
-const updateCurrentUser = () => {
-  const { data: user } = useCurrentUser();
-  const updateUser = useUpdateUser();
 };
 
 export const useUpdateCurrentUserCoins = () => {
