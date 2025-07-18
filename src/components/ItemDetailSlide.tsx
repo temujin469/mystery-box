@@ -304,24 +304,27 @@ function ItemDetail({ item }: { item: Item }) {
 function ItemDetailSkeleton() {
   return (
     <div className="space-y-8">
-      {/* Image Skeleton */}
-      <div className="relative aspect-square w-full max-w-xs mx-auto">
-        <Skeleton className="w-full h-full rounded-full" />
+      {/* Image Skeleton - matching actual layout */}
+      <div className="relative aspect-[3/2] w-full">
+        <Skeleton className="w-full h-full" />
       </div>
 
       {/* Content Skeleton */}
-      <div className="space-y-6">
+      <div className="space-y-6 px-4 sm:px-6">
         {/* Title and Price */}
         <div className="space-y-3">
-          <Skeleton className="h-8 w-3/4 mx-auto" />
-          <Skeleton className="h-8 w-1/2 mx-auto" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-2/3 mx-auto" />
+          <Skeleton className="h-8 w-2/3 mx-auto" />
+          <Skeleton className="h-8 w-1/3 mx-auto" />
+          <div className="max-w-sm mx-auto space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-4/5" />
+            <Skeleton className="h-4 w-3/4" />
+          </div>
         </div>
 
         {/* Related Boxes Skeleton */}
         <div className="pt-6 border-t border-gray-700/30">
-          <Skeleton className="h-5 w-1/2 mb-4" />
+          <Skeleton className="h-5 w-40 mb-4" />
           <div className="grid grid-cols-3 gap-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="space-y-2">
