@@ -14,7 +14,7 @@ export function BoxCard({ box }: Props) {
   return (
     <Card
       key={box.name}
-      className="box-card relative border-0 py-0 rounded-[5px] overflow-hidden bg-card shadow-lg transition-all duration-100 group"
+      className="box-card relative border-0 py-0 rounded-md overflow-hidden bg-card group"
     >
       {/* Price Label */}
       <div

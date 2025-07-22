@@ -66,7 +66,7 @@ export function MainSection() {
               variant={selectedCategoryId === undefined ? "default" : "ghost"}
               size="lg"
               className={`
-                relative overflow-hidden transition-all duration-300 group h-16 p-4 justify-center sm:justify-start border-0
+                relative overflow-hidden group h-16 p-4 justify-center sm:justify-start border-0
                 ${selectedCategoryId === undefined
                   ? "bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-primary/40"
                   : "text-foreground hover:text-foreground bg-card/30 hover:bg-primary/10"
@@ -104,7 +104,7 @@ export function MainSection() {
                     variant={selectedCategoryId === category.id ? "default" : "ghost"}
                     size="lg"
                     className={`
-                      relative overflow-hidden transition-all duration-300 group h-16 p-2 sm:p-4 justify-center border-0
+                      relative overflow-hidden group h-16 p-2 sm:p-4 justify-center border-0
                       ${selectedCategoryId === category.id
                         ? "bg-gradient-to-r from-accent to-primary text-primary-foreground shadow-lg shadow-accent/25 hover:shadow-accent/40"
                         : "text-foreground hover:text-foreground bg-primary/5 hover:bg-accent/10"
@@ -128,7 +128,7 @@ export function MainSection() {
             {/* See More Button - In the same row */}
             <Button 
               variant="ghost" 
-              className="group h-16 p-2 sm:p-4 justify-center bg-gradient-to-r from-muted/30 to-card/30 hover:from-primary/10 hover:to-accent/10 text-muted-foreground hover:text-foreground font-medium transition-all duration-300 hover:scale-105 border-2 border-dashed border-border hover:border-primary/30"
+              className="group h-16 p-2 sm:p-4 justify-center bg-gradient-to-r from-muted/30 to-card/30 hover:from-primary/10 hover:to-accent/10 text-muted-foreground hover:text-foreground font-medium transition-all duration-300 border-2 border-dashed border-border hover:border-primary/30"
             >
               <div className="flex items-center gap-2">
                 <span className="text-xs sm:text-sm font-semibold">Бүгдийг үзэх</span>

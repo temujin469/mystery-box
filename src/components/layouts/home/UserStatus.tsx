@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Gift, Target, TrendingUp, ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { useCurrentUser, useMyProgress } from "@/hooks/api";
 import Link from "next/link";
 import {
@@ -11,16 +10,22 @@ import {
 } from "@/lib/level-progression";
 
 export function UserStatus() {
-  const { data: user, isPending: userLoading } = useCurrentUser();
+  const {
+    data: user,
+    isPending: userLoading,
+    isError: userError,
+  } = useCurrentUser();
   const { data: achievements, isPending: achievementsLoading } =
     useMyProgress();
 
-  if (userLoading || achievementsLoading) {
-    return <UserStatusSkeleton />;
-  }
-
+  // Don't render anything if user is not authenticated
   if (!user) {
     return null;
+  }
+
+  // Show loading only if user exists but data is still loading
+  if (userLoading || achievementsLoading) {
+    return <UserStatusSkeleton />;
   }
 
   // Calculate user level progress using utility

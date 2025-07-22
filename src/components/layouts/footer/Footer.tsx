@@ -166,7 +166,7 @@ export function Footer() {
             className="text-center"
           >
             <p className="text-gray-500 text-sm flex items-center justify-center gap-2">
-              Copyright © 2025 Attila LLC. Made with 
+              Copyright © 2025 Temuujin. Made with 
               <Heart className="text-red-400" size={12} fill="currentColor" />
             </p>
           </motion.div>

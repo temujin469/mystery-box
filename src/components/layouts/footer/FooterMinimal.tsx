@@ -27,11 +27,6 @@ function FooterMinimal({}: Props) {
                 </h2>
               </div>
             </Link>
-
-            {/* Tagline */}
-            <p className="text-gray-400 text-sm font-medium text-center max-w-xs">
-              Таны азыг турших цаг болжээ
-            </p>
           </div>
 
           {/* Social Icons */}
