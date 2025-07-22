@@ -4,8 +4,6 @@ import React, { useEffect, useState } from "react";
 import {
   X,
   Package,
-  TrendingUp,
-  Calendar,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
@@ -28,13 +26,19 @@ export function ItemDetailSlide({
   itemId,
 }: ItemDetailSlideProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const { data: item, isPending, error } = useItem(itemId || 0, !!itemId);
 
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
+      // Small delay to ensure DOM is ready for animation
+      requestAnimationFrame(() => {
+        setIsAnimating(true);
+      });
     } else {
-      const timer = setTimeout(() => setIsVisible(false), 500);
+      setIsAnimating(false);
+      const timer = setTimeout(() => setIsVisible(false), 300);
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
@@ -64,8 +68,8 @@ export function ItemDetailSlide({
       {/* Backdrop */}
       <div
         className={cn(
-          "fixed inset-0 bg-black/60 backdrop-blur-sm transition-all duration-500 ease-in-out",
-          isOpen ? "opacity-100" : "opacity-0"
+          "fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ease-in-out",
+          isAnimating ? "opacity-100" : "opacity-0"
         )}
         onClick={onClose}
       />
@@ -73,8 +77,8 @@ export function ItemDetailSlide({
       {/* Side Panel */}
       <div
         className={cn(
-          "fixed right-0 top-0 h-full w-full max-w-md bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-md border-l border-gray-700/30 shadow-2xl transition-all duration-500 ease-in-out flex flex-col",
-          isOpen ? "translate-x-0" : "translate-x-full"
+          "fixed right-0 top-0 h-full w-full max-w-md bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-md border-l border-gray-700/30 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col",
+          isAnimating ? "translate-x-0" : "translate-x-full"
         )}
       >
         {/* Header */}
@@ -161,9 +165,6 @@ function ItemDetail({ item }: { item: Item }) {
   };
 
   const rarityGlow = getRarityGlow(item.rarity);
-
-  // Get the drop rate from the first box item (assuming all boxes have similar rates)
-  const dropRate = item.boxes?.[0]?.drop_rate || 0.1; // Default to green if no rate
 
   // Modern gradient glow effect
   const modernGlow = rarityGlow;

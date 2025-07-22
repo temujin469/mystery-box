@@ -3,23 +3,33 @@ import React from "react";
 import { Button } from "../ui/button";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useModalStore } from "@/stores/modal.store";
+import { useCurrentUser } from "@/hooks/api";
 
 type Props = {};
 
 export function PromoBanner({}: Props) {
+  const openAuth = useModalStore((state) => state.openAuth);
+  const { data: user, isLoading: isAuthLoading } = useCurrentUser();
+  const isAuth = !!user && !isAuthLoading;
   return (
     <div className="moving-bg relative w-full flex bg-primary/10 overflow-hidden rounded-lg p-8 py-12 bg-[url('/img/inspiration-geometry.png')] mb-10">
-        <div className="absolute left-[-50%] top-[-50%] h-[600px] w-[80%] bg-[#0E1F34] blur-3xl"></div>
+      <div className="absolute left-[-50%] top-[-50%] h-[600px] w-[80%] bg-[#0E1F34] blur-3xl"></div>
       <div className="w-full z-[10]">
         <h1 className="text-2xl md:text-4xl font-bold mb-8">
           <span className="text-primary">Нууцлаг хайрцаг</span> нээж,
           <br /> Бүтээгдэхүүн хожоорой
         </h1>
         <p className="mb-7 text-gray-300 text-sm md:text-md">
-          Ил тод, шударга бөгөөд хайрцаг нээх бүрт нэмэлт урамшуулалтай <br className="hidden sm:block"/>{" "}
-          азын хүрд эргэсний дараа хэн ч хоосон үлддэггүй
+          Ил тод, шударга бөгөөд хайрцаг нээх бүрт нэмэлт урамшуулалтай{" "}
+          <br className="hidden sm:block" /> азын хүрд эргэсний дараа хэн ч
+          хоосон үлддэггүй
         </p>
-        <Button size="lg">Бүртгүүлэх</Button>
+        {!isAuth ? (
+          <Button size="lg" onClick={() => openAuth("signup")}>
+            Бүртгүүлэх
+          </Button>
+        ) : null}
       </div>
 
       <div className="relative sm:w-full">

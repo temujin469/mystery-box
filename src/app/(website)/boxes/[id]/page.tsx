@@ -311,64 +311,82 @@ function BoxPageSkeleton() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-black relative overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
-        <div
-          className="absolute top-40 right-20 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl animate-pulse"
-          style={{ animationDelay: "1s" }}
-        />
-        <div
-          className="absolute bottom-20 left-20 w-36 h-36 bg-pink-500/20 rounded-full blur-3xl animate-pulse"
-          style={{ animationDelay: "2s" }}
-        />
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl" />
+        <div className="absolute top-40 right-20 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-20 w-36 h-36 bg-pink-500/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-40 right-10 w-28 h-28 bg-cyan-500/20 rounded-full blur-3xl" />
       </div>
+
+      {/* Subtle grid pattern overlay */}
+      <div
+        className="absolute inset-0 opacity-5"
+        style={{
+          backgroundImage: `
+          linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
+        `,
+          backgroundSize: "20px 20px",
+        }}
+      />
 
       <div className="relative z-10">
         {/* Header Skeleton */}
-        <div className="container max-w-7xl mx-auto px-3 pt-6 pb-4">
-          <div className="flex items-center justify-between mb-6">
-            <Skeleton className="h-12 w-28 rounded-md" />
-            <Skeleton className="h-10 w-48 rounded-lg" />
+        <div className="container max-w-7xl mx-auto px-3 py-6">
+          <div className="flex items-center gap-6">
+            <Skeleton className="h-12 w-24 rounded-md" />
+            <Skeleton className="h-8 w-48 rounded-lg" />
           </div>
         </div>
 
-        {/* Spinning Reel Skeleton */}
-        <div className="relative h-[400px] mb-8">
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm">
-            <Skeleton className="w-full h-full" />
-          </div>
-          {/* Overlay elements skeleton */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="space-y-4">
-              <Skeleton className="w-32 h-10 rounded-md mx-auto" />
-              <Skeleton className="w-24 h-6 rounded mx-auto" />
+        {/* Spinning Reel Skeleton - Match actual SpinningReel layout */}
+        <div className="w-full relative">
+          <div className="relative bg-gradient-to-br from-gray-900 via-slate-800 to-black pt-4 pb-6 border-t-1 border-b-1 border-gray-700/50 overflow-hidden">
+            {/* Loading Frame */}
+            <div className="relative w-full mx-auto overflow-hidden border-t-2 border-b-2 border-gray-600/50 shadow-2xl h-[280px] flex items-center justify-center bg-gray-800/50">
+              <div className="text-center">
+                <Skeleton className="w-16 h-16 rounded-full mx-auto mb-4" />
+                <Skeleton className="h-4 w-32 mx-auto mb-2" />
+                <div className="flex justify-center gap-1">
+                  <Skeleton className="w-2 h-2 rounded-full" />
+                  <Skeleton className="w-2 h-2 rounded-full" />
+                  <Skeleton className="w-2 h-2 rounded-full" />
+                </div>
+              </div>
+            </div>
+            {/* Bottom HUD */}
+            <div className="mt-4 flex justify-between items-center px-6">
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-3 w-20" />
             </div>
           </div>
         </div>
 
         <div className="container max-w-7xl mx-auto px-3 py-8">
           {/* Enhanced Separator Skeleton */}
-          <div className="w-full flex items-center py-4 px-0 mb-8">
-            <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent via-gray-600/40 to-gray-600/40" />
-            <Skeleton className="h-12 w-48 mx-4 rounded-lg" />
-            <div className="flex-1 h-[2px] bg-gradient-to-l from-transparent via-gray-600/40 to-gray-600/40" />
+          <div className="mb-8">
+            <div className="w-full flex items-center py-6 px-0 relative">
+              <div className="flex-1 h-[1px] bg-gray-600/40" />
+              <Skeleton className="h-8 w-32 mx-6 rounded-md" />
+              <div className="flex-1 h-[1px] bg-gray-600/40" />
+            </div>
           </div>
 
           {/* Controls Skeleton */}
           <div className="mb-6">
             <div className="inline-flex items-center gap-3 px-4 py-3 bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-xl">
-              <div className="w-2 h-2 bg-gray-600 rounded-full" />
+              <Skeleton className="w-2 h-2 rounded-full" />
               <Skeleton className="h-4 w-32" />
               <Skeleton className="h-6 w-10 rounded-full" />
             </div>
           </div>
 
-          {/* Items Grid Skeleton */}
+          {/* Items Grid Skeleton - Match actual layout */}
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-900/50 via-transparent to-gray-900/50 rounded-2xl" />
-
-            <div className="relative p-6 rounded-2xl border border-gray-700/30 bg-gray-800/20 backdrop-blur-sm">
-              <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            <div className="hidden md:block absolute inset-0 bg-gradient-to-br from-gray-900/50 via-transparent to-gray-900/50 rounded-2xl" />
+            
+            <div className="relative md:p-6 md:rounded-2xl md:border md:border-gray-700/30 md:bg-gray-800/20 md:backdrop-blur-sm">
+              <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2">
                 {Array.from({ length: 12 }).map((_, index) => (
                   <div key={index} className="relative group">
                     <div className="space-y-3 p-3 bg-gray-800/30 rounded-lg border border-gray-700/30">

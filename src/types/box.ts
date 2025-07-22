@@ -111,6 +111,14 @@ export interface BoxOpenResponse {
   receivedItem: Item;
   boxOpenHistory: BoxOpenHistory;
   message: string;
+  unlockedAchievements: UnlockedAchievement[];
+}
+
+export interface UnlockedAchievement {
+  id: number;
+  name: string;
+  description: string;
+  unlockedAt: string;
 }
 
 export interface BoxOpenHistoryQuery {

@@ -6,6 +6,7 @@ import { useCurrentUser, useCurrentUserStats, useLogout } from "@/hooks/api";
 import { Package, ArrowDown, ArrowUp, LogOut, Plus } from "lucide-react";
 import Image from "next/image";
 import { useModalStore } from "@/stores/modal.store";
+import { calculateLevelProgression, formatLevelProgress } from "@/lib/level-progression";
 
 export default function UserProfileHeader() {
   const { data: user, isPending } = useCurrentUser();
@@ -28,28 +29,9 @@ export default function UserProfileHeader() {
     );
   }
 
-  // Handle level progression (max level 30)
-  const MAX_LEVEL = 30;
-  const BASE_EXP_PER_LEVEL = 100; // Linear experience needed per level
-  
-  const currentLevel = Math.min(user?.level || 0, MAX_LEVEL); // Start from level 0
-  const currentExp = user?.experience_points || 0;
-  
-  // Calculate total experience needed to reach a specific level (linear progression)
-  const getExpForLevel = (level: number) => {
-    if (level <= 0) return 0; // Level 0 requires 0 XP (starting point)
-    return level * BASE_EXP_PER_LEVEL; // Level 1 = 100, Level 2 = 200, Level 3 = 300, etc.
-  };
-  
-  const currentLevelExp = getExpForLevel(currentLevel); // Total XP needed to reach current level
-  const nextLevelExp = currentLevel >= MAX_LEVEL ? currentLevelExp : getExpForLevel(currentLevel + 1); // Total XP needed for next level
-  const expNeededForCurrentLevel = BASE_EXP_PER_LEVEL; // XP needed for next level (always 100)
-  const currentLevelProgress = currentLevel >= MAX_LEVEL ? expNeededForCurrentLevel : currentExp - currentLevelExp; // Progress within current level
-  
-  // Calculate progress percentage (0-100%)
-  const progress = currentLevel >= MAX_LEVEL 
-    ? 100 
-    : Math.max(0, Math.min(100, (currentLevelProgress / expNeededForCurrentLevel) * 100));
+  // Calculate user level progression using utility
+  const levelData = calculateLevelProgression(user?.level, user?.experience_points);
+  const levelTexts = formatLevelProgress(levelData);
 
   const handleLogout = async () => {
     logout.mutateAsync();
@@ -76,7 +58,7 @@ export default function UserProfileHeader() {
                 </div>
                 {/* Level badge - only on mobile */}
                 <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-background shadow-lg md:hidden">
-                  {currentLevel}
+                  {levelData.currentLevel}
                 </div>
               </div>
 
@@ -113,28 +95,25 @@ export default function UserProfileHeader() {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-foreground">
-                Түвшин {currentLevel}
+                {levelTexts.currentLevelText}
               </span>
               <span className="text-xs text-muted-foreground font-medium">
                 <span className="md:hidden">
-                  {Math.floor(currentLevelProgress)} / {Math.floor(expNeededForCurrentLevel)} XP
+                  {levelTexts.progressText}
                 </span>
                 <span className="hidden md:inline">
-                  {currentLevel >= MAX_LEVEL 
-                    ? "Максимум түвшин" 
-                    : `Түвшин ${currentLevel + 1} хүртэл ${Math.floor(expNeededForCurrentLevel - currentLevelProgress)} XP`
-                  }
+                  {levelTexts.nextLevelText}
                 </span>
               </span>
             </div>
             <div className="w-full bg-muted/50 rounded-full h-3 overflow-hidden">
               <div
                 className="bg-gradient-to-r from-primary via-primary/90 to-primary/80 h-3 rounded-full"
-                style={{ width: `${progress}%` }}
+                style={{ width: `${levelData.progressPercentage}%` }}
               ></div>
             </div>
             <div className="flex items-center justify-between text-xs text-muted-foreground md:hidden">
-              <span>Дараагийн түвшин хүртэл {expNeededForCurrentLevel - currentLevelProgress} XP</span>
+              <span>Дараагийн түвшин хүртэл {levelData.expNeededForNext} XP</span>
             </div>
           </div>
         </div>

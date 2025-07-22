@@ -8,7 +8,7 @@ export function StatsReview() {
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Image src="/logo.svg" alt="JemLit" width={32} height={32} /> 
-          <span className="font-semibold text-lg">JemLit</span>
+          <span className="font-semibold text-lg">Mbox</span>
         </div>
         <div className="text-3xl font-bold mb-3">1458633</div>
         <p className="text-card-foreground/80 mb-4">
