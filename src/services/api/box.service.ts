@@ -1,4 +1,4 @@
-import api from '../../lib/api';
+import api from "../../lib/api";
 import {
   Box,
   CreateBoxData,
@@ -8,15 +8,15 @@ import {
   BoxOpenResponse,
   BoxOpenHistory,
   BoxOpenHistoryQuery,
-} from '../../types/box';
-import { PaginatedResponse } from '../../types/api';
+} from "../../types/box";
+import { PaginatedResponse } from "../../types/api";
 
 /**
  * Box API Service
  * Handles all box-related API operations matching your backend exactly
  */
 export class BoxService {
-  private readonly baseUrl = '/box'; // Note: singular 'box' to match your backend
+  private readonly baseUrl = "/box"; // Note: singular 'box' to match your backend
 
   /**
    * Get all boxes with optional filtering and pagination
@@ -40,7 +40,7 @@ export class BoxService {
     const params: any = {};
     if (name) params.name = name;
     if (isFeatured !== undefined) params.isFeatured = isFeatured;
-    
+
     const response = await api.get<Box[]>(`${this.baseUrl}/simple`, { params });
     return response.data;
   }
@@ -60,7 +60,9 @@ export class BoxService {
    * @returns Promise<Box[]>
    */
   async searchBoxesByName(name: string): Promise<Box[]> {
-    const response = await api.get<Box[]>(`${this.baseUrl}/search/name/${name}`);
+    const response = await api.get<Box[]>(
+      `${this.baseUrl}/search/name/${name}`
+    );
     return response.data;
   }
 
@@ -102,7 +104,9 @@ export class BoxService {
    * @returns Promise<Box>
    */
   async updateFeaturedStatus(id: number, isFeatured: boolean): Promise<Box> {
-    const response = await api.patch<Box>(`${this.baseUrl}/${id}/featured`, { isFeatured });
+    const response = await api.patch<Box>(`${this.baseUrl}/${id}/featured`, {
+      isFeatured,
+    });
     return response.data;
   }
 
@@ -123,11 +127,9 @@ export class BoxService {
    * @param userId - User ID who is opening the box
    * @returns Promise<BoxOpenResponse>
    */
-  async openBox(boxId: number, userId: string): Promise<BoxOpenResponse> {
-    const requestData: BoxOpenRequest = { userId };
+  async openBox(boxId: number): Promise<BoxOpenResponse> {
     const response = await api.post<BoxOpenResponse>(
-      `${this.baseUrl}/${boxId}/open`,
-      requestData
+      `${this.baseUrl}/${boxId}/open`
     );
     return response.data;
   }

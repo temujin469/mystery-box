@@ -6,6 +6,12 @@ import {
 } from '../../types/item';
 import { PaginatedResponse } from '../../types/api';
 
+export interface SellItemResponse {
+  success: boolean;
+  coinsReceived: number;
+  message: string;
+}
+
 export interface ItemQuery {
   page?: number;
   limit?: number;
@@ -117,6 +123,20 @@ export class ItemService {
    */
   async deleteItem(id: number): Promise<void> {
     await api.delete(`${this.baseUrl}/${id}`);
+  }
+
+  /**
+   * Sell an item back for coins
+   * POST /item/:id/sell
+   * @param id - Item ID to sell
+   * @param quantity - Quantity to sell (default: 1)
+   * @returns Promise<SellItemResponse>
+   */
+  async sellItem(id: number, quantity: number = 1): Promise<SellItemResponse> {
+    const response = await api.post<SellItemResponse>(`${this.baseUrl}/${id}/sell`, {
+      quantity,
+    });
+    return response.data;
   }
 }
 

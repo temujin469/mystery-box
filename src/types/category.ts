@@ -22,12 +22,7 @@ export interface CreateCategoryData {
   is_featured?: boolean;
 }
 
-export interface UpdateCategoryData {
-  name?: string;
-  image_url?: string;
-  is_active?: boolean;
-  is_featured?: boolean;
-}
+export interface UpdateCategoryData extends Partial<CreateCategoryData> {}
 
 export interface CategoryQuery extends BaseQuery {
   orderBy?: CategoryOrderByField;
@@ -46,7 +41,6 @@ export enum CategoryOrderByField {
   CREATED_AT = "created_at",
   UPDATED_AT = "updated_at",
 }
-
 
 // Category management actions
 export interface CategoryBulkAction {

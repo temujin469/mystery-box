@@ -1,4 +1,4 @@
-import { BaseQuery } from './api';
+import { BaseQuery } from "./api";
 
 export interface Address {
   id: number;
@@ -19,32 +19,10 @@ export interface Address {
   user?: any; // User type from auth.ts
 }
 
-export interface CreateAddressData {
-  title: string;
-  full_address: string;
-  city?: string;
-  district?: string;
-  khoroo?: string;
-  postal_code?: string;
-  phone?: string;
-  recipient_name?: string;
-  is_default?: boolean;
-  notes?: string;
-  user_id: string;
-}
+export interface CreateAddressData
+  extends Omit<Address, "id" | "created_at" | "updated_at"> {}
 
-export interface UpdateAddressData {
-  title?: string;
-  full_address?: string;
-  city?: string;
-  district?: string;
-  khoroo?: string;
-  postal_code?: string;
-  phone?: string;
-  recipient_name?: string;
-  is_default?: boolean;
-  notes?: string;
-}
+export interface UpdateAddressData extends Partial<CreateAddressData> {}
 
 export interface AddressQuery extends BaseQuery {
   orderBy?: AddressOrderByField;
@@ -58,15 +36,15 @@ export interface AddressQuery extends BaseQuery {
 }
 
 export enum AddressOrderByField {
-  ID = 'id',
-  TITLE = 'title',
-  FULL_ADDRESS = 'full_address',
-  CITY = 'city',
-  DISTRICT = 'district',
-  KHOROO = 'khoroo',
-  IS_DEFAULT = 'is_default',
-  CREATED_AT = 'created_at',
-  UPDATED_AT = 'updated_at',
+  ID = "id",
+  TITLE = "title",
+  FULL_ADDRESS = "full_address",
+  CITY = "city",
+  DISTRICT = "district",
+  KHOROO = "khoroo",
+  IS_DEFAULT = "is_default",
+  CREATED_AT = "created_at",
+  UPDATED_AT = "updated_at",
 }
 
 // Address validation patterns
@@ -103,7 +81,7 @@ export interface AddressSuggestion {
 // Bulk address operations
 export interface AddressBulkAction {
   address_ids: number[];
-  action: 'delete' | 'set_default' | 'archive';
+  action: "delete" | "set_default" | "archive";
   data?: any;
 }
 

@@ -146,7 +146,7 @@ export default function BoxPage({
         <div className="container max-w-7xl mx-auto px-3 py-6">
           <div className="flex items-center gap-6">
             <Link
-              href="/boxes"
+              href="/"
               className="group relative px-6 py-3 bg-gradient-to-r from-slate-800/90 via-gray-800/90 to-slate-700/90 hover:from-slate-700/90 hover:via-gray-700/90 hover:to-slate-600/90 backdrop-blur-md border border-slate-600/60 hover:border-slate-500/80 rounded-md transition-all duration-200 text-gray-300 hover:text-white shadow-lg hover:shadow-slate-500/20 overflow-hidden"
             >
               <div className="flex items-center gap-3 relative z-10">

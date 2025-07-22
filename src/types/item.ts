@@ -5,6 +5,7 @@ export interface Item {
   name: string;
   image_url: string;
   price: number;
+  rarity: number; // Rarity level from 1 to 5
   sell_value?: number;
   description?: string;
   created_at: string;
@@ -26,13 +27,7 @@ export interface CreateItemData {
   description?: string;
 }
 
-export interface UpdateItemData {
-  name?: string;
-  image_url?: string;
-  price?: number;
-  sell_value?: number;
-  description?: string;
-}
+export interface UpdateItemData extends Partial<CreateItemData> {}
 
 export interface ItemQuery extends BaseQuery {
   orderBy?: ItemOrderByField;

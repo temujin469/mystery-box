@@ -50,13 +50,11 @@ export function Header() {
         isVisible ? "translate-y-0" : "-translate-y-full"
       )}
     >
-      <div className="flex items-center justify-between px-3 w-full max-w-7xl mx-auto relative z-10">
+      <div className="flex items-center justify-between px-3 sm:px-6 w-full max-w-7xl mx-auto relative z-10">
         <div className="flex items-center gap-8 lg:gap-20">
           <Link href="/" className="flex items-center gap-3 group">
             <span className="font-bold flex items-center text-2xl gap-2 text-card-foreground group-hover:text-primary transition-colors">
-              <div className="hover:rotate-12 hover:scale-110 transition-transform duration-200">
-                <BoxIcon size={35} className="text-primary" />
-              </div>
+                <Image alt="logo" src="/logo.png" width={33} height={33}/>
             </span>
           </Link>
 

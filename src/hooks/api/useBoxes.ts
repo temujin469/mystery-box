@@ -1,31 +1,34 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { boxService } from '../../services/api';
-import { 
-  Box, 
-  CreateBoxData, 
-  UpdateBoxData, 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { boxService } from "../../services/api";
+import {
+  Box,
+  CreateBoxData,
+  UpdateBoxData,
   BoxQuery,
   BoxOpenResponse,
   BoxOpenHistory,
-  BoxOpenHistoryQuery
-} from '../../types/box';
-import { PaginatedResponse } from '../../types/api';
-import { useCurrentUser } from './useAuth';
+  BoxOpenHistoryQuery,
+} from "../../types/box";
+import { PaginatedResponse } from "../../types/api";
+import { authKeys, useCurrentUser } from "./useAuth";
+import { achievementKeys } from "./useAchievements";
+import { userKeys } from "./useUsers";
 
 // Query Keys
 export const boxKeys = {
-  all: ['boxes'] as const,
-  lists: () => [...boxKeys.all, 'list'] as const,
+  all: ["boxes"] as const,
+  lists: () => [...boxKeys.all, "list"] as const,
   list: (query?: BoxQuery) => [...boxKeys.lists(), query] as const,
-  simple: (name?: string, isFeatured?: boolean) => [...boxKeys.all, 'simple', { name, isFeatured }] as const,
-  featured: () => [...boxKeys.all, 'featured'] as const,
-  search: (name: string) => [...boxKeys.all, 'search', name] as const,
-  details: () => [...boxKeys.all, 'detail'] as const,
+  simple: (name?: string, isFeatured?: boolean) =>
+    [...boxKeys.all, "simple", { name, isFeatured }] as const,
+  featured: () => [...boxKeys.all, "featured"] as const,
+  search: (name: string) => [...boxKeys.all, "search", name] as const,
+  details: () => [...boxKeys.all, "detail"] as const,
   detail: (id: string) => [...boxKeys.details(), id] as const,
   // Box Opening History Keys
-  history: () => [...boxKeys.all, 'history'] as const,
-  userHistory: (query?: BoxOpenHistoryQuery) => 
-    [...boxKeys.history(), 'user', query] as const,
+  history: () => [...boxKeys.all, "history"] as const,
+  userHistory: (query?: BoxOpenHistoryQuery) =>
+    [...boxKeys.history(), "user", query] as const,
 };
 
 // Query Hooks
@@ -93,7 +96,10 @@ export const useUpdateBox = () => {
     onSuccess: (updatedBox) => {
       queryClient.invalidateQueries({ queryKey: boxKeys.lists() });
       queryClient.invalidateQueries({ queryKey: boxKeys.featured() });
-      queryClient.setQueryData(boxKeys.detail(updatedBox.id.toString()), updatedBox);
+      queryClient.setQueryData(
+        boxKeys.detail(updatedBox.id.toString()),
+        updatedBox
+      );
     },
   });
 };
@@ -107,7 +113,10 @@ export const useUpdateBoxFeaturedStatus = () => {
     onSuccess: (updatedBox) => {
       queryClient.invalidateQueries({ queryKey: boxKeys.lists() });
       queryClient.invalidateQueries({ queryKey: boxKeys.featured() });
-      queryClient.setQueryData(boxKeys.detail(updatedBox.id.toString()), updatedBox);
+      queryClient.setQueryData(
+        boxKeys.detail(updatedBox.id.toString()),
+        updatedBox
+      );
     },
   });
 };
@@ -120,7 +129,9 @@ export const useDeleteBox = () => {
     onSuccess: (_, deletedId) => {
       queryClient.invalidateQueries({ queryKey: boxKeys.lists() });
       queryClient.invalidateQueries({ queryKey: boxKeys.featured() });
-      queryClient.removeQueries({ queryKey: boxKeys.detail(deletedId.toString()) });
+      queryClient.removeQueries({
+        queryKey: boxKeys.detail(deletedId.toString()),
+      });
     },
   });
 };
@@ -130,7 +141,7 @@ export const useDeleteBox = () => {
 /**
  * Hook to get user's box opening history with pagination
  */
-export const useUserBoxOpenHistory = (
+export const useMyBoxOpenHistory = (
   query?: BoxOpenHistoryQuery,
   enabled: boolean = true
 ) => {
@@ -152,26 +163,33 @@ export const useOpenMyBox = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (boxId: number) =>
-      boxService.openBox(boxId, user!.id),
+    mutationFn: (boxId: number) => boxService.openBox(boxId),
     onSuccess: (data) => {
       if (!user?.id) return;
-      
+
       // Invalidate user's box opening history
-      queryClient.invalidateQueries({ 
-        queryKey: boxKeys.history() 
+      queryClient.invalidateQueries({
+        queryKey: boxKeys.history(),
       });
-      
+
       // Invalidate user's inventory and stats if those hooks exist
-      queryClient.invalidateQueries({ 
-        queryKey: ['users', user.id, 'inventory'] 
+      queryClient.invalidateQueries({
+        queryKey: userKeys.inventory(user.id),
       });
-      queryClient.invalidateQueries({ 
-        queryKey: ['users', user.id, 'stats'] 
+      queryClient.invalidateQueries({
+        queryKey: userKeys.stats(user.id),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: authKeys.profile(),
+      });
+
+      // invalidate achievement progress
+      queryClient.invalidateQueries({
+        queryKey: achievementKeys.myProgress(),
       });
     },
     // Only enable if user is logged in
-    mutationKey: ['openMyBox', user?.id],
+    mutationKey: ["openMyBox", user?.id],
   });
 };
-

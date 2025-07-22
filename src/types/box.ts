@@ -8,6 +8,7 @@ export interface Box {
   name: string;
   coin: number;
   price: number;
+  rarity: number; // Rarity level from 1 to 5
   commission_rate: number;
   image_url: string;
   is_featured: boolean;
@@ -16,7 +17,7 @@ export interface Box {
   created_at: string;
   updated_at: string;
   // Relations (when included)
-  items?: BoxItem[]; 
+  items?: BoxItem[];
   categories?: any[]; // CategoryBox[]
   boxCount?: number;
 }
@@ -42,7 +43,6 @@ export interface CategoryBox {
   box?: any; // Box type from box.ts
 }
 
-
 export interface CreateBoxData {
   name: string;
   coin: number;
@@ -54,16 +54,7 @@ export interface CreateBoxData {
   available_to?: string;
 }
 
-export interface UpdateBoxData {
-  name?: string;
-  coin?: number;
-  price?: number;
-  commission_rate?: number;
-  is_featured?: boolean;
-  image_url?: string;
-  available_from?: string;
-  available_to?: string;
-}
+export interface UpdateBoxData extends Partial<CreateBoxData> {}
 
 export interface BoxQuery extends BaseQuery {
   orderBy?: BoxOrderByField;
@@ -84,6 +75,7 @@ export enum BoxOrderByField {
   PRICE = "price",
   COMMISSION_RATE = "commission_rate",
   IS_FEATURED = "is_featured",
+  RARITY = "rarity",
   AVAILABLE_FROM = "available_from",
   AVAILABLE_TO = "available_to",
   CREATED_AT = "created_at",

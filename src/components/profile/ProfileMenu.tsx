@@ -11,6 +11,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
+  DrawerFooter,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import {
@@ -107,7 +108,7 @@ export default function ProfileMenu() {
         </MenuItem>
         <MenuItem
           icon={<Gift className="mr-3 w-4 h-4" />}
-          href="/profile/rewards"
+          href="/profile/achievements"
           activeColor="text-yellow-500"
           hoverColor="group-hover:text-yellow-500"
         >
@@ -156,7 +157,7 @@ export default function ProfileMenu() {
               <div className="w-full bg-muted/30 rounded-full h-1.5 overflow-hidden">
                 <div 
                   className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${((user?.level ?? 0) * 15) % 100}%` }}
+                  style={{ width: `${((user?.level ?? 0) / 30) * 100}%` }}
                 />
               </div>
             </div>
@@ -199,7 +200,7 @@ export default function ProfileMenu() {
           </MenuItem>
           <MenuItem
             icon={<Gift className="w-5 h-5" />}
-            href="/profile/rewards"
+            href="/profile/achievements"
             activeColor="text-primary"
             hoverColor="group-hover:text-primary"
             isMobile={true}
@@ -218,19 +219,6 @@ export default function ProfileMenu() {
             Тохиргоо
           </MenuItem>
         </div>
-        
-        {/* Minimal divider */}
-        <div className="my-6 h-px bg-border/50"></div>
-
-        {/* Modern logout button */}
-        <Button
-          onClick={handleLogout}
-          variant="ghost"
-          className="w-full justify-start gap-4 px-4 py-4 h-auto rounded-xl bg-destructive"
-        >
-          <LogOut className="w-5 h-5" />
-          <span className="text-base font-medium">Гарах</span>
-        </Button>
       </div>
     </>
   );
@@ -268,9 +256,19 @@ export default function ProfileMenu() {
           <DrawerHeader className="sr-only">
             <DrawerTitle>Profile Menu</DrawerTitle>
           </DrawerHeader>
-          <div className="pb-6">
+          <div className="flex-1">
             {mobileMenuContent}
           </div>
+          <DrawerFooter className="pb-5">
+            <Button
+              onClick={handleLogout}
+              variant="ghost"
+              className="w-full justify-start gap-4 px-4 py-4 h-auto rounded-xl bg-destructive/10 hover:bg-destructive/20 text-destructive hover:text-destructive"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="text-base font-medium">Гарах</span>
+            </Button>
+          </DrawerFooter>
         </DrawerContent>
       </Drawer>
     );

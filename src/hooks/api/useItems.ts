@@ -114,3 +114,28 @@ export const useDeleteItem = () => {
     },
   });
 };
+
+export const useSellItem = () => {
+  const queryClient = useQueryClient();
+  const { data: user } = useCurrentUser();
+
+  return useMutation({
+    mutationFn: ({ id, quantity }: { id: number; quantity?: number }) =>
+      itemService.sellItem(id, quantity),
+    onSuccess: (_, { id }) => {
+      // Invalidate user's inventory to reflect the sold items
+      if (user?.id) {
+        queryClient.invalidateQueries({ 
+          queryKey: itemKeys.userItems(user.id) 
+        });
+      }
+      
+      // Invalidate all items lists to refresh data
+      queryClient.invalidateQueries({ queryKey: itemKeys.lists() });
+      
+      // Invalidate user queries to update coin balance
+      queryClient.invalidateQueries({ queryKey: ["users", "current"] });
+      queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
+    },
+  });
+};

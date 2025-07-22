@@ -1,50 +1,16 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardHeader, CardTitle } from "../ui/card";
 import Image from "next/image";
-import { Button } from "../ui/button";
 import clsx from "clsx";
 import { Box } from "@/types";
-
-const getPriceClasses = (price: number) => {
-  if (price < 20000)
-    return {
-      tag: "bg-green-500",
-      text: "text-green-500",
-      border: "border-green-500",
-      triangle: "border-r-green-500/40 group-hover:border-r-green-500",
-      button: "bg-green-500/40 group-hover:bg-green-500 text-green-500 group-hover:text-white",
-    };
-  if (price < 40000)
-    return {
-      tag: "bg-blue-500",
-      text: "text-blue-500",
-      border: "border-blue-500",
-      triangle: "border-r-blue-500/40 group-hover:border-r-blue-500",
-      button: "bg-blue-500/40 group-hover:bg-blue-500 text-blue-500 group-hover:text-white",
-    };
-  if (price < 100000)
-    return {
-      tag: "bg-yellow-500",
-      text: "text-yellow-500",
-      border: "border-yellow-500",
-      triangle: "border-r-yellow-500/40 group-hover:border-r-yellow-500",
-      button: "bg-yellow-500/40 group-hover:bg-yellow-500 text-yellow-500 group-hover:text-white",
-    };
-  return {
-    tag: "bg-red-500",
-    text: "text-red-500",
-    border: "border-red-500",
-    triangle: "border-r-red-500/40 group-hover:border-r-red-500",
-    button: "bg-red-500/40 group-hover:bg-red-500 text-red-500 group-hover:text-white",
-  };
-};
+import { getRarityColors } from "@/lib/rarity-colors";
 
 type Props = {
   box: Box;
 };
 
 export function BoxCard({ box }: Props) {
-  const priceStyles = getPriceClasses(box.price);
+  const rarityColors = getRarityColors(box.rarity);
   return (
     <Card
       key={box.name}
@@ -54,10 +20,7 @@ export function BoxCard({ box }: Props) {
       <div
         className={clsx(
           "absolute top-2 right-[-28] text-[11px] z-10 flex items-center justify-center w-28 h-8 rotate-45 border-1 bg-gradient-to-r text-white font-bold",
-          priceStyles.text === "text-green-500" ? "from-green-500 to-emerald-600 border-green-500" :
-          priceStyles.text === "text-blue-500" ? "from-blue-500 to-blue-600 border-blue-500" :
-          priceStyles.text === "text-yellow-500" ? "from-yellow-500 to-orange-600 border-yellow-500" :
-          "from-red-500 to-red-600 border-red-500"
+          `${rarityColors.gradient} ${rarityColors.border}`
         )}
       >
         Шинэ
@@ -73,7 +36,7 @@ export function BoxCard({ box }: Props) {
       {/* Glow circle */}
       <div className="relative">
         <div
-          className={clsx("duration-200 group-hover:w-[75%] group-hover:h-[75%] blur-2xl rounded-full w-[60%] h-[60%] z-0 absolute top-[12%] right-[50%] translate-x-[50%]",priceStyles.tag)}
+          className={clsx("duration-200 group-hover:w-[75%] group-hover:h-[75%] blur-2xl rounded-full w-[60%] h-[60%] z-0 absolute top-[12%] right-[50%] translate-x-[50%]", rarityColors.bg)}
         ></div>
      {/* Box image & title */}
         <CardHeader className="flex flex-col overflow-hidden px-4 md:px-6 z-10 relative">
@@ -93,12 +56,7 @@ export function BoxCard({ box }: Props) {
       </div>
       {/* Price text */}
       <div
-        className={clsx(`font-bold text-[12px] md:text-sm z-10 h-[50px] flex items-center pl-4 md:pl-6 bg-gradient-to-r bg-clip-text text-transparent`,
-          priceStyles.text === "text-green-500" ? "from-green-400 to-emerald-600" :
-          priceStyles.text === "text-blue-500" ? "from-blue-400 to-blue-600" :
-          priceStyles.text === "text-yellow-500" ? "from-yellow-400 to-orange-500" :
-          "from-red-400 to-red-600"
-        )}
+        className={clsx(`font-bold text-[12px] md:text-sm z-10 h-[50px] flex items-center pl-4 md:pl-6 bg-gradient-to-r bg-clip-text text-transparent ${rarityColors.gradient}`)}
       >
         {box.price.toLocaleString()} ₮
       </div>
@@ -106,24 +64,18 @@ export function BoxCard({ box }: Props) {
       {/* Bottom tag ribbon */}
     <div className="absolute bottom-0 right-0 flex w-full justify-end items-end">
         {/* Triangle */}
-        <div
+        {/* <div
           className={clsx(
             "w-0 h-0 border-l-transparent border-t-transparent border-b-transparent border-[45px] border-b-0 border-r-[50px]",
-            priceStyles.text === "text-green-500" ? "border-r-green-500" :
-            priceStyles.text === "text-blue-500" ? "border-r-blue-500" :
-            priceStyles.text === "text-yellow-500" ? "border-r-yellow-500" :
-            "border-r-red-500"
+            rarityColors.border.replace('border-', 'border-r-')
           )}
-        ></div>
+        ></div> */}
 
         {/* "Нээх" Button Tag */}
         <div
           className={clsx(
-            "border-background h-[45px] w-[30%] flex items-center justify-center pr-5 font-bold text-sm bg-gradient-to-r text-white",
-            priceStyles.text === "text-green-500" ? "from-green-500 to-green-600" :
-            priceStyles.text === "text-blue-500" ? "from-blue-500 to-blue-600" :
-            priceStyles.text === "text-yellow-500" ? "from-yellow-500 to-yellow-600" :
-            "from-red-500 to-red-600"
+            "h-[45px] w-[45%] flex items-center justify-center font-bold text-[12px] sm:text-sm bg-gradient-to-r text-white rounded-tl-2xl",
+            rarityColors.gradient
           )}
         >
           Нээх

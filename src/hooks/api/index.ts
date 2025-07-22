@@ -18,6 +18,9 @@ export * from './useItems';
 // Address hooks
 export * from './useAddresses';
 
+// Achievement hooks
+export * from './useAchievements';
+
 // Category hooks
 export * from './useCategories';
 

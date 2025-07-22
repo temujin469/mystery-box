@@ -27,14 +27,16 @@ export default function AddressCard({
   isDeleting = false,
 }: AddressCardProps) {
   return (
-    <Paper className="hover:shadow-lg transition-all duration-300 border border-border/50 hover:border-primary/30">
+    <Paper>
       <div className="space-y-4">
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="w-2 h-8 bg-gradient-to-b from-primary to-accent rounded-full flex-shrink-0"></div>
             <div className="min-w-0 flex-1">
-              <h3 className="font-bold text-lg text-foreground truncate">{address.title}</h3>
+              <h3 className="font-bold text-lg text-foreground truncate">
+                {address.title}
+              </h3>
               {address.is_default && (
                 <span className="inline-flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 px-2 py-1 rounded-lg text-xs font-medium mt-1">
                   <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
@@ -43,13 +45,13 @@ export default function AddressCard({
               )}
             </div>
           </div>
-          
+
           {/* Actions Menu */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className="h-8 w-8 p-0 hover:bg-muted"
               >
                 <MoreVertical className="h-4 w-4" />
@@ -57,16 +59,16 @@ export default function AddressCard({
             </PopoverTrigger>
             <PopoverContent className="w-48 p-1" align="end">
               <div className="space-y-1">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => onEdit(address)}
                   className="w-full justify-start text-sm hover:bg-muted"
                 >
                   <Edit className="mr-2 h-4 w-4" />
                   Засах
                 </Button>
-                
+
                 {!address.is_default && (
                   <Button
                     variant="ghost"
@@ -88,7 +90,7 @@ export default function AddressCard({
                     )}
                   </Button>
                 )}
-                
+
                 <Button
                   variant="ghost"
                   size="sm"
@@ -121,8 +123,12 @@ export default function AddressCard({
               <span className="text-primary text-sm">👤</span>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs text-muted-foreground font-medium">Хүлээн авагч</p>
-              <p className="font-semibold text-foreground truncate">{address.recipient_name}</p>
+              <p className="text-xs text-muted-foreground font-medium">
+                Хүлээн авагч
+              </p>
+              <p className="font-semibold text-foreground truncate">
+                {address.recipient_name}
+              </p>
             </div>
           </div>
 
@@ -133,8 +139,12 @@ export default function AddressCard({
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-xs text-muted-foreground font-medium">Хаяг</p>
-              <p className="font-semibold text-foreground leading-relaxed">{address.full_address}</p>
-              <p className="text-sm text-muted-foreground mt-1">{address.city}, {address.district}</p>
+              <p className="font-semibold text-foreground leading-relaxed">
+                {address.full_address}
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {address.city}, {address.district}
+              </p>
             </div>
           </div>
 
@@ -145,8 +155,12 @@ export default function AddressCard({
                 <span className="text-blue-500 text-sm">�</span>
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground font-medium">Утас</p>
-                <p className="font-semibold text-foreground truncate">{address.phone}</p>
+                <p className="text-xs text-muted-foreground font-medium">
+                  Утас
+                </p>
+                <p className="font-semibold text-foreground truncate">
+                  {address.phone}
+                </p>
               </div>
             </div>
 
@@ -155,8 +169,12 @@ export default function AddressCard({
                 <span className="text-green-500 text-sm">�</span>
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground font-medium">Шуудангийн код</p>
-                <p className="font-semibold text-foreground">{address.postal_code}</p>
+                <p className="text-xs text-muted-foreground font-medium">
+                  Шуудангийн код
+                </p>
+                <p className="font-semibold text-foreground">
+                  {address.postal_code}
+                </p>
               </div>
             </div>
           </div>
@@ -168,8 +186,12 @@ export default function AddressCard({
                 <span className="text-yellow-500 text-sm">📝</span>
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground font-medium">Тэмдэглэл</p>
-                <p className="text-muted-foreground leading-relaxed">{address.notes}</p>
+                <p className="text-xs text-muted-foreground font-medium">
+                  Тэмдэглэл
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  {address.notes}
+                </p>
               </div>
             </div>
           )}

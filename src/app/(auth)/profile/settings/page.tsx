@@ -196,7 +196,7 @@ export default function ProfileSettings() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground py-8">
+    <div>
       <HeaderWithIcon
         icon="⚙️"
         title="Тохиргоо"
@@ -212,7 +212,7 @@ export default function ProfileSettings() {
               placeholder={user?.email ? `Одоогийн: ${user.email}` : "Шинэ имэйл хаяг"}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="text-lg placeholder:text-muted-foreground"
+              className="placeholder:text-muted-foreground"
               disabled={updateUser.isPending}
             />
             <Button 
@@ -234,7 +234,7 @@ export default function ProfileSettings() {
               placeholder={user?.username ? `Одоогийн: ${user.username}` : "Шинэ хэрэглэгчийн нэр"}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="text-lg placeholder:text-muted-foreground"
+              className="placeholder:text-muted-foreground"
               minLength={3}
               maxLength={50}
               disabled={updateUser.isPending}
@@ -261,17 +261,17 @@ export default function ProfileSettings() {
             <Input
               type="password"
               placeholder="Одоогийн нууц үг"
-              className="text-lg placeholder:text-muted-foreground"
+              className="placeholder:text-muted-foreground"
             />
             <Input
               type="password"
               placeholder="Шинэ нууц үг"
-              className="text-lg placeholder:text-muted-foreground"
+              className="placeholder:text-muted-foreground"
             />
             <Input
               type="password"
               placeholder="Шинэ нууц үг давтах"
-              className="text-lg placeholder:text-muted-foreground"
+              className="placeholder:text-muted-foreground"
             />
             <Button className="w-fit bg-primary text-primary-foreground font-semibold">
               Нууц үг шинэчлэх
@@ -291,7 +291,7 @@ export default function ProfileSettings() {
               placeholder={user?.firstname ? `Одоогийн: ${user.firstname}` : "Нэр"}
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="text-lg placeholder:text-muted-foreground"
+              className="placeholder:text-muted-foreground"
               maxLength={50}
               disabled={updateUser.isPending}
             />
@@ -314,7 +314,7 @@ export default function ProfileSettings() {
               placeholder={user?.lastname ? `Одоогийн: ${user.lastname}` : "Овог"}
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="text-lg placeholder:text-muted-foreground"
+              className="placeholder:text-muted-foreground"
               maxLength={50}
               disabled={updateUser.isPending}
             />

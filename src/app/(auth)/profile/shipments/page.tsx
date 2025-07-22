@@ -13,9 +13,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useState, useRef, useEffect } from "react";
-import AddressList from "@/components/profile/shipments/AddressList";
-import AddressForm from "@/components/profile/shipments/AddressForm";
 import { HeaderWithIcon, ResponsiveDialog } from "@/components/common";
+import { AddressForm, AddressList } from "@/components/profile";
 
 export default function Shipment() {
   const { data: user } = useCurrentUser();
@@ -218,7 +217,7 @@ export default function Shipment() {
     setEditingAddress(null);
   };
   return (
-    <div className="min-h-screen bg-background text-foreground py-8">
+    <div>
       <div>
         <HeaderWithIcon
           icon="📬"

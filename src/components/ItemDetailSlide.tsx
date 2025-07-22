@@ -14,6 +14,7 @@ import { Item } from "@/types";
 import { useItem } from "@/hooks/api";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getRarityColors } from "@/lib/rarity-colors";
 
 interface ItemDetailSlideProps {
   isOpen: boolean;
@@ -98,8 +99,6 @@ export function ItemDetailSlide({
             maxHeight: "calc(100vh - 88px)", // Subtract header height
           }}
         >
-
-           
           {isPending && <ItemDetailSkeleton />}
 
           {error && (
@@ -141,48 +140,33 @@ function ItemDetail({ item }: { item: Item }) {
     });
   };
 
-  // Function to get circle colors based on drop rate (exact same as ItemCard)
-  function getDropRateColor(rate: number): string {
-    if (rate < 0.01) {
-      return `bg-red-400`; //extreme
-    } else if (rate < 0.04) {
-      return `bg-yellow-400`;
-    } else if (rate < 0.09) {
-      return `bg-blue-400`;
-    } else {
-      return `bg-green-400`;
-    }
-  }
+  // Get colors based on item rarity
+  const rarityColors = getRarityColors(item.rarity);
 
-  function getDropRateColorBorder(rate: number): string {
-    if (rate < 0.01) {
-      return `border-red-400`; //extreme
-    } else if (rate < 0.04) {
-      return `border-yellow-400`;
-    } else if (rate < 0.09) {
-      return `border-blue-400`;
-    } else {
-      return `border-green-400`;
+  // Rarity-based glow effect
+  const getRarityGlow = (rarity: number): string => {
+    switch (rarity) {
+      case 1: // Legendary - Purple
+        return "shadow-[0_0_30px_rgba(168,85,247,0.4),0_0_60px_rgba(147,51,234,0.3),0_0_90px_rgba(126,34,206,0.2)]";
+      case 2: // Epic - Pink
+        return "shadow-[0_0_30px_rgba(236,72,153,0.4),0_0_60px_rgba(219,39,119,0.3),0_0_90px_rgba(190,24,93,0.2)]";
+      case 3: // Uncommon - Cyan
+        return "shadow-[0_0_30px_rgba(34,211,238,0.4),0_0_60px_rgba(6,182,212,0.3),0_0_90px_rgba(8,145,178,0.2)]";
+      case 4: // Common - Emerald
+        return "shadow-[0_0_30px_rgba(52,211,153,0.4),0_0_60px_rgba(16,185,129,0.3),0_0_90px_rgba(5,150,105,0.2)]";
+      case 5: // Trash - Slate
+      default:
+        return "shadow-[0_0_30px_rgba(148,163,184,0.4),0_0_60px_rgba(100,116,139,0.3),0_0_90px_rgba(71,85,105,0.2)]";
     }
-  }
+  };
 
-  function getDropRateGlow(rate: number): string {
-    if (rate < 0.01) {
-      return "shadow-[0_0_30px_rgba(239,68,68,0.4),0_0_60px_rgba(220,38,38,0.3),0_0_90px_rgba(185,28,28,0.2)]";
-    } else if (rate < 0.04) {
-      return "shadow-[0_0_30px_rgba(251,191,36,0.4),0_0_60px_rgba(245,158,11,0.3),0_0_90px_rgba(217,119,6,0.2)]";
-    } else if (rate < 0.09) {
-      return "shadow-[0_0_30px_rgba(59,130,246,0.4),0_0_60px_rgba(37,99,235,0.3),0_0_90px_rgba(29,78,216,0.2)]";
-    } else {
-      return "shadow-[0_0_30px_rgba(34,197,94,0.4),0_0_60px_rgba(22,163,74,0.3),0_0_90px_rgba(21,128,61,0.2)]";
-    }
-  }
+  const rarityGlow = getRarityGlow(item.rarity);
 
   // Get the drop rate from the first box item (assuming all boxes have similar rates)
   const dropRate = item.boxes?.[0]?.drop_rate || 0.1; // Default to green if no rate
-  
+
   // Modern gradient glow effect
-  const modernGlow = "shadow-[0_0_30px_rgba(99,102,241,0.4),0_0_60px_rgba(139,92,246,0.3),0_0_90px_rgba(168,85,247,0.2)]";
+  const modernGlow = rarityGlow;
 
   return (
     <div className="space-y-8">
@@ -191,12 +175,12 @@ function ItemDetail({ item }: { item: Item }) {
         <div className="relative flex justify-center items-center h-full">
           {/* Top-left angled glow - positioned outside frame */}
           <div
-            className={`w-[120px] h-[500px] absolute bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 blur-3xl ${modernGlow} opacity-50 -top-30 -left-30 rotate-45`}
+            className={`w-[120px] h-[500px] absolute bg-gradient-to-r ${rarityColors.gradient} blur-3xl ${modernGlow} opacity-50 -top-30 -left-30 rotate-45`}
           />
-          
+
           {/* Bottom-right angled glow - positioned outside frame */}
           <div
-            className={`w-[120px] h-[500px] absolute bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 blur-3xl ${modernGlow} opacity-50 -bottom-30 -right-30 rotate-45`}
+            className={`w-[120px] h-[500px] absolute bg-gradient-to-r ${rarityColors.gradient} blur-3xl ${modernGlow} opacity-50 -bottom-30 -right-30 rotate-45`}
           />
 
           <Image
@@ -282,7 +266,6 @@ function ItemDetail({ item }: { item: Item }) {
                     <p className="text-xs text-gray-300 font-medium truncate group-hover:text-white transition-colors">
                       {boxItem.box?.name}
                     </p>
-                  
                   </div>
                 </div>
               ))}
