@@ -125,7 +125,7 @@ export default function AuthModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg w-full h-full sm:h-fit rounded-none border-none sm:rounded-xl p-4 sm:p-6 bg-background text-foreground shadow-xl flex flex-col">
+      <DialogContent className="max-w-lg w-full h-full sm:h-fit rounded-none border-none sm:rounded-xl px-4 py-6 sm:px-6 sm:py-6 bg-background text-foreground shadow-xl flex flex-col overflow-y-scroll sm:overflow-y-hidden">
         <DialogHeader className="mb-3">
           <DialogTitle className="text-2xl font-bold mb-2">
             {tab === "signin" ? "Нэвтрэх" : "Бүртгүүлэх"}
@@ -368,11 +368,16 @@ export default function AuthModal({
               </form>
             </TabsContent>
           </Tabs>
-          <div className="text-center text-sm text-muted-foreground my-10">
+          <div className="text-center text-sm text-muted-foreground my-5">
             эсвэл
           </div>
           <div className="gap-2 mt-2 flex">
-            <Button type="button" size={"lg"} variant="outline" className="flex-1">
+            <Button
+              type="button"
+              size={"lg"}
+              variant="outline"
+              className="flex-1"
+            >
               <Image
                 src="/img/icon/facebook.png"
                 alt="google"
@@ -381,7 +386,12 @@ export default function AuthModal({
               />
               <p>Facebook</p>
             </Button>
-            <Button type="button" size={"lg"} variant="outline" className="flex-1">
+            <Button
+              type="button"
+              size={"lg"}
+              variant="outline"
+              className="flex-1"
+            >
               <Image
                 src="/img/icon/google.png"
                 alt="google"

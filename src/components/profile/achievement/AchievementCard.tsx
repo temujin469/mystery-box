@@ -103,7 +103,12 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement }) => {
       </Paper>
 
       {/* Shadcn Drawer */}
-      <DrawerContent className="border-border/50 max-h-[85vh]">
+      <DrawerContent
+        className="border-border/50"
+        style={{
+          maxHeight: "95vh",
+        }}
+      >
         <DrawerHeader className="text-center border-b border-border/20 pb-6">
           {/* Achievement Image - Centered */}
           <div className="flex justify-center mb-4">
@@ -138,7 +143,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement }) => {
 
         {/* Main Content */}
         <div className="flex-1 px-6 py-6 space-y-6 overflow-y-auto">
-          {/* Achievement Type Badges */}
+          {/* Achievement Type Badges
           <div className="flex flex-wrap justify-center gap-2">
             <span
               className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
@@ -159,7 +164,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement }) => {
             </span>
 
             {achievement.reward_box_id && (
-              <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-800 border border-amber-200">
+              <span className="inline-flex items-center px-4 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-800 border border-amber-200">
                 <svg
                   className="w-4 h-4 mr-2"
                   fill="currentColor"
@@ -174,7 +179,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement }) => {
                 Шагнал
               </span>
             )}
-          </div>
+          </div> */}
 
           {/* Progress Section - Only show if not unlocked */}
           {!achievement.is_unlocked && (
@@ -216,7 +221,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement }) => {
           {/* Success State for Unlocked */}
           {achievement.is_unlocked && (
             <div className="bg-green-400/10 rounded-2xl p-6 text-center">
-              <div className="w-12 h-12 bg-green-200/10 rounded-full flex items-center justify-center mx-auto mb-3">
+              <div className="w-10 h-10 bg-green-200/10 rounded-full flex items-center justify-center mx-auto mb-3">
                 <svg
                   className="w-6 h-6 text-green-600"
                   fill="none"
@@ -231,7 +236,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement }) => {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-green-300 mb-1">
+              <h3 className="font-semibold text-green-300 mb-1">
                 Амжилттай нээгдлээ!
               </h3>
               {achievement.unlocked_at && (
@@ -252,11 +257,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement }) => {
               }}
               className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white text-lg font-semibold py-4 px-6 rounded-2xl hover:from-purple-700 hover:to-blue-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
             >
-              <svg
-                className="w-5 h-5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
                   d="M10 2L3 7v10l7 3 7-3V7l-7-5z"

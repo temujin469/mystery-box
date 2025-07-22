@@ -1,34 +1,38 @@
 "use client";
 
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { HelpCircle, Sparkles, Shield, Gift, Zap } from "lucide-react";
+import { HelpCircle, Sparkles, Shield, Gift, Zap, Truck } from "lucide-react";
 
 const faqItems = [
   {
     id: "item-1",
-    question: "хэрхэн ажилладаг вэ?",
-    answer: "Хэрэглэгчид нууцлаг хайрцаг худалдаж аваад, нээгээд, баталгаатай шагналуудыг гэртээ хүргүүлдэг. Бүх бараа жинхэнэ бөгөөд дэлхий даяар хүргэлттэй.",
+    question: "Хэрхэн ажилладаг вэ?",
+    answer:
+      "Та өөрт таалагдсан нууцлаг хайрцаг сонгон худалдан авна. Хайрцгаа нээх үед дотор нь агуулагдах бараа санамсаргүйгээр тодорхойлогдож, та тухайн барааг хожино. Бид хожсон барааг тань баталгаажуулан Монголын аль ч газарт хүргэж өгнө.",
     icon: <HelpCircle size={20} />,
     color: "from-blue-400 to-cyan-500",
-    glowColor: "shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+    glowColor: "shadow-[0_0_20px_rgba(59,130,246,0.3)]",
   },
   {
-    id: "item-2", 
+    id: "item-2",
     question: "Ямар шагналууд хожих боломжтой вэ?",
-    answer: "Та электроник, ухаалаг төхөөрөмж, тансаг бараа болон бусад олон төрлийн үнэ цэнэтэй зүйлс хожих боломжтой.",
+    answer:
+      "Та ухаалаг төхөөрөмж, электроник, гоо сайхны бүтээгдэхүүн, тансаг эд зүйлс зэрэг олон төрлийн үнэ цэнтэй барааг хожих боломжтой.",
     icon: <Gift size={20} />,
     color: "from-purple-400 to-pink-500",
-    glowColor: "shadow-[0_0_20px_rgba(168,85,247,0.3)]"
+    glowColor: "shadow-[0_0_20px_rgba(168,85,247,0.3)]",
   },
   {
     id: "item-3",
-    question: "Танай бүх брэндийн бүтээгдэхүүнүүд жинхэнэ үү?",
-    answer: "Тийм ээ, бүх бараа жинхэнэ бөгөөд баталгаатай ирдэг.",
-    icon: <Shield size={20} />,
-    color: "from-green-400 to-emerald-500", 
-    glowColor: "shadow-[0_0_20px_rgba(34,197,94,0.3)]"
-  }
+    question: "Хожсон барааг хэрхэн хүлээн авах вэ?",
+    answer:
+      "Танд хожсон барааг баталгаажуулсны дараа бид Монгол улсын аль ч бүс нутагт шуудангаар хүргэж өгнө. Хүргэлт бүрийг хянаж, аюулгүй байдлыг хангаж ажилладаг.",
+    icon: <Truck size={20} />,
+    color: "from-emerald-400 to-teal-500",
+    glowColor: "shadow-[0_0_20px_rgba(52,211,153,0.3)]",
+  },
 ];
+
 
 export function FaqSection() {
   return (
@@ -56,13 +60,13 @@ export function FaqSection() {
       {/* Section Header */}
       <div className="text-center mb-8 md:mb-12 relative z-10">
 
-        <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 mb-3 md:mb-4 flex items-center justify-center gap-2 md:gap-3">
+        <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 mb-3 md:mb-4 flex items-center justify-center gap-2 md:gap-3">
           <Sparkles className="text-yellow-400" size={18} />
           Асуулт Хариулт
           <Zap className="text-blue-400" size={18} />
         </h2>
         <p className="text-sm md:text-lg text-gray-400 max-w-2xl mx-auto px-4">
-          Хамгийн их асуудаг асуултууд болон тэдгээрийн хариултууд
+         Хамгийн их асуудаг асуулт болон тэдгээрийн хариулт
         </p>
       </div>
 

@@ -95,8 +95,9 @@ export const metadata: Metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1.0,
-  maximumScale: 5.0,
-  userScalable: true,
+  maximumScale: 1.0,
+  minimumScale: 1.0,
+  userScalable: false,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
     { media: "(prefers-color-scheme: dark)", color: "#000000" },
@@ -112,8 +113,18 @@ export default function RootLayout({
     <html lang="mn" dir="ltr">
       <head>
         <link rel="icon" href="/favicon/favicon.ico" sizes="any" />
-        <link rel="icon" href="/favicon/favicon-16x16.png" type="image/png" sizes="16x16" />
-        <link rel="icon" href="/favicon/icon-32x32.png" type="image/png" sizes="32x32" />
+        <link
+          rel="icon"
+          href="/favicon/favicon-16x16.png"
+          type="image/png"
+          sizes="16x16"
+        />
+        <link
+          rel="icon"
+          href="/favicon/icon-32x32.png"
+          type="image/png"
+          sizes="32x32"
+        />
         <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" />
@@ -124,7 +135,7 @@ export default function RootLayout({
         <meta name="msapplication-config" content="/browserconfig.xml" />
         <meta name="msapplication-TileColor" content="#000000" />
         <meta name="msapplication-tap-highlight" content="no" />
-        
+
         {/* PWA Meta Tags */}
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-title" content="Нууцлаг хайрцаг" />

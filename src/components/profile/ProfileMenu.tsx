@@ -252,7 +252,9 @@ export default function ProfileMenu() {
         <DrawerTrigger asChild>
           {triggerButton}
         </DrawerTrigger>
-        <DrawerContent className="bg-background border-border/50">
+        <DrawerContent className="bg-background border-border/50" style={{
+          maxHeight:"100vh"
+        }}>
           <DrawerHeader className="sr-only">
             <DrawerTitle>Profile Menu</DrawerTitle>
           </DrawerHeader>

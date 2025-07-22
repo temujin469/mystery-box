@@ -10,7 +10,7 @@ export const LEVEL_CONFIG = {
 
 /**
  * Calculate total experience needed to reach a specific level
- * @param level - Target level (1-30)
+ * @param level - Target level (0-30)
  * @returns Total XP needed to reach that level
  */
 export function getExpForLevel(level: number): number {
