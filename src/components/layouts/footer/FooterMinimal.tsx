@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { Youtube, Instagram, Facebook } from "lucide-react";
+import Image from "next/image";
 
 type Props = {};
 
@@ -17,14 +18,13 @@ function FooterMinimal({}: Props) {
           {/* Logo Section */}
           <div className="flex flex-col items-center space-y-2">
             <Link href="/" className="group">
-              <div className="relative">
-                {/* Logo background glow */}
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-300" />
-
-                {/* Logo container */}
-                <h2 className="text-xl mb-3 font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 font-mono tracking-wider">
-                  MysteryBox
-                </h2>
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <div className="p-1 rounded-xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-blue-400/30">
+                  <Image alt="logo" src="/logo.png" width={45} height={45} />
+                </div>
+                <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+                  Mystery Box
+                </h3>
               </div>
             </Link>
           </div>

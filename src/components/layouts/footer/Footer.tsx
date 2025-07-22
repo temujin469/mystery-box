@@ -3,6 +3,7 @@
 import { Facebook, Instagram, Youtube, Heart, Sparkles, BoxIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 
 const footerLinks = [
   { name: "Компани", href: "/about" },
@@ -73,7 +74,7 @@ export function Footer() {
         ))}
       </div>
 
-      <div className="relative z-10 py-16 px-4 md:px-6">
+      <div className="relative z-10 py-14 px-4 md:px-6">
         <div className="max-w-6xl mx-auto">
           {/* Header Section */}
           <motion.div
@@ -83,11 +84,11 @@ export function Footer() {
             className="text-center mb-12"
           >
             <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="p-3 rounded-xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-blue-400/30">
-                <BoxIcon size={28} className="text-blue-400" />
+              <div className="p-1 rounded-xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-blue-400/30">
+                    <Image alt="logo" src="/logo.png" width={45} height={45}/>
               </div>
-              <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
-                ATTILA
+              <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+                Mystery Box
               </h3>
             </div>
           </motion.div>

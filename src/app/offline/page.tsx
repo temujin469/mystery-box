@@ -1,3 +1,5 @@
+"use client";
+
 export default function OfflinePage() {
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -16,11 +18,3 @@ export default function OfflinePage() {
     </div>
   );
 }
-
-export const metadata = {
-  title: "Интернэт холболт алга | Нууцлаг хайрцаг",
-  robots: {
-    index: false,
-    follow: false,
-  },
-};

@@ -54,7 +54,7 @@ export function Header() {
         <div className="flex items-center gap-8 lg:gap-20">
           <Link href="/" className="flex items-center gap-3 group">
             <span className="font-bold flex items-center text-2xl gap-2 text-card-foreground group-hover:text-primary transition-colors">
-                <Image alt="logo" src="/logo.png" width={33} height={33}/>
+                <Image alt="logo" src="/logo.png" width={52} height={52}/>
             </span>
           </Link>
 
@@ -71,7 +71,7 @@ export function Header() {
               <Button className="bg-primary/10 hover:bg-primary/20 transition-all duration-300 backdrop-blur-sm border border-primary/20 hover:border-primary/30">
                 <div className="flex items-center gap-2">
                   <GiftIcon size={18} />
-                  ҮНЭГҮЙ НУУЦЛАГ ХАЙРЦАГ
+                  Шагнал
                 </div>
               </Button>
             </Link>
