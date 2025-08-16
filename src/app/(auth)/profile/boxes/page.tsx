@@ -2,12 +2,11 @@
 
 import React, { useState } from "react";
 import { useMyBoxOpenHistory } from "@/hooks/api";
-import HeaderWithIcon from "@/components/common/HeaderWithIcon";
+import { HeaderWithIcon, Pagination } from "@/components/common";
 import { Paper } from "@/components/common/Paper";
 import { Button } from "@/components/ui/button";
 import {
   Package,
-  ChevronLeft,
   ChevronRight,
   Calendar,
   Sparkles,
@@ -16,24 +15,17 @@ import Image from "next/image";
 import { getRarityColors, getRarityName } from "@/lib/rarity-colors";
 import { formatCurrency } from "@/lib/currency";
 import clsx from "clsx";
-
-// Simple date formatter that works consistently on server and client
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-
-  return `${year}.${month}.${day} ${hours}:${minutes}`;
-};
+import { formatDate } from "@/lib/date";
 
 const BoxHistoryPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const pageLimit = 10;
+  const pageLimit = 5;
 
-  const { data, isPending, error } = useMyBoxOpenHistory({
+  const {
+    data: response,
+    isPending,
+    error,
+  } = useMyBoxOpenHistory({
     page: currentPage,
     limit: pageLimit,
   });
@@ -46,20 +38,62 @@ const BoxHistoryPage = () => {
           title="Хайрцгийн түүх"
           subtitle="Таны нээсэн бүх хайрцгийн түүх"
         />
-        <div className="space-y-4">
+        <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Paper key={i} className="animate-pulse">
-              <div className="flex items-center gap-4 p-4">
-                <div className="w-16 h-16 bg-muted rounded-lg"></div>
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-muted rounded w-1/3"></div>
-                  <div className="h-3 bg-muted rounded w-1/2"></div>
-                  <div className="h-3 bg-muted rounded w-1/4"></div>
+            <Paper key={i} variant="compact" className="md:variant-default animate-pulse">
+              <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+                {/* Box Section Skeleton */}
+                <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
+                  {/* Box Image Skeleton */}
+                  <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-lg bg-muted"></div>
+
+                  {/* Box Details Skeleton */}
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <div className="h-4 md:h-5 bg-muted rounded w-2/3"></div>
+                    <div className="h-3 md:h-4 bg-muted rounded w-1/2"></div>
+                    <div className="h-4 bg-muted rounded w-16"></div>
+                  </div>
                 </div>
-                <div className="w-16 h-16 bg-muted rounded-lg"></div>
+
+                {/* Arrow Divider Skeleton - Hidden on mobile */}
+                <div className="hidden md:flex items-center justify-center">
+                  <div className="w-5 h-5 bg-muted rounded"></div>
+                </div>
+
+                {/* Mobile Divider */}
+                <div className="md:hidden h-px bg-muted"></div>
+
+                {/* Item Section Skeleton */}
+                <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
+                  {/* Item Image Skeleton */}
+                  <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-lg bg-muted">
+                    {/* Rarity indicator skeleton */}
+                    <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 md:w-5 md:h-5 rounded-full bg-muted-foreground"></div>
+                  </div>
+
+                  {/* Item Details Skeleton */}
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <div className="h-3 bg-muted rounded w-16"></div>
+                    <div className="h-4 md:h-5 bg-muted rounded w-2/3"></div>
+                    <div className="h-4 bg-muted rounded w-16"></div>
+                  </div>
+                </div>
               </div>
             </Paper>
           ))}
+        </div>
+        
+        {/* Pagination Skeleton */}
+        <div className="mt-8">
+          <div className="flex justify-center">
+            <div className="flex items-center gap-2">
+              <div className="h-9 w-9 bg-muted rounded"></div>
+              <div className="h-9 w-9 bg-muted rounded"></div>
+              <div className="h-9 w-9 bg-muted rounded"></div>
+              <div className="h-9 w-9 bg-muted rounded"></div>
+              <div className="h-9 w-9 bg-muted rounded"></div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -89,7 +123,7 @@ const BoxHistoryPage = () => {
     );
   }
 
-  const hasHistory = data?.data && data.data.length > 0;
+  const hasHistory = response?.history && response.history.length > 0;
 
   if (!hasHistory) {
     return (
@@ -118,18 +152,19 @@ const BoxHistoryPage = () => {
     );
   }
 
-  const totalPages = Math.ceil((data?.meta?.total || 0) / pageLimit);
+  const totalPages = response.pagination?.totalPages || 10;
+  
 
   return (
     <div className="space-y-6">
       <HeaderWithIcon
         icon="📦"
         title="Хайрцгийн түүх"
-        subtitle={`Нийт ${data?.meta?.total || 0} хайрцаг нээсэн байна`}
+        subtitle={`Нийт ${response?.history?.length || 0} хайрцаг нээсэн байна`}
       />
 
       <div className="space-y-3">
-        {data?.data?.map((history) => {
+        {response?.history?.map((history) => {
           const rarityColors = getRarityColors(history.item?.rarity || 5); // Default to common (5)
 
           return (
@@ -227,65 +262,19 @@ const BoxHistoryPage = () => {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-6">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Өмнөх
-          </Button>
-
-          <div className="flex items-center gap-1">
-            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              let pageNum;
-              if (totalPages <= 5) {
-                pageNum = i + 1;
-              } else if (currentPage <= 3) {
-                pageNum = i + 1;
-              } else if (currentPage >= totalPages - 2) {
-                pageNum = totalPages - 4 + i;
-              } else {
-                pageNum = currentPage - 2 + i;
-              }
-
-              return (
-                <Button
-                  key={pageNum}
-                  variant={currentPage === pageNum ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setCurrentPage(pageNum)}
-                  className="w-8 h-8 p-0"
-                >
-                  {pageNum}
-                </Button>
-              );
-            })}
-          </div>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              setCurrentPage(Math.min(totalPages, currentPage + 1))
-            }
-            disabled={currentPage === totalPages}
-          >
-            Дараах
-            <ChevronRight className="w-4 h-4" />
-          </Button>
+        <div className="mt-8">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={response.pagination?.total || 0}
+            itemsPerPage={pageLimit}
+            onPageChange={setCurrentPage}
+            showInfo={true}
+            showFirstLast={true}
+            size="md"
+          />
         </div>
       )}
-
-      {/* Summary */}
-      <Paper className="text-center">
-        <div className="text-sm text-muted-foreground">
-          Хуудас {currentPage} / {totalPages} • Нийт {data?.meta?.total || 0}{" "}
-        
-        </div>
-      </Paper>
     </div>
   );
 };

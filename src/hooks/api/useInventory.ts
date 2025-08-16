@@ -1,12 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { userService } from "../../services/api";
 import { useCurrentUser } from "./useAuth";
-import { userKeys } from "./useUsers";
-import {
-  UserInventory,
-  AddItemToInventoryResponse,
-  AddItemsToInventoryResponse,
-} from "../../types/item";
+import { userKeys } from "./useUser";
+import { UserInventory } from "../../types/item";
 
 // ================= INVENTORY QUERY HOOKS =================
 
@@ -18,7 +14,15 @@ export const useCurrentUserInventory = () => {
 
   return useQuery({
     queryKey: userKeys.inventory(user?.id || ""),
-    queryFn: () => userService.getUserInventory(user!.id),
+    queryFn: async () => {
+      if (!user?.id) throw new Error("User not found");
+      const response = await userService.getUserInventory(user.id);
+      return {
+        inventory: response.data,
+        message: response.message,
+        success: response.success,
+      };
+    },
     enabled: !!user?.id,
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
@@ -27,7 +31,7 @@ export const useCurrentUserInventory = () => {
 // ================= INVENTORY MUTATION HOOKS =================
 
 /**
- * Add item to current user's inventory with quantity support
+ * Add item to current user's inventory
  */
 export const useAddItemToCurrentUserInventory = () => {
   const queryClient = useQueryClient();
@@ -46,13 +50,10 @@ export const useAddItemToCurrentUserInventory = () => {
       }
       return userService.addItemToInventory(user.id, itemId, quantity);
     },
-    onSuccess: () => {
-      if (user) {
+    onSuccess: (response) => {
+      if (response.success && user) {
         queryClient.invalidateQueries({
           queryKey: userKeys.inventory(user.id),
-        });
-        queryClient.invalidateQueries({
-          queryKey: userKeys.inventoryCount(user.id),
         });
         queryClient.invalidateQueries({ queryKey: userKeys.stats(user.id) });
       }
@@ -64,7 +65,7 @@ export const useAddItemToCurrentUserInventory = () => {
 };
 
 /**
- * Add multiple items to current user's inventory (useful for mystery box opening)
+ * Add multiple items to current user's inventory (for mystery box opening)
  */
 export const useAddItemsToCurrentUserInventory = () => {
   const queryClient = useQueryClient();
@@ -77,13 +78,10 @@ export const useAddItemsToCurrentUserInventory = () => {
       }
       return userService.addItemsToInventory(user.id, itemIds);
     },
-    onSuccess: () => {
-      if (user) {
+    onSuccess: (response) => {
+      if (response.success && user) {
         queryClient.invalidateQueries({
           queryKey: userKeys.inventory(user.id),
-        });
-        queryClient.invalidateQueries({
-          queryKey: userKeys.inventoryCount(user.id),
         });
         queryClient.invalidateQueries({ queryKey: userKeys.stats(user.id) });
       }
@@ -114,19 +112,12 @@ export const useRemoveItemFromCurrentUserInventory = () => {
       }
       return userService.removeItemFromInventory(user.id, itemId, quantity);
     },
-    onSuccess: (_, { itemId }) => {
-      if (user) {
+    onSuccess: (response) => {
+      if (response.success && user) {
         queryClient.invalidateQueries({
           queryKey: userKeys.inventory(user.id),
         });
-        queryClient.invalidateQueries({
-          queryKey: userKeys.inventoryCount(user.id),
-        });
         queryClient.invalidateQueries({ queryKey: userKeys.stats(user.id) });
-        // Invalidate specific item check
-        queryClient.invalidateQueries({
-          queryKey: userKeys.hasItem(user.id, itemId),
-        });
       }
     },
     onError: (error) => {

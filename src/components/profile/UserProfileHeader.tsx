@@ -3,14 +3,19 @@
 import { Button } from "@/components/ui/button";
 import { Paper } from "@/components/common/Paper";
 import { useCurrentUser, useCurrentUserStats, useLogout } from "@/hooks/api";
-import { Package, ArrowDown, ArrowUp, LogOut, Plus } from "lucide-react";
+import { Package, ArrowDown, ArrowUp, LogOut, Plus, Truck } from "lucide-react";
 import Image from "next/image";
 import { useModalStore } from "@/stores/modal.store";
-import { calculateLevelProgression, formatLevelProgress } from "@/lib/level-progression";
+import {
+  calculateLevelProgression,
+  formatLevelProgress,
+} from "@/lib/level-progression";
 
 export default function UserProfileHeader() {
   const { data: user, isPending } = useCurrentUser();
-  const { data: stats, isPending: statsLoading } = useCurrentUserStats();
+  const { data: statsResponse, isPending: statsLoading } =
+    useCurrentUserStats();
+  const stats = statsResponse?.stats;
 
   const openTopup = useModalStore((state) => state.openTopup);
   const logout = useLogout();
@@ -30,7 +35,10 @@ export default function UserProfileHeader() {
   }
 
   // Calculate user level progression using utility
-  const levelData = calculateLevelProgression(user?.level, user?.experience_points);
+  const levelData = calculateLevelProgression(
+    user?.level,
+    user?.experience_points
+  );
   const levelTexts = formatLevelProgress(levelData);
 
   const handleLogout = async () => {
@@ -98,9 +106,7 @@ export default function UserProfileHeader() {
                 {levelTexts.currentLevelText}
               </span>
               <span className="text-xs text-muted-foreground font-medium">
-                <span className="md:hidden">
-                  {levelTexts.progressText}
-                </span>
+                <span className="md:hidden">{levelTexts.progressText}</span>
                 <span className="hidden md:inline">
                   {levelTexts.nextLevelText}
                 </span>
@@ -113,7 +119,9 @@ export default function UserProfileHeader() {
               ></div>
             </div>
             <div className="flex items-center justify-between text-xs text-muted-foreground md:hidden">
-              <span>Дараагийн түвшин хүртэл {levelData.expNeededForNext} XP</span>
+              <span>
+                Дараагийн түвшин хүртэл {levelData.expNeededForNext} XP
+              </span>
             </div>
           </div>
         </div>
@@ -194,13 +202,15 @@ export default function UserProfileHeader() {
         >
           <div className="flex items-center gap-3 mb-3">
             <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
-              <ArrowUp className="w-4 h-4 md:w-5 md:h-5 text-white" />
+              <Truck className="w-4 h-4 md:w-5 md:h-5 text-white" />
             </div>
             <span className="text-xs md:text-sm text-muted-foreground font-medium">
-              Нийт зарлага
+              Нийт Захиалга
             </span>
           </div>
-          <p className="text-xl md:text-2xl font-bold text-foreground">₮0.00</p>
+          <p className="text-xl md:text-2xl font-bold text-foreground">
+            {stats?.totalOrders || 0}
+          </p>
         </Paper>
       </div>
     </div>

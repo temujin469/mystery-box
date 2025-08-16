@@ -4,8 +4,8 @@ import { useModalStore } from "@/stores/modal.store";
 import { useSpinningReelStore } from "@/stores/spinningReel.store";
 import { SpiningItem } from "@/components/spiningReel/SpiningReel";
 import { toast } from "sonner";
-import { useOpenMyBox } from "@/hooks/api/useBoxes";
-import { useSellItem } from "@/hooks/api/useItems";
+import { useOpenMyBox } from "@/hooks/api/useBox";
+import { useSellItem } from "@/hooks/api/useItem";
 import { useAchievementNotifications } from "@/hooks/useAchievementNotifications";
 
 /*
@@ -29,7 +29,7 @@ export const useSpinBusinessLogic = () => {
   const API_CALL_COOLDOWN = 2000; // 2 seconds between API calls
 
   // Track the type of the last spin to determine if quick sell is allowed
-  const [lastSpinType, setLastSpinType] = useState<"paid" | "trial" | null>(
+  const [lastSpinType, setLastSpinType] = useState<"paid" | "trial" | "reward" | null>(
     null
   );
 
@@ -100,10 +100,10 @@ export const useSpinBusinessLogic = () => {
 
           // Convert the API response item to SpiningItem format
           const winnerItem: SpiningItem = {
-            id: result.receivedItem.id,
-            name: result.receivedItem.name,
-            image_url: result.receivedItem.image_url,
-            sell_value: result.receivedItem.sell_value || 0,
+            id: result.data.receivedItem.id,
+            name: result.data.receivedItem.name,
+            image_url: result.data.receivedItem.image_url,
+            sell_value: result.data.receivedItem.sell_value || 0,
             drop_rate: 0, // Drop rate is not relevant for the actual winner
           };
 
@@ -126,18 +126,21 @@ export const useSpinBusinessLogic = () => {
           // Show success message after spin completes
           setTimeout(() => {
             toast.success(
-              // `Хайрцаг нээгдлээ! ${result.receivedItem.name} олдлоо!`
+              // `Хайрцаг нээгдлээ! ${result.data.receivedItem.name} олдлоо!`
               `Хайрцаг нээгдлээ!`
             );
 
             // Handle achievement notifications
-            if (result.unlockedAchievements && result.unlockedAchievements.length > 0) {
-              showAchievementNotifications(result.unlockedAchievements);
+            if (
+              result.data.unlockedAchievements &&
+              result.data.unlockedAchievements.length > 0
+            ) {
+              showAchievementNotifications(result.data.unlockedAchievements);
             }
           }, 2600); // Spin duration + buffer
 
           console.log(
-            `🎰 Box opened - received: ${result.receivedItem.name} (ID: ${result.receivedItem.id})`
+            `🎰 Box opened - received: ${result.data.receivedItem.name} (ID: ${result.data.receivedItem.id} ${result.message})`
           );
         }
 
@@ -187,7 +190,7 @@ export const useSpinBusinessLogic = () => {
     [isAuthenticated, openAuth]
   );
 
-  // Handle win 
+  // Handle win
   const handleWin = useCallback(
     async (item: SpiningItem) => {
       try {
@@ -204,6 +207,11 @@ export const useSpinBusinessLogic = () => {
           // For paid spins, the backend already handled inventory
           console.log(
             `Paid spin win: ${item.name} (already added to inventory by backend)`
+          );
+        } else if (lastSpinType === "reward") {
+          // For reward spins, the backend already handled inventory
+          console.log(
+            `Reward spin win: ${item.name} (already added to inventory by backend)`
           );
         }
       } catch (error) {
@@ -237,7 +245,12 @@ export const useSpinBusinessLogic = () => {
         }
 
         // Security check: Validate item data
-        if (!item || !item.id || typeof item.sell_value !== 'number' || item.sell_value <= 0) {
+        if (
+          !item ||
+          !item.id ||
+          typeof item.sell_value !== "number" ||
+          item.sell_value <= 0
+        ) {
           console.warn("Invalid item for quick sell:", item);
           toast.error("Энэ эд зүйлийг зарах боломжгүй");
           return;
@@ -258,7 +271,7 @@ export const useSpinBusinessLogic = () => {
 
         // Success feedback
         toast.success(
-          // result.message,
+          // result.message
           "Амжилттай зарагдлаа",
           { id: "quick-sell" }
         );
@@ -266,7 +279,7 @@ export const useSpinBusinessLogic = () => {
         console.log("Quick sell completed:", {
           item: item.name,
           itemId: item.id,
-          coinsReceived: result.coinsReceived,
+          message: result.message,
         });
       } catch (error) {
         console.error("Failed to process quick sell:", error);

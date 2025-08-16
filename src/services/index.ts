@@ -9,7 +9,8 @@ export {
   itemService,
   addressService,
   categoryService,
-  achievementService
+  achievementService,
+  orderService
 } from './api';
 
 

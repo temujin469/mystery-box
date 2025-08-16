@@ -11,25 +11,19 @@ type BoxesGridProps = {
 };
 
 export function BoxesGrid({ categoryId, isFeatured }: BoxesGridProps) {
-  const { data, isLoading, error } = useBoxes({
-    isFeatured,
+  const {
+    data: response,
+    isLoading,
+    error,
+  } = useBoxes({
+    isFeatured: isFeatured ? "true" : undefined,
     categoryId,
     page: 1,
     limit: 50, // Fetch more boxes to ensure we have enough for filtering
   });
 
-  const boxes = data?.data || [];
-
-  // const filteredBoxes = useMemo(() => {
-  //   if (!data?.data) return [];
-
-  //   // If category is "all", return all boxes
-  //   if (category === "all") {
-  //     return data.data;
-  //   }
-
-  //   });
-  // }, [data?.data]);
+  const boxes = response?.boxes || [];
+  const pagination = response?.pagination;
 
   if (isLoading) {
     return (
@@ -64,6 +58,11 @@ export function BoxesGrid({ categoryId, isFeatured }: BoxesGridProps) {
         <p className="text-muted-foreground">
           Хайрцгууд ачаалахад алдаа гарлаа. Дахин оролдоно уу.
         </p>
+        {process.env.NODE_ENV === "development" && (
+          <p className="text-xs text-red-500 mt-2">
+            {error instanceof Error ? error.message : "Unknown error"}
+          </p>
+        )}
       </div>
     );
   }
@@ -72,21 +71,35 @@ export function BoxesGrid({ categoryId, isFeatured }: BoxesGridProps) {
     return (
       <div className="text-center py-8">
         <p className="text-muted-foreground">
-          {categoryId === null
-            ? "Хайрцаг олдсонгүй"
-            : "Энэ ангилалд хайрцаг олдсонгүй"}
+          {categoryId ? "Энэ ангилалд хайрцаг олдсонгүй" : "Хайрцаг олдсонгүй"}
         </p>
+        {response?.success === false && response?.message && (
+          <p className="text-xs text-muted-foreground mt-2">
+            {response.message}
+          </p>
+        )}
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
-      {boxes.map((box) => (
-        <Link href={`/boxes/${box.id}`} key={box.id}>
-          <BoxCard box={box} />
-        </Link>
-      ))}
+    <div>
+      <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+        {boxes.map((box: Box) => (
+          <Link href={`/boxes/${box.id}`} key={box.id}>
+            <BoxCard box={box} />
+          </Link>
+        ))}
+      </div>
+
+      {/* Show pagination info or success message in development mode */}
+      {pagination && process.env.NODE_ENV === "development" && (
+        <div className="text-xs text-muted-foreground mb-4">
+          Showing {boxes.length} of {pagination.total} boxes
+          {pagination.totalPages > 1 &&
+            ` (Page ${pagination.page} of ${pagination.totalPages})`}
+        </div>
+      )}
     </div>
   );
 }

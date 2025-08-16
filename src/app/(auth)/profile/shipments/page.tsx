@@ -1,6 +1,6 @@
 "use client";
 import {
-  useCurrentUserAddresses,
+  useMyAddresses,
   useCreateAddress,
   useUpdateAddress,
   useCurrentUser,
@@ -22,7 +22,7 @@ export default function Shipment() {
     data: addressesResponse,
     isLoading,
     error,
-  } = useCurrentUserAddresses({
+  } = useMyAddresses({
     page: 1,
     limit: 50,
   });
@@ -32,7 +32,11 @@ export default function Shipment() {
   const deleteAddress = useDeleteAddress();
 
   // Extract addresses array from the paginated response
-  const addresses = addressesResponse?.data || [];
+  const addresses = addressesResponse?.addresses || [];
+
+  // Address limit constants
+  const MAX_ADDRESSES = 3;
+  const hasReachedLimit = addresses.length >= MAX_ADDRESSES;
 
   // Form visibility and editing state
   const [showForm, setShowForm] = useState(false);
@@ -222,12 +226,25 @@ export default function Shipment() {
         <HeaderWithIcon
           icon="📬"
           title="Хүргэлтийн хаяг"
-          actionButton={{
-            label: "Шинэ хаяг нэмэх",
-            onClick: handleShowNewAddressForm,
-            variant: "secondary",
-            icon: "＋",
-          }}
+          actionButton={
+            hasReachedLimit
+              ? {
+                  label: "Дээд хязгаар (3/3)",
+                  onClick: () => {
+                    toast.error("Дээд хязгаар хүрсэн", {
+                      description: "Дээд тал нь 3 хаяг хадгалах боломжтой.",
+                    });
+                  },
+                  variant: "secondary" as const,
+                  icon: "🚫",
+                }
+              : {
+                  label: "Шинэ хаяг нэмэх",
+                  onClick: handleShowNewAddressForm,
+                  variant: "secondary" as const,
+                  icon: "＋",
+                }
+          }
         />
 
         <AddressList

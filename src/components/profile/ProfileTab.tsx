@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Package, Box, Truck, Gift, Settings } from "lucide-react";
+import { Package, Box, ShoppingCart, Truck, Gift, Settings } from "lucide-react";
 
 // Mongolian tab labels with icons and corresponding route paths
 const tabs = [
@@ -18,6 +18,12 @@ const tabs = [
     href: "/profile/boxes",
     icon: Box,
     color: "text-purple-500",
+  },
+  {
+    label: "Захиалга",
+    href: "/profile/orders",
+    icon: ShoppingCart,
+    color: "text-orange-500",
   },
   {
     label: "Хүргэлт",

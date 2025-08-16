@@ -6,7 +6,7 @@ import SpinningReel, {
   SpiningItem,
 } from "@/components/spiningReel/SpiningReel";
 import { ItemCard } from "@/components/card";
-import { ItemDetailSlide } from "@/components/ItemDetailSlide";
+import { ItemDetailSlide } from "@/components/features/item/ItemDetailSlide";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useBox } from "@/hooks/api";
@@ -22,14 +22,15 @@ export default function BoxPage({
   const [isSlideOpen, setIsSlideOpen] = useState(false);
 
   const boxId = Number(use(params).id);
-  const { data: box, isPending, error } = useBox(boxId);
+  const { data: boxResponse, isPending, error } = useBox(boxId);
 
   // Set boxId in store when component mounts or boxId changes
   useEffect(() => {
     useSpinningReelStore.getState().setBoxId(boxId);
   }, [boxId]);
 
-  const boxItems = box?.items || [];
+  const box = boxResponse?.box;
+  const boxItems = boxResponse?.box?.items || [];
 
   const handleItemClick = (itemId: number) => {
     setSelectedItemId(itemId);
@@ -384,7 +385,7 @@ function BoxPageSkeleton() {
           {/* Items Grid Skeleton - Match actual layout */}
           <div className="relative">
             <div className="hidden md:block absolute inset-0 bg-gradient-to-br from-gray-900/50 via-transparent to-gray-900/50 rounded-2xl" />
-            
+
             <div className="relative md:p-6 md:rounded-2xl md:border md:border-gray-700/30 md:bg-gray-800/20 md:backdrop-blur-sm">
               <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2">
                 {Array.from({ length: 12 }).map((_, index) => (

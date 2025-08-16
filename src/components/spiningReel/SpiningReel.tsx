@@ -410,7 +410,7 @@ const SpinningReel: React.FC<{
   ]);
 
   const spin = useCallback(
-    async (winnerItem: SpiningItem | null, spinType: "paid" | "trial") => {
+    async (winnerItem: SpiningItem | null, spinType: "paid" | "trial" | "reward") => {
       if (spinning || !containerRef.current || reel.length === 0) return;
 
       console.log("🎰 Spin function called with:", {
@@ -440,8 +440,19 @@ const SpinningReel: React.FC<{
           toast.error("Error: No winner item provided for paid spin");
           return;
         }
+      } else if (spinType === "reward") {
+        // For reward spins, use the winner item passed from the achievement reward API
+        if (winnerItem) {
+          winItem = winnerItem;
+          console.log("🎰 Reward spin - using achievement reward winner:", winItem.name);
+        } else {
+          // This should not happen in normal flow
+          console.error("🎰 Reward spin but no winner item provided!");
+          toast.error("Error: No winner item provided for reward spin");
+          return;
+        }
       } else {
-        // This should not happen - only trial or paid spins are allowed
+        // This should not happen - only trial, paid, or reward spins are allowed
         console.error("🎰 Invalid spin type:", spinType);
         toast.error("Error: Invalid spin type. Please try again.");
         return;
@@ -512,6 +523,9 @@ const SpinningReel: React.FC<{
       setSpinning(true);
       setSpinCount((c) => c + 1);
       setFinalTranslate(finalTranslateValue);
+
+      // Update store with the current spin type
+      useSpinningReelStore.getState().setLastSpinType(spinType);
 
       // Complete spin and set final state
       setTimeout(() => {

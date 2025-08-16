@@ -1,18 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import {
-  X,
-  Package,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+import React, { useState } from "react";
+import { Package, ChevronDown, ChevronUp } from "lucide-react";
 import { Item } from "@/types";
 import { useItem } from "@/hooks/api";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getRarityColors } from "@/lib/rarity-colors";
+import Link from "next/link";
+import { Slide } from "@/components/common";
 
 interface ItemDetailSlideProps {
   isOpen: boolean;
@@ -25,111 +21,46 @@ export function ItemDetailSlide({
   onClose,
   itemId,
 }: ItemDetailSlideProps) {
-  const [isVisible, setIsVisible] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const { data: item, isPending, error } = useItem(itemId || 0, !!itemId);
-
-  useEffect(() => {
-    if (isOpen) {
-      setIsVisible(true);
-      // Small delay to ensure DOM is ready for animation
-      requestAnimationFrame(() => {
-        setIsAnimating(true);
-      });
-    } else {
-      setIsAnimating(false);
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden";
-    }
-
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "unset";
-    };
-  }, [isOpen, onClose]);
-
-  if (!isVisible) return null;
+  const {
+    data: ItemResponse,
+    isPending,
+    error,
+  } = useItem(itemId || 0, !!itemId);
+  const item = ItemResponse?.item;
 
   return (
-    <div className="fixed inset-0 z-50 flex">
-      {/* Backdrop */}
-      <div
-        className={cn(
-          "fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ease-in-out",
-          isAnimating ? "opacity-100" : "opacity-0"
-        )}
-        onClick={onClose}
-      />
+    <Slide
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Бүтээгдэхүүний дэлгэрэнгүй"
+      maxWidth="md"
+      contentClassName="p-0"
+    >
+      {isPending && <ItemDetailSkeleton />}
 
-      {/* Side Panel */}
-      <div
-        className={cn(
-          "fixed right-0 top-0 h-full w-full max-w-md bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-md border-l border-gray-700/30 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col",
-          isAnimating ? "translate-x-0" : "translate-x-full"
-        )}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-6 sm:py-4 border-b border-gray-700/20 flex-shrink-0">
-          <h2 className="text-[16px] font-semibold text-foreground bg-clip-text">
-            Бүтээгдэхүүний дэлгэрэнгүй
-          </h2>
+      {error && (
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-r from-red-500/20 to-orange-500/20 flex items-center justify-center mb-4 border border-red-500/30">
+            <Package className="w-8 h-8 text-red-400" />
+          </div>
+          <p className="text-gray-400 mb-4 text-lg">
+            Мэдээлэл ачаалахад алдаа гарлаа
+          </p>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-800/50 transition-colors group"
+            className="px-6 py-3 bg-gradient-to-r from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 rounded-lg text-sm transition-all duration-200 border border-gray-600/50"
           >
-            <X className="w-5 h-5 text-gray-400 group-hover:text-white" />
+            Хаах
           </button>
         </div>
+      )}
 
-        {/* Content */}
-        <div
-          className="flex-1 overflow-y-auto  scroll-smooth"
-          style={{
-            scrollbarWidth: "thin",
-            scrollbarColor: "rgba(75, 85, 99, 0.5) rgba(55, 65, 81, 0.5)",
-            maxHeight: "calc(100vh - 88px)", // Subtract header height
-          }}
-        >
-          {isPending && <ItemDetailSkeleton />}
-
-          {error && (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-r from-red-500/20 to-orange-500/20 flex items-center justify-center mb-4 border border-red-500/30">
-                <Package className="w-8 h-8 text-red-400" />
-              </div>
-              <p className="text-gray-400 mb-4 text-lg">
-                Мэдээлэл ачаалахад алдаа гарлаа
-              </p>
-              <button
-                onClick={onClose}
-                className="px-6 py-3 bg-gradient-to-r from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 rounded-lg text-sm transition-all duration-200 border border-gray-600/50"
-              >
-                Хаах
-              </button>
-            </div>
-          )}
-
-          {item && (
-            <div className="pb-6">
-              <ItemDetail item={item} />
-            </div>
-          )}
+      {item && (
+        <div className="pb-6">
+          <ItemDetail item={item} />
         </div>
-      </div>
-    </div>
+      )}
+    </Slide>
   );
 }
 
@@ -243,32 +174,33 @@ function ItemDetail({ item }: { item: Item }) {
               Агуулсан хайрцгууд
             </h4>
             <div className="grid grid-cols-3 gap-3 mb-4">
-              {item.boxes.slice(0, 6).map((boxItem: any, index: number) => (
-                <div
-                  key={boxItem.box_id || index}
-                  className="bg-card/80 rounded-lg p-3  hover:bg-card cursor-pointer group"
-                >
-                  <div className="aspect-square w-full mb-2 relative">
-                    <div className="relative w-full h-fullflex items-center justify-center">
-                      {boxItem.box?.image_url ? (
-                        <Image
-                          src={boxItem.box.image_url}
-                          alt={boxItem.box.name || "Box"}
-                          width={60}
-                          height={60}
-                          className="object-contain w-full h-full p-2"
-                        />
-                      ) : (
-                        <Package className="w-6 h-6 text-gray-500" />
-                      )}
+              {item.boxes.map((boxItem: any, index: number) => (
+                <Link href={`/boxes/${boxItem.box_id}`} key={boxItem.box_id || index}>
+                  <div
+                    className="bg-card/80 rounded-lg p-3  hover:bg-card cursor-pointer group"
+                  >
+                    <div className="aspect-square w-full mb-2 relative">
+                      <div className="relative w-full h-fullflex items-center justify-center">
+                        {boxItem.box?.image_url ? (
+                          <Image
+                            src={boxItem.box.image_url}
+                            alt={boxItem.box.name || "Box"}
+                            width={60}
+                            height={60}
+                            className="object-contain w-full h-full p-2"
+                          />
+                        ) : (
+                          <Package className="w-6 h-6 text-gray-500" />
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-gray-300 font-medium truncate group-hover:text-white transition-colors">
+                        {boxItem.box?.name}
+                      </p>
                     </div>
                   </div>
-                  <div className="text-center">
-                    <p className="text-xs text-gray-300 font-medium truncate group-hover:text-white transition-colors">
-                      {boxItem.box?.name}
-                    </p>
-                  </div>
-                </div>
+                </Link>
               ))}
             </div>
             {item.boxes.length > 6 && (

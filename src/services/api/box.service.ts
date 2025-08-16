@@ -4,12 +4,15 @@ import {
   CreateBoxData,
   UpdateBoxData,
   BoxQuery,
-  BoxOpenRequest,
   BoxOpenResponse,
   BoxOpenHistory,
   BoxOpenHistoryQuery,
 } from "../../types/box";
-import { PaginatedResponse } from "../../types/api";
+import {
+  ApiResponse,
+  PaginatedApiResponse,
+  OperationResponse,
+} from "../../types/api-response";
 
 /**
  * Box API Service
@@ -21,68 +24,32 @@ export class BoxService {
   /**
    * Get all boxes with optional filtering and pagination
    * @param query - Query parameters for filtering, sorting, and pagination
-   * @returns Promise<PaginatedResponse<Box>>
+   * @returns Promise<PaginatedApiResponse<Box>> - Returns full response with success, message, timestamp, data, pagination
    */
-  async getBoxes(query?: BoxQuery): Promise<PaginatedResponse<Box>> {
-    const response = await api.get<PaginatedResponse<Box>>(this.baseUrl, {
+  async getBoxes(query?: BoxQuery): Promise<PaginatedApiResponse<Box>> {
+    const response = await api.get<PaginatedApiResponse<Box>>(this.baseUrl, {
       params: query,
     });
     return response.data;
   }
 
   /**
-   * Get all boxes with simple filtering (public endpoint)
-   * @param name - Box name filter
-   * @param isFeatured - Featured status filter
-   * @returns Promise<Box[]>
-   */
-  async getBoxesSimple(name?: string, isFeatured?: boolean): Promise<Box[]> {
-    const params: any = {};
-    if (name) params.name = name;
-    if (isFeatured !== undefined) params.isFeatured = isFeatured;
-
-    const response = await api.get<Box[]>(`${this.baseUrl}/simple`, { params });
-    return response.data;
-  }
-
-  /**
-   * Get all featured boxes
-   * @returns Promise<Box[]>
-   */
-  async getFeaturedBoxes(): Promise<Box[]> {
-    const response = await api.get<Box[]>(`${this.baseUrl}/featured`);
-    return response.data;
-  }
-
-  /**
-   * Search boxes by name
-   * @param name - Box name to search for
-   * @returns Promise<Box[]>
-   */
-  async searchBoxesByName(name: string): Promise<Box[]> {
-    const response = await api.get<Box[]>(
-      `${this.baseUrl}/search/name/${name}`
-    );
-    return response.data;
-  }
-
-  /**
    * Get a specific box by ID
    * @param id - Box ID
-   * @returns Promise<Box>
+   * @returns Promise<ApiResponse<Box>> - Returns full response with success, message, timestamp
    */
-  async getBoxById(id: number): Promise<Box> {
-    const response = await api.get<Box>(`${this.baseUrl}/${id}`);
+  async getBoxById(id: number): Promise<ApiResponse<Box>> {
+    const response = await api.get<ApiResponse<Box>>(`${this.baseUrl}/${id}`);
     return response.data;
   }
 
   /**
    * Create a new box (admin only)
    * @param data - Box creation data
-   * @returns Promise<Box>
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
-  async createBox(data: CreateBoxData): Promise<Box> {
-    const response = await api.post<Box>(this.baseUrl, data);
+  async createBox(data: CreateBoxData): Promise<OperationResponse> {
+    const response = await api.post<OperationResponse>(this.baseUrl, data);
     return response.data;
   }
 
@@ -90,10 +57,13 @@ export class BoxService {
    * Update an existing box (admin only)
    * @param id - Box ID
    * @param data - Box update data
-   * @returns Promise<Box>
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
-  async updateBox(id: number, data: UpdateBoxData): Promise<Box> {
-    const response = await api.patch<Box>(`${this.baseUrl}/${id}`, data);
+  async updateBox(id: number, data: UpdateBoxData): Promise<OperationResponse> {
+    const response = await api.patch<OperationResponse>(
+      `${this.baseUrl}/${id}`,
+      data
+    );
     return response.data;
   }
 
@@ -101,22 +71,31 @@ export class BoxService {
    * Update box featured status (admin only)
    * @param id - Box ID
    * @param isFeatured - Featured status
-   * @returns Promise<Box>
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
-  async updateFeaturedStatus(id: number, isFeatured: boolean): Promise<Box> {
-    const response = await api.patch<Box>(`${this.baseUrl}/${id}/featured`, {
-      isFeatured,
-    });
+  async updateFeaturedStatus(
+    id: number,
+    isFeatured: boolean
+  ): Promise<OperationResponse> {
+    const response = await api.patch<OperationResponse>(
+      `${this.baseUrl}/${id}/featured`,
+      {
+        isFeatured,
+      }
+    );
     return response.data;
   }
 
   /**
    * Delete a box (admin only)
    * @param id - Box ID
-   * @returns Promise<void>
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
-  async deleteBox(id: number): Promise<void> {
-    await api.delete(`${this.baseUrl}/${id}`);
+  async deleteBox(id: number): Promise<OperationResponse> {
+    const response = await api.delete<OperationResponse>(
+      `${this.baseUrl}/${id}`
+    );
+    return response.data;
   }
 
   // ================= BOX OPENING METHODS =================
@@ -124,26 +103,37 @@ export class BoxService {
   /**
    * Open a box for a user
    * @param boxId - Box ID to open
-   * @param userId - User ID who is opening the box
-   * @returns Promise<BoxOpenResponse>
+   * @returns Promise<ApiResponse<BoxOpenResponse>> - Returns full response for comprehensive business logic handling
    */
-  async openBox(boxId: number): Promise<BoxOpenResponse> {
-    const response = await api.post<BoxOpenResponse>(
+  async openBox(boxId: number): Promise<ApiResponse<BoxOpenResponse>> {
+    const response = await api.post<ApiResponse<BoxOpenResponse>>(
       `${this.baseUrl}/${boxId}/open`
     );
-    return response.data;
+    return response.data; // Return full response to handle success/failure
+  }
+
+  /**
+   * Open an achievement reward box
+   * @param boxId - Box ID to open
+   * @param achievementId - Achievement ID that grants access to this reward box
+   * @returns Promise<ApiResponse<BoxOpenResponse>> - Returns full response for comprehensive business logic handling
+   */
+  async openRewardBox(boxId: number, achievementId: number): Promise<ApiResponse<BoxOpenResponse>> {
+    const response = await api.post<ApiResponse<BoxOpenResponse>>(
+      `${this.baseUrl}/${boxId}/achievement/${achievementId}/reward`
+    );
+    return response.data; // Return full response to handle success/failure
   }
 
   /**
    * Get user's box opening history with pagination
-   * @param userId - User ID
    * @param query - Query parameters for pagination
-   * @returns Promise<PaginatedResponse<BoxOpenHistory>>
+   * @returns Promise<PaginatedApiResponse<BoxOpenHistory>> - Returns full response with success, message, timestamp, data, pagination
    */
   async getMyBoxOpenHistory(
     query?: BoxOpenHistoryQuery
-  ): Promise<PaginatedResponse<BoxOpenHistory>> {
-    const response = await api.get<PaginatedResponse<BoxOpenHistory>>(
+  ): Promise<PaginatedApiResponse<BoxOpenHistory>> {
+    const response = await api.get<PaginatedApiResponse<BoxOpenHistory>>(
       `${this.baseUrl}/me/history`,
       { params: query }
     );

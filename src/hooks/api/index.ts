@@ -4,30 +4,34 @@
 export * from './useAuth';
 
 // User hooks
-export * from './useUsers';
+export * from './useUser';
 
 // Inventory hooks
 export * from './useInventory';
 
 // Box hooks
-export * from './useBoxes';
+export * from './useBox';
 
 // Item hooks
-export * from './useItems';
+export * from './useItem';
 
 // Address hooks
-export * from './useAddresses';
+export * from './useAddress';
 
 // Achievement hooks
-export * from './useAchievements';
+export * from './useAchievement';
 
 // Category hooks
-export * from './useCategories';
+export * from './useCategory';
+
+// Order hooks
+export * from './useOrder';
 
 // Re-export query keys for advanced usage
 export { authKeys } from './useAuth';
-export { userKeys } from './useUsers';
-export { boxKeys } from './useBoxes';
-export { itemKeys } from './useItems';
-export { addressKeys } from './useAddresses';
-export { categoryKeys } from './useCategories';
+export { userKeys } from './useUser';
+export { boxKeys } from './useBox';
+export { itemKeys } from './useItem';
+export { addressKeys } from './useAddress';
+export { categoryKeys } from './useCategory';
+export { orderKeys } from './useOrder';

@@ -1,29 +1,46 @@
-import { BaseQuery, OrderDirection } from "./api";
+import { BaseQuery } from "./api-response";
+
+// Forward declarations to avoid circular imports
+interface BoxItem {
+  box_id: number;
+  item_id: number;
+  drop_rate: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
+interface OrderItem {
+  id: number;
+  order_id: string;
+  item_id: number;
+  quantity: number;
+  price: number;
+}
 
 export interface Item {
   id: number;
+  sku:string;
   name: string;
   image_url: string;
   price: number;
   rarity: number; // Rarity level from 1 to 5
-  sell_value?: number;
+  sell_value: number; // Required in backend, not optional
   description?: string;
-  created_at: string;
-  updated_at: string;
+  created_at: Date; // Should be Date, not string
+  updated_at: Date; // Should be Date, not string
   // Relations (when included)
-  boxes?: any[]; // BoxItem[]
+  boxes?: BoxItem[]; // Fixed type from any[]
   users?: UserItem[];
-  itemCount?: number;
+  order_items?: OrderItem[]; // Added missing relation
 }
-
-// Remove ItemRarity enum since it's not in your backend
-// Remove category_id and rarity fields since they're not in your backend
 
 export interface CreateItemData {
   name: string;
+  sku:string
   image_url: string;
   price: number;
-  sell_value?: number;
+  rarity: number; // Added rarity field (required in backend DTO)
+  sell_value: number; // Required in backend, not optional
   description?: string;
 }
 
@@ -32,11 +49,10 @@ export interface UpdateItemData extends Partial<CreateItemData> {}
 export interface ItemQuery extends BaseQuery {
   orderBy?: ItemOrderByField;
   name?: string;
-  description?: string;
   minPrice?: number;
   maxPrice?: number;
-  minSellValue?: number;
-  maxSellValue?: number;
+  sku?:string;
+  userId?: string;
 }
 
 export enum ItemOrderByField {
@@ -50,12 +66,12 @@ export enum ItemOrderByField {
 
 // User-Item relationship (updated to match backend implementation with quantity support)
 export interface UserItem {
-  id: number; // Added primary key
+  id: number; // Primary key
   user_id: string;
   item_id: number;
-  quantity: number; // Added quantity support
-  redeemed_at: string;
-  updated_at: string; // Added updated timestamp
+  quantity: number; // Quantity support
+  redeemed_at: Date; // Should be Date, not string
+  updated_at: Date; // Should be Date, not string
   // Relations
   user?: any; // User type from auth.ts
   item?: Item;
@@ -65,53 +81,18 @@ export interface UserItem {
 export interface UserInventory {
   items: Array<{
     item: Item;
-    quantity: number; // Added quantity
-    redeemed_at: string;
-    updated_at: string; // Added updated timestamp
+    quantity: number;
+    redeemed_at: Date; // Should be Date, not string
+    updated_at: Date; // Should be Date, not string
   }>;
-  total: number; // Now represents total quantity, not item count
-}
-
-export interface AddItemToInventoryResponse {
-  message: string;
-  userItem: UserItem;
-}
-
-export interface AddItemsToInventoryResponse {
-  message: string;
-  addedItems: UserItem[];
+  total: number; // Total quantity of all items
 }
 
 export interface AddItemToInventoryData {
   item_id: number;
-  quantity?: number; // Added optional quantity support
+  quantity?: number; // Optional, defaults to 1 in backend
 }
 
 export interface AddItemsToInventoryData {
   item_ids: number[];
-}
-
-export interface RemoveItemFromInventoryData {
-  quantity?: number; // Added optional quantity support
-}
-
-// Item transfer/trade related types
-export interface ItemTransferData {
-  item_id: number;
-  to_user_id: string;
-  quantity: number;
-}
-
-export interface ItemBulkAction {
-  item_ids: number[];
-  action: "delete" | "update" | "transfer";
-  data?: any;
-}
-
-// Item statistics
-export interface ItemStats {
-  totalItems: number;
-  itemsByPrice: Array<{ priceRange: string; count: number }>;
-  mostValuableItems: Item[];
-  recentItems: Item[];
 }

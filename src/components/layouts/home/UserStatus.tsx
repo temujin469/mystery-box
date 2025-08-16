@@ -15,8 +15,10 @@ export function UserStatus() {
     isPending: userLoading,
     isError: userError,
   } = useCurrentUser();
-  const { data: achievements, isPending: achievementsLoading } =
+  const { data: progressData, isPending: achievementsLoading } =
     useMyProgress();
+
+  const achievements = progressData?.progress || [];
 
   // Don't render anything if user is not authenticated
   if (!user) {

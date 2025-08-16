@@ -1,5 +1,6 @@
 /**
- * Token storage utility that handles both localStorage and cookies
+ * Authentication token management
+ * Handles both localStorage and cookies for SSR compatibility
  * Cookies are needed for server-side middleware, localStorage for client-side
  */
 
@@ -30,7 +31,7 @@ const removeCookie = (name: string) => {
   }
 };
 
-export const tokenStorage = {
+export const auth = {
   setAccessToken: (token: string) => {
     // Store in both localStorage and cookies
     if (typeof window !== 'undefined') {
@@ -64,7 +65,7 @@ export const tokenStorage = {
   },
 
   hasToken: (): boolean => {
-    return !!tokenStorage.getAccessToken();
+    return !!auth.getAccessToken();
   },
 
   clearTokens: () => {
@@ -75,5 +76,15 @@ export const tokenStorage = {
     }
     removeCookie('access_token');
     removeCookie('refresh_token');
+  },
+
+  // Additional auth helpers
+  isAuthenticated: (): boolean => {
+    return auth.hasToken();
+  },
+
+  setTokens: (accessToken: string, refreshToken: string) => {
+    auth.setAccessToken(accessToken);
+    auth.setRefreshToken(refreshToken);
   }
 };

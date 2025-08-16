@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
-import { safeLocalStorage } from "./localStorage";
+import { safeLocalStorage } from "../utils/localStorage";
 
 // DRY API client using Axios
 

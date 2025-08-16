@@ -7,41 +7,14 @@ import {
   UpdateExperienceData,
   UserStats,
   UserRole,
+  UserQuery,
 } from "../../types/auth";
-import { PaginatedResponse } from "../../types/api";
 import {
-  UserInventory,
-  AddItemToInventoryResponse,
-  AddItemsToInventoryResponse,
-} from "../../types/item";
-
-export interface UserQuery {
-  page?: number;
-  limit?: number;
-  orderBy?: UserOrderByField;
-  orderDirection?: "ASC" | "DESC";
-  search?: string;
-  email?: string;
-  username?: string;
-  minLevel?: number;
-  maxLevel?: number;
-  minCoins?: number;
-  maxCoins?: number;
-  role?: UserRole;
-}
-
-export enum UserOrderByField {
-  ID = "id",
-  EMAIL = "email",
-  USERNAME = "username",
-  FIRSTNAME = "firstname",
-  LASTNAME = "lastname",
-  COINS = "coins",
-  LEVEL = "level",
-  EXPERIENCE_POINTS = "experience_points",
-  ROLE = "role",
-  CREATED_AT = "created_at",
-}
+  ApiResponse,
+  PaginatedApiResponse,
+  OperationResponse,
+} from "../../types/api-response";
+import { UserInventory } from "../../types/item";
 
 /**
  * User API Service
@@ -54,10 +27,13 @@ export class UserService {
    * Create a new user
    * POST /user
    * @param createUserData - User creation data
-   * @returns Promise<User>
+   * @returns Promise<ApiResponse<User>> - Returns full response with success, message, timestamp
    */
-  async createUser(createUserData: RegisterData): Promise<User> {
-    const response = await api.post<User>(this.baseUrl, createUserData);
+  async createUser(createUserData: RegisterData): Promise<ApiResponse<User>> {
+    const response = await api.post<ApiResponse<User>>(
+      this.baseUrl,
+      createUserData
+    );
     return response.data;
   }
 
@@ -65,38 +41,12 @@ export class UserService {
    * Get all users with optional filtering and pagination
    * GET /user
    * @param query - Query parameters for filtering, sorting, and pagination
-   * @returns Promise<PaginatedResponse<User>>
+   * @returns Promise<PaginatedApiResponse<User>> - Returns full response with success, message, timestamp, data, pagination
    */
-  async getUsers(query?: UserQuery): Promise<PaginatedResponse<User>> {
-    const response = await api.get<PaginatedResponse<User>>(this.baseUrl, {
+  async getUsers(query?: UserQuery): Promise<PaginatedApiResponse<User>> {
+    const response = await api.get<PaginatedApiResponse<User>>(this.baseUrl, {
       params: query,
     });
-    return response.data;
-  }
-
-  /**
-   * Find user by email
-   * GET /user/search/email/:email
-   * @param email - User email
-   * @returns Promise<User>
-   */
-  async findByEmail(email: string): Promise<User> {
-    const response = await api.get<User>(
-      `${this.baseUrl}/search/email/${email}`
-    );
-    return response.data;
-  }
-
-  /**
-   * Find user by username
-   * GET /user/search/username/:username
-   * @param username - Username
-   * @returns Promise<User>
-   */
-  async findByUsername(username: string): Promise<User> {
-    const response = await api.get<User>(
-      `${this.baseUrl}/search/username/${username}`
-    );
     return response.data;
   }
 
@@ -104,10 +54,12 @@ export class UserService {
    * Get user statistics
    * GET /user/:id/stats
    * @param id - User ID
-   * @returns Promise<UserStats>
+   * @returns Promise<ApiResponse<UserStats>> - Returns full response with success, message, timestamp
    */
-  async getUserStats(id: string): Promise<UserStats> {
-    const response = await api.get<UserStats>(`${this.baseUrl}/${id}/stats`);
+  async getUserStats(id: string): Promise<ApiResponse<UserStats>> {
+    const response = await api.get<ApiResponse<UserStats>>(
+      `${this.baseUrl}/${id}/stats`
+    );
     return response.data;
   }
 
@@ -115,10 +67,10 @@ export class UserService {
    * Get a specific user by ID
    * GET /user/:id
    * @param id - User ID
-   * @returns Promise<User>
+   * @returns Promise<ApiResponse<User>> - Returns full response with success, message, timestamp
    */
-  async getUserById(id: string): Promise<User> {
-    const response = await api.get<User>(`${this.baseUrl}/${id}`);
+  async getUserById(id: string): Promise<ApiResponse<User>> {
+    const response = await api.get<ApiResponse<User>>(`${this.baseUrl}/${id}`);
     return response.data;
   }
 
@@ -127,10 +79,13 @@ export class UserService {
    * PATCH /user/:id
    * @param id - User ID
    * @param updateUserData - User update data
-   * @returns Promise<User>
+   * @returns Promise<ApiResponse<User>> - Returns full response with success, message, timestamp
    */
-  async updateUser(id: string, updateUserData: UpdateUserData): Promise<User> {
-    const response = await api.patch<User>(
+  async updateUser(
+    id: string,
+    updateUserData: UpdateUserData
+  ): Promise<ApiResponse<User>> {
+    const response = await api.patch<ApiResponse<User>>(
       `${this.baseUrl}/${id}`,
       updateUserData
     );
@@ -142,10 +97,13 @@ export class UserService {
    * PATCH /user/:id/coins
    * @param id - User ID
    * @param coinsData - Coins update data
-   * @returns Promise<User>
+   * @returns Promise<OperationResponse> - Returns operation status with message
    */
-  async updateUserCoins(id: string, coinsData: UpdateCoinsData): Promise<User> {
-    const response = await api.patch<User>(
+  async updateUserCoins(
+    id: string,
+    coinsData: UpdateCoinsData
+  ): Promise<OperationResponse> {
+    const response = await api.patch<OperationResponse>(
       `${this.baseUrl}/${id}/coins`,
       coinsData
     );
@@ -157,13 +115,13 @@ export class UserService {
    * PATCH /user/:id/experience
    * @param id - User ID
    * @param experienceData - Experience update data
-   * @returns Promise<User>
+   * @returns Promise<OperationResponse> - Returns operation status with message
    */
   async updateUserExperience(
     id: string,
     experienceData: UpdateExperienceData
-  ): Promise<User> {
-    const response = await api.patch<User>(
+  ): Promise<OperationResponse> {
+    const response = await api.patch<OperationResponse>(
       `${this.baseUrl}/${id}/experience`,
       experienceData
     );
@@ -171,24 +129,17 @@ export class UserService {
   }
 
   /**
-   * Promote user to admin
-   * PATCH /user/:id/promote
+   * Update user role
+   * PATCH /user/:id/role
    * @param id - User ID
-   * @returns Promise<User>
+   * @param role - New user role
+   * @returns Promise<OperationResponse> - Returns operation status with message
    */
-  async promoteToAdmin(id: string): Promise<User> {
-    const response = await api.patch<User>(`${this.baseUrl}/${id}/promote`);
-    return response.data;
-  }
-
-  /**
-   * Demote user from admin
-   * PATCH /user/:id/demote
-   * @param id - User ID
-   * @returns Promise<User>
-   */
-  async demoteFromAdmin(id: string): Promise<User> {
-    const response = await api.patch<User>(`${this.baseUrl}/${id}/demote`);
+  async updateUserRole(id: string, role: UserRole): Promise<OperationResponse> {
+    const response = await api.patch<OperationResponse>(
+      `${this.baseUrl}/${id}/role`,
+      { role }
+    );
     return response.data;
   }
 
@@ -196,10 +147,13 @@ export class UserService {
    * Delete a user
    * DELETE /user/:id
    * @param id - User ID
-   * @returns Promise<void>
+   * @returns Promise<OperationResponse> - Returns operation status with message
    */
-  async deleteUser(id: string): Promise<void> {
-    await api.delete(`${this.baseUrl}/${id}`);
+  async deleteUser(id: string): Promise<OperationResponse> {
+    const response = await api.delete<OperationResponse>(
+      `${this.baseUrl}/${id}`
+    );
+    return response.data;
   }
 
   // ================= INVENTORY METHODS =================
@@ -208,10 +162,10 @@ export class UserService {
    * Get user's inventory
    * GET /user/:id/inventory
    * @param id - User ID
-   * @returns Promise<UserInventory>
+   * @returns Promise<ApiResponse<UserInventory>> - Returns full response with success, message, timestamp
    */
-  async getUserInventory(id: string): Promise<UserInventory> {
-    const response = await api.get<UserInventory>(
+  async getUserInventory(id: string): Promise<ApiResponse<UserInventory>> {
+    const response = await api.get<ApiResponse<UserInventory>>(
       `${this.baseUrl}/${id}/inventory`
     );
     return response.data;
@@ -223,14 +177,14 @@ export class UserService {
    * @param id - User ID
    * @param itemId - Item ID to add
    * @param quantity - Quantity to add (default: 1)
-   * @returns Promise<AddItemToInventoryResponse>
+   * @returns Promise<OperationResponse> - Returns operation status with message
    */
   async addItemToInventory(
     id: string,
     itemId: number,
     quantity: number = 1
-  ): Promise<AddItemToInventoryResponse> {
-    const response = await api.post<AddItemToInventoryResponse>(
+  ): Promise<OperationResponse> {
+    const response = await api.post<OperationResponse>(
       `${this.baseUrl}/${id}/inventory`,
       { item_id: itemId, quantity }
     );
@@ -242,13 +196,13 @@ export class UserService {
    * POST /user/:id/inventory/bulk
    * @param id - User ID
    * @param itemIds - Array of item IDs to add
-   * @returns Promise<AddItemsToInventoryResponse>
+   * @returns Promise<OperationResponse> - Returns operation status with message
    */
   async addItemsToInventory(
     id: string,
     itemIds: number[]
-  ): Promise<AddItemsToInventoryResponse> {
-    const response = await api.post<AddItemsToInventoryResponse>(
+  ): Promise<OperationResponse> {
+    const response = await api.post<OperationResponse>(
       `${this.baseUrl}/${id}/inventory/bulk`,
       { item_ids: itemIds }
     );
@@ -261,14 +215,14 @@ export class UserService {
    * @param id - User ID
    * @param itemId - Item ID to remove
    * @param quantity - Quantity to remove (default: 1)
-   * @returns Promise<{message: string}>
+   * @returns Promise<OperationResponse> - Returns operation status with message
    */
   async removeItemFromInventory(
     id: string,
     itemId: number,
     quantity: number = 1
-  ): Promise<{ message: string }> {
-    const response = await api.delete<{ message: string }>(
+  ): Promise<OperationResponse> {
+    const response = await api.delete<OperationResponse>(
       `${this.baseUrl}/${id}/inventory/${itemId}?quantity=${quantity}`
     );
     return response.data;

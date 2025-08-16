@@ -1,24 +1,21 @@
+import { BaseQuery } from "./api-response";
+
 export interface LoginCredentials {
   email: string;
   password: string;
 }
 
-export interface RegisterData {
-  email: string;
-  username: string;
-  password: string;
-  firstname?: string;
-  lastname?: string;
-  coins?: number;
-  level?: number;
-  experience_points?: number;
-  role?: UserRole;
+export interface RegisterData extends CreateUserData {
+  // Same structure as CreateUserData for user registration
 }
 
-export interface AuthResponse {
+export interface LoginResponse {
   access_token: string;
   refresh_token: string;
-  // user: User;
+}
+
+export interface RefreshTokenResponse {
+  access_token: string;
 }
 
 export interface User {
@@ -31,11 +28,14 @@ export interface User {
   level: number;
   experience_points: number;
   role: UserRole;
-  created_at: string;
-  updated_at?: string;
-  // addressCount?: number;
-  // transactionCount?: number;
-  // itemCount?: number;
+  created_at: Date; // Should be Date, not string
+  // Relations (when included)
+  transactions?: any[]; // Transaction[]
+  boxOpenHistory?: any[]; // BoxOpenHistory[]
+  items?: any[]; // UserItem[]
+  addresses?: any[]; // Address[]
+  achievements?: any[]; // UserAchievement[]
+  orders?: any[]; // Order[]
 }
 
 export enum UserRole {
@@ -44,19 +44,24 @@ export enum UserRole {
   ADMIN = "ADMIN",
 }
 
-export interface UpdateUserData {
-  email?: string;
-  username?: string;
+export interface CreateUserData {
+  email: string;
+  username: string;
+  password: string;
   firstname?: string;
   lastname?: string;
   coins?: number;
   level?: number;
   experience_points?: number;
-  // role?: UserRole;
+  role?: UserRole;
+}
+
+export interface UpdateUserData extends Partial<CreateUserData> {
+  // Extends CreateUserData with all fields optional for updates
 }
 
 export interface UpdateCoinsData {
-  coins: number;
+  coins: number; // Can be positive or negative for adding/subtracting
 }
 
 export interface UpdateExperienceData {
@@ -68,4 +73,33 @@ export interface UserStats {
   totalItems: number;
   totalAddresses: number;
   totalBoxesOpened: number;
+  totalOrders: number;
+  level: number;
+  experiencePoints: number;
+  coinBalance: number;
+}
+
+export interface UserQuery extends BaseQuery {
+  orderBy?: UserOrderByField;
+  search?: string;
+  email?: string;
+  username?: string;
+  minLevel?: number;
+  maxLevel?: number;
+  minCoins?: number;
+  maxCoins?: number;
+  role?: UserRole;
+}
+
+export enum UserOrderByField {
+  ID = "id",
+  EMAIL = "email",
+  USERNAME = "username",
+  FIRSTNAME = "firstname",
+  LASTNAME = "lastname",
+  COINS = "coins",
+  LEVEL = "level",
+  EXPERIENCE_POINTS = "experience_points",
+  ROLE = "role",
+  CREATED_AT = "created_at",
 }

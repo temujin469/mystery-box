@@ -1,11 +1,11 @@
-"use client"
+"use client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { authService } from "../../services/api";
 import {
   LoginCredentials,
   RegisterData,
-  AuthResponse,
+  LoginResponse,
   User,
   UpdateUserData,
 } from "../../types/auth";
@@ -13,8 +13,7 @@ import {
 // Query Keys
 export const authKeys = {
   all: ["auth"] as const,
-  user: () => [...authKeys.all, "user"] as const,
-  profile: () => [...authKeys.user(), "profile"] as const,
+  profile: () => [...authKeys.all, "profile"] as const,
 };
 
 // Query Hooks
@@ -33,7 +32,7 @@ export const useCurrentUser = () => {
 
     // Listen for storage events (for cross-tab synchronization)
     window.addEventListener("storage", checkToken);
-    
+
     // Custom event for same-tab updates
     window.addEventListener("auth-token-changed", checkToken);
 
@@ -47,7 +46,10 @@ export const useCurrentUser = () => {
 
   return useQuery({
     queryKey: authKeys.profile(),
-    queryFn: () => authService.getProfile(),
+    queryFn: async () => {
+      const response = await authService.getProfile();
+      return response.data as User;
+    },
     enabled: hasToken, // Only fetch if token exists
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: false, // Don't retry on auth failures
@@ -66,14 +68,16 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: (credentials: LoginCredentials) =>
       authService.login(credentials),
-    onSuccess: () => {
-      // Dispatch custom event to notify auth token change
-      window.dispatchEvent(new Event("auth-token-changed"));
-      
-      // Invalidate and refetch user profile
-      queryClient.invalidateQueries({ queryKey: authKeys.profile() });
-      // Immediately refetch the profile to get user data
-      queryClient.refetchQueries({ queryKey: authKeys.profile() });
+    onSuccess: (response) => {
+      if (response.success) {
+        // Dispatch custom event to notify auth token change
+        window.dispatchEvent(new Event("auth-token-changed"));
+
+        // Invalidate and refetch user profile
+        queryClient.invalidateQueries({ queryKey: authKeys.profile() });
+        // Immediately refetch the profile to get user data
+        queryClient.refetchQueries({ queryKey: authKeys.profile() });
+      }
     },
   });
 };
@@ -83,14 +87,16 @@ export const useRegister = () => {
 
   return useMutation({
     mutationFn: (data: RegisterData) => authService.register(data),
-    onSuccess: () => {
-      // Dispatch custom event to notify auth token change
-      window.dispatchEvent(new Event("auth-token-changed"));
-      
-      // Invalidate and refetch user profile
-      queryClient.invalidateQueries({ queryKey: authKeys.profile() });
-      // Immediately refetch the profile to get user data
-      queryClient.refetchQueries({ queryKey: authKeys.profile() });
+    onSuccess: (response) => {
+      if (response.success) {
+        // Dispatch custom event to notify auth token change
+        window.dispatchEvent(new Event("auth-token-changed"));
+
+        // Invalidate and refetch user profile
+        queryClient.invalidateQueries({ queryKey: authKeys.profile() });
+        // Immediately refetch the profile to get user data
+        queryClient.refetchQueries({ queryKey: authKeys.profile() });
+      }
     },
   });
 };
@@ -110,7 +116,7 @@ export const useLogout = () => {
 
       // Use service method to clear auth data
       authService.clearAuthData();
-      
+
       // Dispatch custom event to notify auth token change
       window.dispatchEvent(new Event("auth-token-changed"));
     },
@@ -119,10 +125,10 @@ export const useLogout = () => {
       queryClient.clear();
       queryClient.resetQueries();
       queryClient.invalidateQueries({ queryKey: authKeys.profile() });
-      
+
       // Use service method to clear auth data
       authService.clearAuthData();
-      
+
       // Dispatch custom event to notify auth token change
       window.dispatchEvent(new Event("auth-token-changed"));
     },
@@ -134,12 +140,14 @@ export const useRefreshToken = () => {
 
   return useMutation({
     mutationFn: () => authService.refreshToken(),
-    onSuccess: (authResponse) => {
-      // Dispatch custom event to notify auth token change
-      window.dispatchEvent(new Event("auth-token-changed"));
-      
-      // Update user data in cache
-      queryClient.invalidateQueries({ queryKey: authKeys.profile() });
+    onSuccess: (response) => {
+      if (response.success) {
+        // Dispatch custom event to notify auth token change
+        window.dispatchEvent(new Event("auth-token-changed"));
+
+        // Update user data in cache
+        queryClient.invalidateQueries({ queryKey: authKeys.profile() });
+      }
     },
   });
 };
@@ -171,5 +179,17 @@ export const useChangePassword = () => {
       currentPassword: string;
       newPassword: string;
     }) => authService.changePassword(currentPassword, newPassword),
+  });
+};
+
+export const useVerifyEmail = () => {
+  return useMutation({
+    mutationFn: (token: string) => authService.verifyEmail(token),
+  });
+};
+
+export const useResendVerification = () => {
+  return useMutation({
+    mutationFn: () => authService.resendVerification(),
   });
 };

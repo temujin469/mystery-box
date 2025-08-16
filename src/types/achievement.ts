@@ -27,6 +27,7 @@ export interface Achievement {
 export interface UserAchievement {
   achievement_id: number;
   unlocked_at: Date;
+  claimed:boolean;
   achievement: {
     id: number;
     name: string;
@@ -78,4 +79,7 @@ export interface UserAchievementProgress
   progress_percentage: number;
   current_progress: number;
   image_url: string;
+  claimed:boolean
 }
+
+

@@ -8,12 +8,14 @@ interface ProfileItemCardProps {
   item: Item;
   quantity: number;
   onClick?: () => void;
+  className?: string;
 }
 
 export default function ProfileItemCard({
   item,
   quantity,
   onClick,
+  className,
 }: ProfileItemCardProps) {
   // Get rarity colors based on item rarity (fallback to price-based if rarity not available)
   const rarityColors = getRarityColors(item.rarity);
@@ -21,7 +23,7 @@ export default function ProfileItemCard({
   return (
     <Paper
       variant="compact"
-      className={`relative overflow-hidden group `}
+      className={`relative overflow-hidden group ${className || ""}`}
       onClick={onClick}
     >
       {/* Background pattern */}
@@ -61,13 +63,13 @@ export default function ProfileItemCard({
           </div>
 
           {/* Total value for quantity > 1 */}
-          {quantity > 1 && (
+          {/* {quantity > 1 && (
             <div className="text-[10px] whitespace-nowrap text-muted-foreground">
               <span className="text-accent font-medium">
                 Нийт: {formatCurrency(item.price * quantity)}
               </span>
             </div>
-          )}
+          )} */}
 
           {/* Sell value if available */}
           {/* {item.sell_value && (
@@ -81,4 +83,3 @@ export default function ProfileItemCard({
     </Paper>
   );
 }
-

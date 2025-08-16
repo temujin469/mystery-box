@@ -17,10 +17,12 @@ import {
 } from "@/components/ui/drawer";
 
 interface AchievementCardProps {
-  achievement: UserAchievementProgress;
+  userAchievementProgress: UserAchievementProgress;
 }
 
-const AchievementCard: React.FC<AchievementCardProps> = ({ achievement }) => {
+const AchievementCard: React.FC<AchievementCardProps> = ({
+  userAchievementProgress: achievement,
+}) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const getConditionText = (
@@ -78,17 +80,21 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement }) => {
             {achievement.name}
           </h3>
 
-          {/* Show Claim Button if unlocked, Progress Bar if not */}
-          {achievement.is_unlocked && achievement.reward_box_id ? (
+          {/* Show Claim Button if unlocked and not claimed, Progress Bar if not unlocked */}
+          {achievement.is_unlocked && achievement.reward_box_id && !achievement.claimed ? (
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                window.location.href = `/boxes/${achievement.reward_box_id}?reward=true`;
+                window.location.href = `/boxes/${achievement.reward_box_id}?reward=${achievement.id}`;
               }}
               className="w-full bg-gradient-to-r from-purple-500 to-blue-600 text-white text-xs font-medium py-2 px-3 rounded-lg hover:from-purple-600 hover:to-blue-700 transition-all duration-200"
             >
               Шагнал авах
             </button>
+          ) : achievement.is_unlocked && achievement.claimed ? (
+            <div className="w-full bg-gray-400/20 text-gray-500 text-xs font-medium py-2 px-3 rounded-lg text-center">
+              Шагнал авсан
+            </div>
           ) : (
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
@@ -248,24 +254,37 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement }) => {
           )}
         </div>
 
-        {/* Footer with Claim Button */}
+        {/* Footer with Claim Button or Claimed Status */}
         {achievement.is_unlocked && achievement.reward_box_id && (
           <DrawerFooter className="border-t border-border/20 py-6 px-6">
-            <button
-              onClick={() => {
-                window.location.href = `/boxes/${achievement.reward_box_id}?reward=true`;
-              }}
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white text-lg font-semibold py-4 px-6 rounded-2xl hover:from-purple-700 hover:to-blue-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
-            >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M10 2L3 7v10l7 3 7-3V7l-7-5z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Шагналын хайрцаг нээх
-            </button>
+            {!achievement.claimed ? (
+              <button
+                onClick={() => {
+                  window.location.href = `/boxes/${achievement.reward_box_id}?reward=${achievement.id}`;
+                }}
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white text-lg font-semibold py-4 px-6 rounded-2xl hover:from-purple-700 hover:to-blue-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fillRule="evenodd"
+                    d="M10 2L3 7v10l7 3 7-3V7l-7-5z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Шагналын хайрцаг нээх
+              </button>
+            ) : (
+              <div className="w-full bg-gray-400/20 text-gray-500 text-lg font-semibold py-4 px-6 rounded-2xl text-center flex items-center justify-center gap-3">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Шагнал авсан
+              </div>
+            )}
           </DrawerFooter>
         )}
       </DrawerContent>

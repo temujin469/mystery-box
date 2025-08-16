@@ -25,24 +25,42 @@ export const achievementKeys = {
 
 // Hooks for admin/public endpoints
 export function useAchievements() {
-  return useQuery<Achievement[]>({
+  return useQuery({
     queryKey: achievementKeys.list(),
     queryFn: () => achievementService.getAchievements(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    select: (response) => ({
+      achievements: response.data,
+      message: response.message,
+      success: response.success,
+    }),
   });
 }
 
 export function useAchievement(id: number, enabled = true) {
-  return useQuery<Achievement>({
+  return useQuery({
     queryKey: achievementKeys.detail(id),
     queryFn: () => achievementService.getAchievement(id),
     enabled: enabled && !!id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    select: (response) => ({
+      achievement: response.data,
+      message: response.message,
+      success: response.success,
+    }),
   });
 }
 
 export function useAchievementStats() {
-  return useQuery<AchievementStats>({
+  return useQuery({
     queryKey: achievementKeys.stats(),
     queryFn: achievementService.getAchievementStats,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    select: (response) => ({
+      stats: response.data,
+      message: response.message,
+      success: response.success,
+    }),
   });
 }
 
@@ -50,20 +68,32 @@ export function useAchievementStats() {
 export function useMyAchievements() {
   const { data: user } = useCurrentUser();
   
-  return useQuery<UserAchievement[]>({
+  return useQuery({
     queryKey: achievementKeys.myAchievements(),
-    queryFn: achievementService.getMyAchievements,
+    queryFn: () => achievementService.getMyAchievements(),
     enabled: !!user,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    select: (response) => ({
+      achievements: response.data,
+      message: response.message,
+      success: response.success,
+    }),
   });
 }
 
 export function useMyProgress() {
   const { data: user } = useCurrentUser();
   
-  return useQuery<UserAchievementProgress[]>({
+  return useQuery({
     queryKey: achievementKeys.myProgress(),
-    queryFn: achievementService.getMyProgress,
+    queryFn: () => achievementService.getMyProgress(),
     enabled: !!user,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    select: (response) => ({
+      progress: response.data,
+      message: response.message,
+      success: response.success,
+    }),
   });
 }
 
@@ -102,44 +132,6 @@ export function useDeleteAchievement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: achievementKeys.lists() });
       queryClient.invalidateQueries({ queryKey: achievementKeys.stats() });
-    },
-  });
-}
-
-// Mutation hooks for user operations (commented for future usage)
-// export function useUnlockAchievement() {
-//   const queryClient = useQueryClient();
-
-//   return useMutation({
-//     mutationFn: ({ userId, achievementId }: { userId: string; achievementId: number }) =>
-//       achievementService.unlockAchievement(userId, achievementId),
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: achievementKeys.myAchievements() });
-//       queryClient.invalidateQueries({ queryKey: achievementKeys.myProgress() });
-//     },
-//   });
-// }
-
-// export function useCheckAndUnlockAchievements() {
-//   const queryClient = useQueryClient();
-
-//   return useMutation({
-//     mutationFn: (userId: string) => achievementService.checkAndUnlockAchievements(userId),
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: achievementKeys.myAchievements() });
-//       queryClient.invalidateQueries({ queryKey: achievementKeys.myProgress() });
-//     },
-//   });
-// }
-
-export function useCheckMyAchievements() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: achievementService.checkMyAchievements,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: achievementKeys.myAchievements() });
-      queryClient.invalidateQueries({ queryKey: achievementKeys.myProgress() });
     },
   });
 }

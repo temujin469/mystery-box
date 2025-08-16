@@ -7,73 +7,72 @@ import {
   AchievementStats,
   UserAchievementProgress,
 } from "../../types/achievement";
+import { ApiResponse, OperationResponse } from "../../types/api-response";
 
 class AchievementService {
-  // Admin endpoints
-  async getAchievements(): Promise<Achievement[]> {
-    const { data } = await api.get("/achievements");
-    return data;
+  private readonly baseUrl = "/achievements";
+
+  // Admin endpoints - Return full response data with success, message, timestamp
+  async getAchievements(): Promise<ApiResponse<Achievement[]>> {
+    const response = await api.get<ApiResponse<Achievement[]>>(this.baseUrl);
+    return response.data;
   }
 
-  async getAchievement(id: number): Promise<Achievement> {
-    const { data } = await api.get(`/achievements/${id}`);
-    return data;
+  async getAchievement(id: number): Promise<ApiResponse<Achievement>> {
+    const response = await api.get<ApiResponse<Achievement>>(
+      `${this.baseUrl}/${id}`
+    );
+    return response.data;
   }
 
-  async createAchievement(achievementData: CreateAchievementData): Promise<Achievement> {
-    const { data } = await api.post("/achievements", achievementData);
-    return data;
+  async createAchievement(
+    achievementData: CreateAchievementData
+  ): Promise<OperationResponse> {
+    const response = await api.post<OperationResponse>(
+      this.baseUrl,
+      achievementData
+    );
+    return response.data;
   }
 
-  async updateAchievement(id: number, achievementData: UpdateAchievementData): Promise<Achievement> {
-    const { data } = await api.patch(`/achievements/${id}`, achievementData);
-    return data;
+  async updateAchievement(
+    id: number,
+    achievementData: UpdateAchievementData
+  ): Promise<OperationResponse> {
+    const response = await api.patch<OperationResponse>(
+      `${this.baseUrl}/${id}`,
+      achievementData
+    );
+    return response.data;
   }
 
-  async deleteAchievement(id: number): Promise<void> {
-    await api.delete(`/achievements/${id}`);
+  async deleteAchievement(id: number): Promise<OperationResponse> {
+    const response = await api.delete<OperationResponse>(
+      `${this.baseUrl}/${id}`
+    );
+    return response.data;
   }
 
-  async getAchievementStats(): Promise<AchievementStats> {
-    const { data } = await api.get("/achievements/stats");
-    return data;
+  async getAchievementStats(): Promise<ApiResponse<AchievementStats>> {
+    const response = await api.get<ApiResponse<AchievementStats>>(
+      `${this.baseUrl}/stats`
+    );
+    return response.data;
   }
 
-  // User-specific endpoints
-  async getUserAchievements(userId: string): Promise<UserAchievement[]> {
-    const { data } = await api.get(`/achievements/user/${userId}`);
-    return data;
+  // Current user endpoints (requires authentication) - Return full response data with success, message, timestamp
+  async getMyAchievements(): Promise<ApiResponse<UserAchievement[]>> {
+    const response = await api.get<ApiResponse<UserAchievement[]>>(
+      `${this.baseUrl}/me/achievements`
+    );
+    return response.data;
   }
 
-  async getUserProgress(userId: string): Promise<UserAchievementProgress[]> {
-    const { data } = await api.get(`/achievements/user/${userId}/progress`);
-    return data;
-  }
-
-  async unlockAchievement(userId: string, achievementId: number): Promise<UserAchievement> {
-    const { data } = await api.post(`/achievements/user/${userId}/unlock/${achievementId}`);
-    return data;
-  }
-
-  async checkAndUnlockAchievements(userId: string): Promise<UserAchievement[]> {
-    const { data } = await api.post(`/achievements/user/${userId}/check-unlock`);
-    return data;
-  }
-
-  // Current user endpoints (requires authentication)
-  async getMyAchievements(): Promise<UserAchievement[]> {
-    const { data } = await api.get("/achievements/me/achievements");
-    return data;
-  }
-
-  async getMyProgress(): Promise<UserAchievementProgress[]> {
-    const { data } = await api.get("/achievements/me/progress");
-    return data;
-  }
-
-  async checkMyAchievements(): Promise<UserAchievement[]> {
-    const { data } = await api.post("/achievements/me/check-unlock");
-    return data;
+  async getMyProgress(): Promise<ApiResponse<UserAchievementProgress[]>> {
+    const response = await api.get<ApiResponse<UserAchievementProgress[]>>(
+      `${this.baseUrl}/me/progress`
+    );
+    return response.data;
   }
 }
 

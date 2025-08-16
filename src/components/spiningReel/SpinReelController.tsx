@@ -1,14 +1,20 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
-import { FastForward } from "lucide-react";
+import { FastForward, Gift, Package } from "lucide-react";
 import { useSpinBusinessLogic } from "@/hooks/useSpinBusinessLogic";
 import { useSpinningReelStore } from "@/stores/spinningReel.store";
-import { useBox } from "@/hooks/api/useBoxes";
+import { useBox, useOpenRewardBox } from "@/hooks/api/useBox";
 import { SpiningItem } from "./SpiningReel";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface SpinReelControllerProps {
   spinning: boolean;
-  onSpin: (winnerItem: SpiningItem | null, spinType: "paid" | "trial") => void;
+  onSpin: (
+    winnerItem: SpiningItem | null,
+    spinType: "paid" | "trial" | "reward"
+  ) => void;
   onResetWinner: () => void;
 }
 
@@ -21,13 +27,34 @@ const SpinReelController: React.FC<SpinReelControllerProps> = ({
   const lastClickTime = useRef<number>(0);
   const CLICK_COOLDOWN = 1000; // 1 second cooldown between clicks
 
+  // Router for navigation
+  const router = useRouter();
+
+  // State to track if reward has been claimed
+  const [isRewardClaimed, setIsRewardClaimed] = useState(false);
+
+  // Get URL search params to check for reward parameter
+  const searchParams = useSearchParams();
+  const rewardParam = searchParams.get("reward");
+  const achievementId = rewardParam ? parseInt(rewardParam, 10) : null;
+  const isRewardMode = achievementId !== null && !isNaN(achievementId);
+
   // Get boxId and winnerItem from store directly
   const boxId = useSpinningReelStore((state) => state.boxId);
   const canQuickSell = useSpinningReelStore((state) => state.canQuickSell);
   const winner = useSpinningReelStore((state) => state.winnerItem);
 
   // Fetch box data using the boxId from store
-  const { data: box, isLoading: isBoxLoading } = useBox(boxId || 0, !!boxId);
+  const { data: boxResponse, isLoading: isBoxLoading } = useBox(
+    boxId || 0,
+    !!boxId
+  );
+
+  // Reward box opening hook
+  const { mutate: openRewardBox, isPending: isOpeningReward } =
+    useOpenRewardBox();
+
+  const box = boxResponse?.box;
 
   // Business logic hook - handles authentication, modal management, and business rules
   const {
@@ -65,7 +92,7 @@ const SpinReelController: React.FC<SpinReelControllerProps> = ({
     if (!isClickAllowed()) {
       return;
     }
-    
+
     handleTrialSpinRequest(onSpin);
   };
 
@@ -90,6 +117,62 @@ const SpinReelController: React.FC<SpinReelControllerProps> = ({
     onResetWinner(); // Parent component handler - resets winner state
   };
 
+  // Handler for navigating to profile items
+  const handleViewItems = () => {
+    // Security check: Rate limiting
+    if (!isClickAllowed()) {
+      return;
+    }
+
+    router.push("/profile/items");
+  };
+
+  // Handler for claiming achievement reward
+  const handleClaimReward = () => {
+    // Security check: Rate limiting
+    if (!isClickAllowed()) {
+      return;
+    }
+
+    if (boxId && achievementId) {
+      openRewardBox(
+        { boxId, achievementId },
+        {
+          onSuccess: (response) => {
+            // Trigger the spinning animation with the won item
+            const winnerItem: SpiningItem = {
+              id: response.data.receivedItem.id,
+              name: response.data.receivedItem.name,
+              image_url: response.data.receivedItem.image_url,
+              drop_rate: 1.0, // Default drop rate for reward items
+              sell_value: response.data.receivedItem.sell_value || 0,
+            };
+            console.log("ahha", response.data);
+            onSpin(winnerItem, "reward"); // Use reward type for achievement reward claims
+            setIsRewardClaimed(true); // Mark reward as claimed
+
+          },
+          onError: (error) => {
+            // console.error("Failed to open reward box:", error);
+
+            // Check if it's a 403 Forbidden error
+            if ((error as any)?.response?.status === 403) {
+              toast.warning("Шагналын хайрцгийг нээх эрх байхгүй байна", {
+                description: "Шагналын хайрцаг аль хэдийн нээгдсэн",
+                duration: 3000,
+              });
+            } else {
+              toast.error("Шагналын хайрцаг нээхэд алдаа гарлаа", {
+                description: "Дахин оролдоно уу.",
+                duration: 4000,
+              });
+            }
+          },
+        }
+      );
+    }
+  };
+
   // Don't render if box is not loaded yet
   if (!box || isBoxLoading) {
     return (
@@ -101,7 +184,32 @@ const SpinReelController: React.FC<SpinReelControllerProps> = ({
 
   return (
     <div className="flex w-full justify-center gap-2 sm:gap-4 py-8 px-4">
-      {winner ? (
+      {isRewardMode ? (
+        // Reward Mode - Single Claim Button
+        <Button
+          className={`relative flex-1 max-w-[280px] px-6 sm:px-8 py-4 border text-white font-mono transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:hover:shadow-none rounded-xl text-sm sm:text-base ${
+            isRewardClaimed
+              ? "bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 border-blue-500/50 hover:shadow-blue-500/25"
+              : "bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-500 hover:to-green-600 border-emerald-500/50 hover:shadow-emerald-500/25"
+          }`}
+          onClick={isRewardClaimed ? handleViewItems : handleClaimReward}
+          size="lg"
+          disabled={spinning || isOpeningReward}
+        >
+          {isRewardClaimed ? (
+            <Package className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+          ) : (
+            <Gift className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+          )}
+          <span className="relative z-10">
+            {isOpeningReward
+              ? "Авч байна..."
+              : isRewardClaimed
+              ? "Миний эд зүйлс"
+              : "Шагнал авах"}
+          </span>
+        </Button>
+      ) : winner ? (
         // Winner State - Two Action Buttons
         <>
           <Button

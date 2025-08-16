@@ -11,7 +11,7 @@ export interface SpiningItem {
 }
 
 // Define spin types
-export type SpinType = "paid" | "trial" | null;
+export type SpinType = "paid" | "trial" | "reward" | null;
 
 // Define business logic states
 interface SpinBusinessState {

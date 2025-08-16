@@ -31,17 +31,29 @@ export const validateDecimalCurrency = (value: number | string): number | null =
 /**
  * Formats currency value for display
  * @param value - The currency value to format (can be string or number)
+ * @param showDecimals - Whether to always show decimal places (default: false)
  * @returns Formatted currency string with ₮ symbol
  * @example
+ * formatCurrency(123) // returns "123₮"
  * formatCurrency(123.45) // returns "123.45₮"
- * formatCurrency("123.45") // returns "123.45₮"
- * formatCurrency(0) // returns "0.00₮"
+ * formatCurrency(123.00) // returns "123₮"
+ * formatCurrency(123.45, true) // returns "123.45₮" (always shows decimals)
+ * formatCurrency(123, true) // returns "123.00₮" (forces decimals)
  */
-export const formatCurrency = (value: number | string): string => {
+export const formatCurrency = (value: number | string, showDecimals: boolean = false): string => {
   const validatedValue = validateDecimalCurrency(value);
-  if (validatedValue === null) return "0.00₮";
-  return `${validatedValue.toFixed(2)}₮`;
+  if (validatedValue === null) return showDecimals ? "0.00₮" : "0₮";
+  
+  // Check if the number has meaningful decimal places
+  const hasDecimals = validatedValue % 1 !== 0;
+  
+  if (showDecimals || hasDecimals) {
+    return `${validatedValue.toFixed(2)}₮`;
+  } else {
+    return `${Math.floor(validatedValue)}₮`;
+  }
 };
+
 
 /**
  * Checks if user has sufficient balance for a transaction

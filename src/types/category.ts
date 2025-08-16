@@ -1,4 +1,4 @@
-import { BaseQuery } from "./api";
+import { BaseQuery } from "./api-response";
 import { CategoryBox } from "./box";
 
 export interface Category {
@@ -7,11 +7,11 @@ export interface Category {
   image_url?: string;
   is_active: boolean;
   is_featured: boolean;
-  created_at: string;
-  updated_at: string;
+  created_at: Date; // Should be Date, not string
+  updated_at: Date; // Should be Date, not string
   // Relations (when included)
   boxes?: CategoryBox[];
-  // Counts (when requested)
+  // Counts (when requested via getCategoryStats)
   boxCount?: number;
 }
 
@@ -27,61 +27,21 @@ export interface UpdateCategoryData extends Partial<CreateCategoryData> {}
 export interface CategoryQuery extends BaseQuery {
   orderBy?: CategoryOrderByField;
   name?: string;
-  is_active?: boolean;
-  is_featured?: boolean;
-  // Advanced filters
-  hasBoxes?: boolean;
+  isActive?: boolean;
+  isFeatured?: boolean;
 }
 
 export enum CategoryOrderByField {
   ID = "id",
   NAME = "name",
   IS_ACTIVE = "is_active",
-  IS_FEATURED = "is_featured",
   CREATED_AT = "created_at",
-  UPDATED_AT = "updated_at",
+  UPDATED_AT = "updated_at", // Removed IS_FEATURED as it's not in backend enum
 }
 
-// Category management actions
-export interface CategoryBulkAction {
-  category_ids: number[];
-  action: "activate" | "deactivate" | "feature" | "unfeature" | "delete";
-  data?: any;
-}
-
-// Category statistics
+// Category stats response (from getCategoryStats endpoint)
 export interface CategoryStats {
-  totalCategories: number;
-  activeCategories: number;
-  featuredCategories: number;
-  categoriesWithBoxes: number;
-  topCategoriesByBoxes: Array<{
-    category: Category;
-    boxCount: number;
-  }>;
-}
-
-// Category hierarchy (if implementing nested categories in future)
-export interface CategoryHierarchy {
   category: Category;
-  children: CategoryHierarchy[];
-  level: number;
-  path: string[];
-}
-
-// Category search/filter helpers
-export interface CategoryFilter {
-  search?: string;
-  active?: boolean;
-  featured?: boolean;
-  hasBoxes?: boolean;
-  ids?: number[];
-}
-
-// Category display options
-export interface CategoryDisplayOptions {
-  showBoxCount?: boolean;
-  includeInactive?: boolean;
-  groupByFeatured?: boolean;
-  sortByPopularity?: boolean;
+  totalBoxes: number;
+  activeBoxes: number;
 }

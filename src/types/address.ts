@@ -1,4 +1,4 @@
-import { BaseQuery } from "./api";
+import { BaseQuery } from "./api-response";
 
 export interface Address {
   id: number;
@@ -13,83 +13,46 @@ export interface Address {
   recipient_name?: string;
   is_default: boolean;
   notes?: string;
-  created_at: string;
-  updated_at: string;
+  created_at: Date; // Should be Date, not string
+  updated_at: Date; // Should be Date, not string
   // Relations (when included)
   user?: any; // User type from auth.ts
 }
 
-export interface CreateAddressData
-  extends Omit<Address, "id" | "created_at" | "updated_at"> {}
-
-export interface UpdateAddressData extends Partial<CreateAddressData> {}
-
-export interface AddressQuery extends BaseQuery {
-  orderBy?: AddressOrderByField;
-  title?: string;
-  full_address?: string;
+export interface CreateAddressData {
+  title: string;
+  full_address: string;
   city?: string;
   district?: string;
   khoroo?: string;
+  postal_code?: string;
+  phone?: string;
+  recipient_name?: string;
   is_default?: boolean;
-  user_id?: string; // For admin queries
+  notes?: string;
+  user_id: string; // Required in CreateAddressDto
+}
+
+export interface UpdateAddressData extends Partial<CreateAddressData> {
+  // All fields from CreateAddressData are optional for updates
+}
+
+export interface AddressQuery extends BaseQuery {
+  orderBy?: AddressOrderByField;
+  city?: string;
+  district?: string;
+  khoroo?: string;
+  isDefault?: boolean; // Backend uses 'isDefault', not 'is_default'
+  userId?: string; // Backend uses 'userId', not 'user_id'
 }
 
 export enum AddressOrderByField {
   ID = "id",
-  TITLE = "title",
-  FULL_ADDRESS = "full_address",
   CITY = "city",
   DISTRICT = "district",
-  KHOROO = "khoroo",
   IS_DEFAULT = "is_default",
   CREATED_AT = "created_at",
   UPDATED_AT = "updated_at",
+  // Removed: TITLE, FULL_ADDRESS, KHOROO (not in backend enum)
 }
 
-// Address validation patterns
-export interface AddressValidationRules {
-  postalCodePattern?: string;
-  phonePattern?: string;
-  requiredFields: string[];
-  maxLengths: Record<string, number>;
-}
-
-// Country-specific address formats
-export interface CountryAddressConfig {
-  code: string;
-  name: string;
-  postalCodePattern: string;
-  phonePattern: string;
-  stateProvinceLabel: string; // "State", "Province", "Region", etc.
-  postalCodeLabel: string; // "Zip Code", "Postal Code", etc.
-  addressFormat: string[]; // Order of address lines for display
-}
-
-// Address suggestions/autocomplete
-export interface AddressSuggestion {
-  formatted_address: string;
-  address_components: {
-    address_line_1: string;
-    city: string;
-    state_province: string;
-    postal_code: string;
-    country: string;
-  };
-}
-
-// Bulk address operations
-export interface AddressBulkAction {
-  address_ids: number[];
-  action: "delete" | "set_default" | "archive";
-  data?: any;
-}
-
-// Address statistics for admin
-export interface AddressStats {
-  totalAddresses: number;
-  addressesByCountry: Record<string, number>;
-  defaultAddressesCount: number;
-  recentAddresses: Address[];
-  mostUsedCities: Array<{ city: string; count: number }>;
-}

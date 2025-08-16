@@ -2,30 +2,55 @@
 
 import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Search, Filter, Package, Star, Zap, Sparkles, Grid, List, SlidersHorizontal } from "lucide-react";
+import {
+  Search,
+  Filter,
+  Package,
+  Star,
+  Zap,
+  Sparkles,
+  Grid,
+  List,
+  SlidersHorizontal,
+} from "lucide-react";
 import { useBoxes, useCategories } from "@/hooks/api";
 import { BoxCard } from "@/components/card/BoxCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { BoxQuery, BoxOrderByField } from "@/types/box";
-import { OrderDirection } from "@/types/api";
+import { OrderDirection } from "@/types/api-response";
 
 export default function BoxesPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>();
+  const [selectedCategoryId, setSelectedCategoryId] = useState<
+    number | undefined
+  >();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [priceRange, setPriceRange] = useState<{ min?: number; max?: number }>({});
-  const [sortBy, setSortBy] = useState<BoxOrderByField>(BoxOrderByField.CREATED_AT);
-  const [sortOrder, setSortOrder] = useState<OrderDirection>(OrderDirection.DESC);
+  const [priceRange, setPriceRange] = useState<{ min?: number; max?: number }>(
+    {}
+  );
+  const [sortBy, setSortBy] = useState<BoxOrderByField>(
+    BoxOrderByField.CREATED_AT
+  );
+  const [sortOrder, setSortOrder] = useState<OrderDirection>(
+    OrderDirection.DESC
+  );
   const [showFilters, setShowFilters] = useState(false);
 
   // Fetch categories for filter
-  const { data: categoriesResponse, isLoading: categoriesLoading } = useCategories({
-    isActive: true,
-    limit: 50,
-  });
+  const { data: categoriesResponse, isLoading: categoriesLoading } =
+    useCategories({
+      isActive: true,
+      limit: 50,
+    });
 
   // Build query for boxes
   const boxQuery: BoxQuery = useMemo(() => {
@@ -53,11 +78,15 @@ export default function BoxesPage() {
   }, [searchQuery, selectedCategoryId, priceRange, sortBy, sortOrder]);
 
   // Fetch boxes with current filters
-  const { data: boxesResponse, isLoading: boxesLoading, error } = useBoxes(boxQuery);
+  const {
+    data: boxesResponse,
+    isLoading: boxesLoading,
+    error,
+  } = useBoxes(boxQuery);
 
   const categories = categoriesResponse?.data || [];
-  const boxes = boxesResponse?.data || [];
-  const totalBoxes = boxesResponse?.meta?.total || 0;
+  const boxes = boxesResponse?.boxes || [];
+  const totalBoxes = boxesResponse?.pagination?.total || 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-8">
@@ -89,7 +118,10 @@ export default function BoxesPage() {
             {/* Top Row - Search and View Controls */}
             <div className="flex flex-col md:flex-row gap-4 mb-6">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={20}
+                />
                 <Input
                   type="text"
                   placeholder="Хайрцаг хайх..."
@@ -98,7 +130,7 @@ export default function BoxesPage() {
                   className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-white/40"
                 />
               </div>
-              
+
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -114,7 +146,11 @@ export default function BoxesPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => setViewMode("grid")}
-                    className={`p-3 ${viewMode === "grid" ? "bg-blue-500 text-white" : "text-gray-400 hover:text-white"}`}
+                    className={`p-3 ${
+                      viewMode === "grid"
+                        ? "bg-blue-500 text-white"
+                        : "text-gray-400 hover:text-white"
+                    }`}
                   >
                     <Grid size={20} />
                   </Button>
@@ -122,7 +158,11 @@ export default function BoxesPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => setViewMode("list")}
-                    className={`p-3 ${viewMode === "list" ? "bg-blue-500 text-white" : "text-gray-400 hover:text-white"}`}
+                    className={`p-3 ${
+                      viewMode === "list"
+                        ? "bg-blue-500 text-white"
+                        : "text-gray-400 hover:text-white"
+                    }`}
                   >
                     <List size={20} />
                   </Button>
@@ -141,15 +181,27 @@ export default function BoxesPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {/* Category Filter */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Ангилал</label>
-                    <Select value={selectedCategoryId?.toString() || ""} onValueChange={(value: string) => setSelectedCategoryId(value ? parseInt(value) : undefined)}>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Ангилал
+                    </label>
+                    <Select
+                      value={selectedCategoryId?.toString() || ""}
+                      onValueChange={(value: string) =>
+                        setSelectedCategoryId(
+                          value ? parseInt(value) : undefined
+                        )
+                      }
+                    >
                       <SelectTrigger className="bg-white/10 border-white/20 text-white">
                         <SelectValue placeholder="Бүх ангилал" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="">Бүх ангилал</SelectItem>
                         {categories.map((category) => (
-                          <SelectItem key={category.id} value={category.id.toString()}>
+                          <SelectItem
+                            key={category.id}
+                            value={category.id.toString()}
+                          >
                             {category.name}
                           </SelectItem>
                         ))}
@@ -159,45 +211,92 @@ export default function BoxesPage() {
 
                   {/* Price Range */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Хамгийн бага үнэ</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Хамгийн бага үнэ
+                    </label>
                     <Input
                       type="number"
                       placeholder="0"
                       value={priceRange.min || ""}
-                      onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value ? parseInt(e.target.value) : undefined }))}
+                      onChange={(e) =>
+                        setPriceRange((prev) => ({
+                          ...prev,
+                          min: e.target.value
+                            ? parseInt(e.target.value)
+                            : undefined,
+                        }))
+                      }
                       className="bg-white/10 border-white/20 text-white placeholder-gray-400"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Хамгийн их үнэ</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Хамгийн их үнэ
+                    </label>
                     <Input
                       type="number"
                       placeholder="∞"
                       value={priceRange.max || ""}
-                      onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value ? parseInt(e.target.value) : undefined }))}
+                      onChange={(e) =>
+                        setPriceRange((prev) => ({
+                          ...prev,
+                          max: e.target.value
+                            ? parseInt(e.target.value)
+                            : undefined,
+                        }))
+                      }
                       className="bg-white/10 border-white/20 text-white placeholder-gray-400"
                     />
                   </div>
 
                   {/* Sort Options */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Эрэмбэлэх</label>
-                    <Select value={`${sortBy}-${sortOrder}`} onValueChange={(value: string) => {
-                      const [field, order] = value.split('-');
-                      setSortBy(field as BoxOrderByField);
-                      setSortOrder(order as OrderDirection);
-                    }}>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Эрэмбэлэх
+                    </label>
+                    <Select
+                      value={`${sortBy}-${sortOrder}`}
+                      onValueChange={(value: string) => {
+                        const [field, order] = value.split("-");
+                        setSortBy(field as BoxOrderByField);
+                        setSortOrder(order as OrderDirection);
+                      }}
+                    >
                       <SelectTrigger className="bg-white/10 border-white/20 text-white">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value={`${BoxOrderByField.CREATED_AT}-${OrderDirection.DESC}`}>Шинэ → Хуучин</SelectItem>
-                        <SelectItem value={`${BoxOrderByField.CREATED_AT}-${OrderDirection.ASC}`}>Хуучин → Шинэ</SelectItem>
-                        <SelectItem value={`${BoxOrderByField.PRICE}-${OrderDirection.ASC}`}>Үнэ: Бага → Их</SelectItem>
-                        <SelectItem value={`${BoxOrderByField.PRICE}-${OrderDirection.DESC}`}>Үнэ: Их → Бага</SelectItem>
-                        <SelectItem value={`${BoxOrderByField.NAME}-${OrderDirection.ASC}`}>Нэр: А → Я</SelectItem>
-                        <SelectItem value={`${BoxOrderByField.NAME}-${OrderDirection.DESC}`}>Нэр: Я → А</SelectItem>
+                        <SelectItem
+                          value={`${BoxOrderByField.CREATED_AT}-${OrderDirection.DESC}`}
+                        >
+                          Шинэ → Хуучин
+                        </SelectItem>
+                        <SelectItem
+                          value={`${BoxOrderByField.CREATED_AT}-${OrderDirection.ASC}`}
+                        >
+                          Хуучин → Шинэ
+                        </SelectItem>
+                        <SelectItem
+                          value={`${BoxOrderByField.PRICE}-${OrderDirection.ASC}`}
+                        >
+                          Үнэ: Бага → Их
+                        </SelectItem>
+                        <SelectItem
+                          value={`${BoxOrderByField.PRICE}-${OrderDirection.DESC}`}
+                        >
+                          Үнэ: Их → Бага
+                        </SelectItem>
+                        <SelectItem
+                          value={`${BoxOrderByField.NAME}-${OrderDirection.ASC}`}
+                        >
+                          Нэр: А → Я
+                        </SelectItem>
+                        <SelectItem
+                          value={`${BoxOrderByField.NAME}-${OrderDirection.DESC}`}
+                        >
+                          Нэр: Я → А
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -244,10 +343,13 @@ export default function BoxesPage() {
         >
           {boxesLoading ? (
             // Loading skeleton
-            <div className={viewMode === "grid" 
-              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-              : "space-y-4"
-            }>
+            <div
+              className={
+                viewMode === "grid"
+                  ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                  : "space-y-4"
+              }
+            >
               {Array.from({ length: 8 }).map((_, index) => (
                 <Skeleton key={index} className="h-80 w-full rounded-2xl" />
               ))}
@@ -259,9 +361,7 @@ export default function BoxesPage() {
               <h3 className="text-xl font-bold text-gray-400 mb-2">
                 Алдаа гарлаа
               </h3>
-              <p className="text-gray-500">
-                Дахин оролдоно уу
-              </p>
+              <p className="text-gray-500">Дахин оролдоно уу</p>
             </div>
           ) : boxes.length === 0 ? (
             // Empty state
@@ -276,10 +376,13 @@ export default function BoxesPage() {
             </div>
           ) : (
             // Boxes display
-            <div className={viewMode === "grid" 
-              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-              : "space-y-4"
-            }>
+            <div
+              className={
+                viewMode === "grid"
+                  ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                  : "space-y-4"
+              }
+            >
               {boxes.map((box, index) => (
                 <motion.div
                   key={box.id}
@@ -288,9 +391,7 @@ export default function BoxesPage() {
                   transition={{ delay: index * 0.05 }}
                   className={viewMode === "list" ? "max-w-none" : ""}
                 >
-                  <BoxCard 
-                    box={box} 
-                  />
+                  <BoxCard box={box} />
                 </motion.div>
               ))}
             </div>

@@ -1,52 +1,34 @@
-import api from '../../lib/api';
+import api from "../../lib/api";
 import {
   Item,
   CreateItemData,
   UpdateItemData,
-} from '../../types/item';
-import { PaginatedResponse } from '../../types/api';
-
-export interface SellItemResponse {
-  success: boolean;
-  coinsReceived: number;
-  message: string;
-}
-
-export interface ItemQuery {
-  page?: number;
-  limit?: number;
-  orderBy?: ItemOrderByField;
-  orderDirection?: 'ASC' | 'DESC';
-  name?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  userId?: string; // Optional user ID to filter items by owner
-}
-
-export enum ItemOrderByField {
-  ID = 'id',
-  NAME = 'name',
-  PRICE = 'price',
-  SELL_VALUE = 'sell_value',
-  CREATED_AT = 'created_at',
-  UPDATED_AT = 'updated_at',
-}
+  ItemQuery,
+} from "../../types/item";
+import {
+  ApiResponse,
+  PaginatedApiResponse,
+  OperationResponse,
+} from "../../types/api-response";
 
 /**
  * Item API Service
  * Handles all item-related API operations matching the backend controller exactly
  */
 export class ItemService {
-  private readonly baseUrl = '/item';
+  private readonly baseUrl = "/item";
 
   /**
    * Create a new item
    * POST /item
    * @param createItemData - Item creation data
-   * @returns Promise<Item>
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
-  async createItem(createItemData: CreateItemData): Promise<Item> {
-    const response = await api.post<Item>(this.baseUrl, createItemData);
+  async createItem(createItemData: CreateItemData): Promise<OperationResponse> {
+    const response = await api.post<OperationResponse>(
+      this.baseUrl,
+      createItemData
+    );
     return response.data;
   }
 
@@ -54,41 +36,12 @@ export class ItemService {
    * Get all items with optional filtering and pagination
    * GET /item
    * @param query - Query parameters for filtering, sorting, and pagination
-   * @returns Promise<PaginatedResponse<Item>>
+   * @returns Promise<PaginatedApiResponse<Item>> - Returns full response with success, message, timestamp, data, pagination
    */
-  async getItems(query?: ItemQuery): Promise<PaginatedResponse<Item>> {
-    const response = await api.get<PaginatedResponse<Item>>(this.baseUrl, {
+  async getItems(query?: ItemQuery): Promise<PaginatedApiResponse<Item>> {
+    const response = await api.get<PaginatedApiResponse<Item>>(this.baseUrl, {
       params: query,
     });
-    return response.data;
-  }
-
-  /**
-   * Get all items with simple filtering (no pagination)
-   * GET /item/simple
-   * @param name - Optional name filter
-   * @param minPrice - Optional minimum price filter
-   * @param maxPrice - Optional maximum price filter
-   * @returns Promise<Item[]>
-   */
-  async getItemsSimple(name?: string, minPrice?: number, maxPrice?: number): Promise<Item[]> {
-    const params: any = {};
-    if (name) params.name = name;
-    if (minPrice !== undefined) params.minPrice = minPrice;
-    if (maxPrice !== undefined) params.maxPrice = maxPrice;
-
-    const response = await api.get<Item[]>(`${this.baseUrl}/simple`, { params });
-    return response.data;
-  }
-
-  /**
-   * Search items by name
-   * GET /item/search/name/:name
-   * @param name - Item name to search for
-   * @returns Promise<Item[]>
-   */
-  async searchItemsByName(name: string): Promise<Item[]> {
-    const response = await api.get<Item[]>(`${this.baseUrl}/search/name/${name}`);
     return response.data;
   }
 
@@ -96,10 +49,10 @@ export class ItemService {
    * Get a specific item by ID
    * GET /item/:id
    * @param id - Item ID
-   * @returns Promise<Item>
+   * @returns Promise<ApiResponse<Item>> - Returns full response with success, message, timestamp
    */
-  async getItemById(id: number): Promise<Item> {
-    const response = await api.get<Item>(`${this.baseUrl}/${id}`);
+  async getItemById(id: number): Promise<ApiResponse<Item>> {
+    const response = await api.get<ApiResponse<Item>>(`${this.baseUrl}/${id}`);
     return response.data;
   }
 
@@ -108,10 +61,16 @@ export class ItemService {
    * PATCH /item/:id
    * @param id - Item ID
    * @param updateItemData - Item update data
-   * @returns Promise<Item>
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
-  async updateItem(id: number, updateItemData: UpdateItemData): Promise<Item> {
-    const response = await api.patch<Item>(`${this.baseUrl}/${id}`, updateItemData);
+  async updateItem(
+    id: number,
+    updateItemData: UpdateItemData
+  ): Promise<OperationResponse> {
+    const response = await api.patch<OperationResponse>(
+      `${this.baseUrl}/${id}`,
+      updateItemData
+    );
     return response.data;
   }
 
@@ -119,10 +78,13 @@ export class ItemService {
    * Delete an item
    * DELETE /item/:id
    * @param id - Item ID
-   * @returns Promise<void>
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
-  async deleteItem(id: number): Promise<void> {
-    await api.delete(`${this.baseUrl}/${id}`);
+  async deleteItem(id: number): Promise<OperationResponse> {
+    const response = await api.delete<OperationResponse>(
+      `${this.baseUrl}/${id}`
+    );
+    return response.data;
   }
 
   /**
@@ -130,12 +92,15 @@ export class ItemService {
    * POST /item/:id/sell
    * @param id - Item ID to sell
    * @param quantity - Quantity to sell (default: 1)
-   * @returns Promise<SellItemResponse>
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
-  async sellItem(id: number, quantity: number = 1): Promise<SellItemResponse> {
-    const response = await api.post<SellItemResponse>(`${this.baseUrl}/${id}/sell`, {
-      quantity,
-    });
+  async sellItem(id: number, quantity: number = 1): Promise<OperationResponse> {
+    const response = await api.post<OperationResponse>(
+      `${this.baseUrl}/${id}/sell`,
+      {
+        quantity,
+      }
+    );
     return response.data;
   }
 }

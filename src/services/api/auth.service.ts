@@ -2,12 +2,14 @@ import api from "../../lib/api";
 import {
   LoginCredentials,
   RegisterData,
-  AuthResponse,
   User,
   UpdateUserData,
+  RefreshTokenResponse,
+  LoginResponse,
 } from "../../types/auth";
-import { ApiResponse } from "../../types/api";
-import { safeLocalStorage } from "@/lib/localStorage";
+import { ApiResponse, OperationResponse } from "../../types/api-response";
+import { auth } from "../../lib/auth";
+import { safeLocalStorage } from "../../utils/localStorage";
 
 /**
  * Authentication API Service
@@ -19,18 +21,21 @@ export class AuthService {
   /**
    * Login with email and password
    * @param credentials - Login credentials (email, password)
-   * @returns Promise<AuthResponse>
+   * @returns Promise<ApiResponse<LoginResponse>> - Returns full response with success, message, timestamp
    */
-  async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>(
+  async login(
+    credentials: LoginCredentials
+  ): Promise<ApiResponse<LoginResponse>> {
+    const response = await api.post<ApiResponse<LoginResponse>>(
       `${this.baseUrl}/login`,
       credentials
     );
 
-    // Store tokens in localStorage
-    safeLocalStorage.setItem("access_token", response.data.access_token);
-    safeLocalStorage.setItem("refresh_token", response.data.refresh_token);
-    // localStorage.setItem('user', JSON.stringify(response.data.user));
+    // Extract login data for token storage
+    const loginData = response.data.data;
+
+    // Store tokens using auth utility
+    auth.setTokens(loginData.access_token, loginData.refresh_token);
 
     // Dispatch custom event to notify token change
     window.dispatchEvent(new Event("auth-token-changed"));
@@ -41,18 +46,19 @@ export class AuthService {
   /**
    * Register a new user account
    * @param data - Registration data
-   * @returns Promise<AuthResponse>
+   * @returns Promise<ApiResponse<LoginResponse>> - Returns full response with success, message, timestamp
    */
-  async register(data: RegisterData): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>(
+  async register(data: RegisterData): Promise<ApiResponse<LoginResponse>> {
+    const response = await api.post<ApiResponse<LoginResponse>>(
       `${this.baseUrl}/register`,
       data
     );
 
-    // Store tokens in localStorage after successful registration
-    safeLocalStorage.setItem("access_token", response.data.access_token);
-    safeLocalStorage.setItem("refresh_token", response.data.refresh_token);
-    // localStorage.setItem('user', JSON.stringify(response.data.user));
+    // Extract login data for token storage
+    const loginData = response.data.data;
+
+    // Store tokens using auth utility
+    auth.setTokens(loginData.access_token, loginData.refresh_token);
 
     // Dispatch custom event to notify token change
     window.dispatchEvent(new Event("auth-token-changed"));
@@ -77,7 +83,7 @@ export class AuthService {
       safeLocalStorage.removeItem("access_token");
       safeLocalStorage.removeItem("refresh_token");
       // localStorage.removeItem("user");
-      
+
       // Dispatch custom event to notify token change
       window.dispatchEvent(new Event("auth-token-changed"));
     }
@@ -85,23 +91,27 @@ export class AuthService {
 
   /**
    * Refresh access token using refresh token
-   * @returns Promise<AuthResponse>
+   * @returns Promise<ApiResponse<LoginResponse>> - Returns full response with success, message, timestamp
    */
-  async refreshToken(): Promise<AuthResponse> {
+  async refreshToken(): Promise<ApiResponse<RefreshTokenResponse>> {
     const refreshToken = safeLocalStorage.getItem("refresh_token");
 
     if (!refreshToken) {
       throw new Error("No refresh token available");
     }
 
-    const response = await api.post<AuthResponse>(`${this.baseUrl}/refresh`, {
-      refresh_token: refreshToken,
-    });
+    const response = await api.post<ApiResponse<RefreshTokenResponse>>(
+      `${this.baseUrl}/refresh`,
+      {
+        refresh_token: refreshToken,
+      }
+    );
+
+    const authData = response.data.data;
 
     // Update stored tokens
-    safeLocalStorage.setItem("access_token", response.data.access_token);
-    safeLocalStorage.setItem("refresh_token", response.data.refresh_token);
-    // localStorage.setItem('user', JSON.stringify(response.data.user));
+    safeLocalStorage.setItem("access_token", authData.access_token);
+    // localStorage.setItem('user', JSON.stringify(authData.user));
 
     // Dispatch custom event to notify token change
     window.dispatchEvent(new Event("auth-token-changed"));
@@ -111,25 +121,24 @@ export class AuthService {
 
   /**
    * Get current user profile
-   * @returns Promise<User>
+   * @returns Promise<ApiResponse<User>> - Returns full response with success, message, timestamp
    */
-  async getProfile(): Promise<User> {
-    const response = await api.get<User>(`${this.baseUrl}/me`);
+  async getProfile(): Promise<ApiResponse<User>> {
+    const response = await api.get<ApiResponse<User>>(`${this.baseUrl}/me`);
     return response.data;
   }
-
 
   /**
    * Change user password
    * @param currentPassword - Current password
    * @param newPassword - New password
-   * @returns Promise<ApiResponse>
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
   async changePassword(
     currentPassword: string,
     newPassword: string
-  ): Promise<ApiResponse> {
-    const response = await api.patch<ApiResponse>(
+  ): Promise<OperationResponse> {
+    const response = await api.patch<OperationResponse>(
       `${this.baseUrl}/change-password`,
       {
         current_password: currentPassword,
@@ -142,10 +151,10 @@ export class AuthService {
   /**
    * Request password reset email
    * @param email - User email
-   * @returns Promise<ApiResponse>
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
-  async forgotPassword(email: string): Promise<ApiResponse> {
-    const response = await api.post<ApiResponse>(
+  async forgotPassword(email: string): Promise<OperationResponse> {
+    const response = await api.post<OperationResponse>(
       `${this.baseUrl}/forgot-password`,
       { email }
     );
@@ -156,13 +165,13 @@ export class AuthService {
    * Reset password using reset token
    * @param token - Reset token from email
    * @param newPassword - New password
-   * @returns Promise<ApiResponse>
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
   async resetPassword(
     token: string,
     newPassword: string
-  ): Promise<ApiResponse> {
-    const response = await api.post<ApiResponse>(
+  ): Promise<OperationResponse> {
+    const response = await api.post<OperationResponse>(
       `${this.baseUrl}/reset-password`,
       {
         token,
@@ -175,10 +184,10 @@ export class AuthService {
   /**
    * Verify email address
    * @param token - Verification token from email
-   * @returns Promise<ApiResponse>
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
-  async verifyEmail(token: string): Promise<ApiResponse> {
-    const response = await api.post<ApiResponse>(
+  async verifyEmail(token: string): Promise<OperationResponse> {
+    const response = await api.post<OperationResponse>(
       `${this.baseUrl}/verify-email`,
       { token }
     );
@@ -187,15 +196,14 @@ export class AuthService {
 
   /**
    * Resend email verification
-   * @returns Promise<ApiResponse>
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
-  async resendVerification(): Promise<ApiResponse> {
-    const response = await api.post<ApiResponse>(
+  async resendVerification(): Promise<OperationResponse> {
+    const response = await api.post<OperationResponse>(
       `${this.baseUrl}/resend-verification`
     );
     return response.data;
   }
-
 
   /**
    * Get stored access token

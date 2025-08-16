@@ -1,31 +1,16 @@
 import api from '../../lib/api';
 import {
   Address,
+  AddressQuery,
   CreateAddressData,
   UpdateAddressData,
 } from '../../types/address';
-import { PaginatedResponse } from '../../types/api';
+import { 
+  ApiResponse, 
+  PaginatedApiResponse, 
+  OperationResponse 
+} from '../../types/api-response';
 
-export interface AddressQuery {
-  page?: number;
-  limit?: number;
-  orderBy?: AddressOrderByField;
-  orderDirection?: 'ASC' | 'DESC';
-  city?: string;
-  district?: string;
-  khoroo?: string;
-  isDefault?: boolean;
-  userId?: string;
-}
-
-export enum AddressOrderByField {
-  ID = 'id',
-  CITY = 'city',
-  DISTRICT = 'district',
-  IS_DEFAULT = 'is_default',
-  CREATED_AT = 'created_at',
-  UPDATED_AT = 'updated_at',
-}
 
 /**
  * Address API Service
@@ -38,44 +23,33 @@ export class AddressService {
    * Create a new address
    * POST /address
    * @param createAddressData - Address creation data
-   * @returns Promise<Address>
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
-  async createAddress(createAddressData: CreateAddressData): Promise<Address> {
-    const response = await api.post<Address>(this.baseUrl, createAddressData);
+  async createAddress(createAddressData: CreateAddressData): Promise<OperationResponse> {
+    const response = await api.post<OperationResponse>(this.baseUrl, createAddressData);
     return response.data;
   }
 
   /**
-   * Get all addresses with optional filtering and pagination
-   * GET /address
+   * Get my addresses with optional filtering and pagination
+   * GET /address/me
    * @param query - Query parameters for filtering, sorting, and pagination
-   * @returns Promise<PaginatedResponse<Address>>
+   * @returns Promise<PaginatedApiResponse<Address>> - Returns full response with success, message, timestamp, data, pagination
    */
-  async getAddresses(query?: AddressQuery): Promise<PaginatedResponse<Address>> {
-    const response = await api.get<PaginatedResponse<Address>>(this.baseUrl, {
+  async getMyAddresses(query?: AddressQuery): Promise<PaginatedApiResponse<Address>> {
+    const response = await api.get<PaginatedApiResponse<Address>>(`${this.baseUrl}/me`, {
       params: query,
     });
     return response.data;
   }
 
   /**
-   * Get all addresses simple (no pagination)
-   * GET /address/simple
-   * @returns Promise<Address[]>
+   * Get my default address
+   * GET /address/me/default
+   * @returns Promise<ApiResponse<Address | null>> - Returns full response with success, message, timestamp
    */
-  async getAddressesSimple(): Promise<Address[]> {
-    const response = await api.get<Address[]>(`${this.baseUrl}/simple`);
-    return response.data;
-  }
-
-  /**
-   * Get default address for a user
-   * GET /address/default/:userId
-   * @param userId - User ID
-   * @returns Promise<Address>
-   */
-  async getDefaultAddress(userId: string): Promise<Address> {
-    const response = await api.get<Address>(`${this.baseUrl}/default/${userId}`);
+  async getMyDefaultAddress(): Promise<ApiResponse<Address | null>> {
+    const response = await api.get<ApiResponse<Address | null>>(`${this.baseUrl}/me/default`);
     return response.data;
   }
 
@@ -83,10 +57,10 @@ export class AddressService {
    * Get a specific address by ID
    * GET /address/:id
    * @param id - Address ID
-   * @returns Promise<Address>
+   * @returns Promise<ApiResponse<Address>> - Returns full response with success, message, timestamp
    */
-  async getAddressById(id: number): Promise<Address> {
-    const response = await api.get<Address>(`${this.baseUrl}/${id}`);
+  async getAddressById(id: number): Promise<ApiResponse<Address>> {
+    const response = await api.get<ApiResponse<Address>>(`${this.baseUrl}/${id}`);
     return response.data;
   }
 
@@ -95,10 +69,10 @@ export class AddressService {
    * PATCH /address/:id
    * @param id - Address ID
    * @param updateAddressData - Address update data
-   * @returns Promise<Address>
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
-  async updateAddress(id: number, updateAddressData: UpdateAddressData): Promise<Address> {
-    const response = await api.patch<Address>(`${this.baseUrl}/${id}`, updateAddressData);
+  async updateAddress(id: number, updateAddressData: UpdateAddressData): Promise<OperationResponse> {
+    const response = await api.patch<OperationResponse>(`${this.baseUrl}/${id}`, updateAddressData);
     return response.data;
   }
 
@@ -106,10 +80,10 @@ export class AddressService {
    * Set an address as default
    * PATCH /address/:id/set-default
    * @param id - Address ID
-   * @returns Promise<Address>
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
-  async setDefaultAddress(id: number): Promise<Address> {
-    const response = await api.patch<Address>(`${this.baseUrl}/${id}/set-default`);
+  async setDefaultAddress(id: number): Promise<OperationResponse> {
+    const response = await api.patch<OperationResponse>(`${this.baseUrl}/${id}/set-default`);
     return response.data;
   }
 
@@ -117,10 +91,11 @@ export class AddressService {
    * Delete an address
    * DELETE /address/:id
    * @param id - Address ID
-   * @returns Promise<void>
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
-  async deleteAddress(id: number): Promise<void> {
-    await api.delete(`${this.baseUrl}/${id}`);
+  async deleteAddress(id: number): Promise<OperationResponse> {
+    const response = await api.delete<OperationResponse>(`${this.baseUrl}/${id}`);
+    return response.data;
   }
 }
 

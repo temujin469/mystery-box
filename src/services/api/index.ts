@@ -6,3 +6,4 @@ export { itemService } from "./item.service";
 export { addressService } from "./address.service";
 export { categoryService } from "./category.service";
 export { achievementService } from "./achievement.service";
+export { orderService } from "./order.service";

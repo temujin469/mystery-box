@@ -3,16 +3,16 @@
 import React from "react";
 import { useMyProgress } from "@/hooks/api";
 import { Paper } from "@/components/common/Paper";
-import { 
-  AchievementCard, 
-  AchievementSkeleton, 
-  AchievementError, 
-  AchievementEmpty 
+import {
+  AchievementCard,
+  AchievementSkeleton,
+  AchievementError,
+  AchievementEmpty,
 } from "@/components/profile/achievement";
 import HeaderWithIcon from "@/components/common/HeaderWithIcon";
 
 const AchievementsPage = () => {
-  const { data: achievements, isLoading, error, refetch } = useMyProgress();
+  const { data: response, isLoading, error, refetch } = useMyProgress();
 
   if (isLoading) {
     return (
@@ -22,7 +22,7 @@ const AchievementsPage = () => {
           title="Миний амжилтууд"
           subtitle="Ачаалж байна..."
         />
-        
+
         {/* Progress Overview Skeleton */}
         <Paper className="p-6 mb-6 animate-pulse">
           <div className="flex items-center justify-between mb-4">
@@ -34,13 +34,13 @@ const AchievementsPage = () => {
               <div className="h-8 w-16 bg-muted/30 rounded"></div>
             </div>
           </div>
-          
+
           {/* Progress Bar Skeleton */}
           <div className="w-full bg-muted/20 rounded-full h-3">
             <div className="h-3 rounded-full bg-muted/40 w-1/3"></div>
           </div>
         </Paper>
-        
+
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {[...Array(8)].map((_, index) => (
             <AchievementSkeleton key={index} />
@@ -63,17 +63,15 @@ const AchievementsPage = () => {
     );
   }
 
-  const unlockedCount = achievements?.filter((a) => a.is_unlocked).length || 0;
-  const totalCount = achievements?.length || 0;
+  const unlockedCount =
+    response?.progress?.filter((a) => a.is_unlocked).length || 0;
+  const totalCount = response?.progress?.length || 0;
   const completionPercentage =
     totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
 
   return (
     <div className="">
-      <HeaderWithIcon
-        icon="🏆"
-        title="Миний амжилтууд"
-      />
+      <HeaderWithIcon icon="🏆" title="Миний амжилтууд" />
 
       {/* Progress Overview */}
       <Paper className="p-6 mb-6">
@@ -101,10 +99,13 @@ const AchievementsPage = () => {
       </Paper>
 
       {/* Achievements Grid */}
-      {achievements && achievements.length > 0 ? (
+      {response?.progress && response.progress.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {achievements.map((achievement) => (
-            <AchievementCard key={achievement.id} achievement={achievement} />
+          {response.progress.map((achievementProgress) => (
+            <AchievementCard
+              key={achievementProgress.id}
+              userAchievementProgress={achievementProgress}
+            />
           ))}
         </div>
       ) : (
