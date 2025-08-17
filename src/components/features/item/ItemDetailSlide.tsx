@@ -67,13 +67,6 @@ export function ItemDetailSlide({
 function ItemDetail({ item }: { item: Item }) {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("mn-MN", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
 
   // Get colors based on item rarity
   const rarityColors = getRarityColors(item.rarity);

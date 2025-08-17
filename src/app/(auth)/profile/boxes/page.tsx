@@ -5,12 +5,7 @@ import { useMyBoxOpenHistory } from "@/hooks/api";
 import { HeaderWithIcon, Pagination } from "@/components/common";
 import { Paper } from "@/components/common/Paper";
 import { Button } from "@/components/ui/button";
-import {
-  Package,
-  ChevronRight,
-  Calendar,
-  Sparkles,
-} from "lucide-react";
+import { Package, ChevronRight, Calendar, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { getRarityColors, getRarityName } from "@/lib/rarity-colors";
 import { formatCurrency } from "@/lib/currency";
@@ -19,7 +14,6 @@ import { formatDate } from "@/lib/date";
 
 const BoxHistoryPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const pageLimit = 5;
 
   const {
     data: response,
@@ -27,7 +21,7 @@ const BoxHistoryPage = () => {
     error,
   } = useMyBoxOpenHistory({
     page: currentPage,
-    limit: pageLimit,
+    limit: 5,
   });
 
   if (isPending) {
@@ -40,7 +34,11 @@ const BoxHistoryPage = () => {
         />
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Paper key={i} variant="compact" className="md:variant-default animate-pulse">
+            <Paper
+              key={i}
+              variant="compact"
+              className="md:variant-default animate-pulse"
+            >
               <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
                 {/* Box Section Skeleton */}
                 <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
@@ -82,7 +80,7 @@ const BoxHistoryPage = () => {
             </Paper>
           ))}
         </div>
-        
+
         {/* Pagination Skeleton */}
         <div className="mt-8">
           <div className="flex justify-center">
@@ -152,8 +150,9 @@ const BoxHistoryPage = () => {
     );
   }
 
-  const totalPages = response.pagination?.totalPages || 10;
-  
+  const totalPages = response.pagination?.totalPages || 0;
+  const pageLimit = response.pagination.limit;
+  const totalItems = response.pagination?.total || 0;
 
   return (
     <div className="space-y-6">
@@ -199,7 +198,7 @@ const BoxHistoryPage = () => {
                       </span>
                     </div>
                     <div className="inline-block px-2 py-0.5 mt-1 rounded bg-muted text-muted-foreground text-xs">
-                      {formatCurrency(history.box?.price || 0)}
+                      {formatCurrency(history.box_price || 0)}
                     </div>
                   </div>
                 </div>
@@ -250,7 +249,7 @@ const BoxHistoryPage = () => {
                       {history.item?.name || "Тодорхойгүй эд зүйл"}
                     </h4>
                     <div className="inline-block px-2 py-0.5 mt-1 rounded bg-green-50 text-green-700 text-xs">
-                      {formatCurrency(history.item?.price || 0)}
+                      {formatCurrency(history.item_price || 0)}
                     </div>
                   </div>
                 </div>
@@ -266,12 +265,12 @@ const BoxHistoryPage = () => {
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            totalItems={response.pagination?.total || 0}
+            totalItems={totalItems}
             itemsPerPage={pageLimit}
             onPageChange={setCurrentPage}
             showInfo={true}
             showFirstLast={true}
-            size="md"
+            size="lg"
           />
         </div>
       )}

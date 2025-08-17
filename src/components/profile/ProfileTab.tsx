@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Package, Box, ShoppingCart, Truck, Gift, Settings } from "lucide-react";
+import { Package, Box, Truck, Gift, Settings, Map, MapPinned } from "lucide-react";
 
 // Mongolian tab labels with icons and corresponding route paths
 const tabs = [
@@ -22,13 +22,13 @@ const tabs = [
   {
     label: "Захиалга",
     href: "/profile/orders",
-    icon: ShoppingCart,
+    icon: Truck,
     color: "text-orange-500",
   },
   {
     label: "Хүргэлт",
     href: "/profile/shipments",
-    icon: Truck,
+    icon: MapPinned,
     color: "text-green-500",
   },
   {
@@ -60,7 +60,7 @@ export default function ProfileTab() {
               key={tab.href}
               href={tab.href}
               className={`
-                relative flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl font-medium transition-all duration-300 ease-out
+                relative flex items-center justify-center gap-2.5 px-3 md:px-5 py-5 md:py-5 rounded-xl font-medium transition-all duration-300 ease-out
                 ${
                   isActive
                     ? "bg-muted/50 text-foreground shadow-sm"
@@ -87,8 +87,8 @@ export default function ProfileTab() {
 
               <span
                 className={`
-                font-semibold whitespace-nowrap text-sm transition-all duration-200 relative z-10
-                ${isActive ? "block" : "hidden sm:block"}
+                font-semibold whitespace-nowrap text-xs md:text-sm transition-all duration-200 relative z-10
+                ${isActive ? "block" : "hidden md:block"}
               `}
               >
                 {tab.label}

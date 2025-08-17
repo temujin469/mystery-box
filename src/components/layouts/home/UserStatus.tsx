@@ -56,7 +56,7 @@ export function UserStatus() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
       {/* User XP Progress */}
-      <div className="bg-gradient-to-br from-slate-900/95 via-gray-900/95 to-zinc-900/95 backdrop-blur-md border border-gray-700/30 rounded-xl p-4 shadow-xl">
+      <div className="bg-gradient-to-br from-card via-card to-primary/20 backdrop-blur-md rounded-xl p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full border border-blue-500/30 flex items-center justify-center">
@@ -92,7 +92,7 @@ export function UserStatus() {
       </div>
 
       {/* Available Rewards */}
-      <div className="bg-gradient-to-br from-slate-900/95 via-gray-900/95 to-zinc-900/95 backdrop-blur-md border border-gray-700/30 rounded-xl p-4 shadow-xl">
+      <div className="bg-gradient-to-br from-card via-card to-primary/30 backdrop-blur-md rounded-xl p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-full border border-cyan-500/30 flex items-center justify-center">
@@ -127,7 +127,7 @@ export function UserStatus() {
       </div>
 
       {/* Next Achievement */}
-      <div className="bg-gradient-to-br from-slate-900/95 via-gray-900/95 to-zinc-900/95 backdrop-blur-md border border-gray-700/30 rounded-xl p-4 shadow-xl">
+      <div className="bg-gradient-to-br from-card via-card to-primary/30 backdrop-blur-md rounded-xl p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-full border border-emerald-500/30 flex items-center justify-center">

@@ -30,35 +30,35 @@ export function OrderCard({ order, onClick, onViewDetail }: OrderCardProps) {
       case OrderStatus.PENDING:
         return {
           label: "Хүлээгдэж байна",
-          color: "bg-amber-50 text-amber-700 border-amber-200",
+          color: "bg-amber-500/10 text-amber-700 border-amber-700",
           dotColor: "bg-amber-400",
           icon: Clock,
         };
       case OrderStatus.CONFIRMED:
         return {
           label: "Баталгаажсан",
-          color: "bg-blue-50 text-blue-700 border-blue-200",
+          color: "bg-blue-500/10 text-blue-700 border-blue-700",
           dotColor: "bg-blue-400",
           icon: CheckCircle,
         };
       case OrderStatus.DELIVERED:
         return {
           label: "Хүргэгдсэн",
-          color: "bg-green-50 text-green-700 border-green-200",
+          color: "bg-green-500/10 text-green-700 border-green-700",
           dotColor: "bg-green-400",
           icon: Package,
         };
       case OrderStatus.CANCELLED:
         return {
           label: "Цуцлагдсан",
-          color: "bg-red-50 text-red-700 border-red-200",
+          color: "bg-red-500/10 text-red-700 border-red-700",
           dotColor: "bg-red-400",
           icon: XCircle,
         };
       default:
         return {
           label: "Тодорхойгүй",
-          color: "bg-gray-50 text-gray-700 border-gray-200",
+          color: "bg-gray-500/10 text-gray-700 border-gray-700",
           dotColor: "bg-gray-400",
           icon: Clock,
         };
@@ -84,7 +84,7 @@ export function OrderCard({ order, onClick, onViewDetail }: OrderCardProps) {
 
   return (
     <Card
-      className={`border-0 py-4 shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-sm ${
+      className={`border-0 py-1 shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-sm ${
         onClick ? "cursor-pointer" : ""
       }`}
       onClick={handleClick}
@@ -93,7 +93,7 @@ export function OrderCard({ order, onClick, onViewDetail }: OrderCardProps) {
         {/* Header - Order Number & Status */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground text-sm sm:text-lg truncate">
+            <h3 className="font-semibold text-foreground text-sm sm:text-lg truncate mb-3">
               #{order.order_number}
             </h3>
             <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
@@ -105,8 +105,8 @@ export function OrderCard({ order, onClick, onViewDetail }: OrderCardProps) {
           <div
             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${statusConfig.color}`}
           >
-            <div className={`w-2 h-2 rounded-full ${statusConfig.dotColor}`} />
-            <span className="text=[5px] sm:text-base">
+            <div className={`w-2 h-2 hidden rounded-full ${statusConfig.dotColor}`} />
+            <span className="text-[9px] sm:text-base">
               {statusConfig.label}
             </span>
             <StatusIcon className="w-3 h-3 sm:hidden" />

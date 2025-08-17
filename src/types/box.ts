@@ -92,6 +92,9 @@ export interface BoxOpenHistory {
   box_id: number; // Changed from string to number
   item_id: number; // Changed from string to number
   opened_at: Date; // Should be Date, not string
+  item_price: number;
+  box_price: number;
+  commission_rate: number;
   // Relations
   box?: Box;
   item?: Item;

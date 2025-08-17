@@ -53,7 +53,7 @@ export default function HeaderWithIcon({
   className = "",
 }: HeaderWithIconProps) {
   return (
-    <div className={`flex items-center justify-between mb-8 ${className}`}>
+    <div className={`flex items-center justify-between mb-8 lg:mb-5 lg:p-3 lg:rounded-lg lg:bg-card  ${className}`}>
       <div className="flex items-center gap-3">
         <div className="p-2 bg-primary/10 rounded-lg">
           {typeof icon === "string" ? (
@@ -63,9 +63,9 @@ export default function HeaderWithIcon({
           )}
         </div>
         <div>
-          <h1 className="text-xl xl:text-2xl font-bold">{title}</h1>
+          <h1 className="text-lg xl:text-xl font-bold">{title}</h1>
           {subtitle && (
-            <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
+            <p className="text-xs xl:text-sm text-muted-foreground mt-1">{subtitle}</p>
           )}
         </div>
       </div>
@@ -74,7 +74,7 @@ export default function HeaderWithIcon({
         <Button
           onClick={actionButton.onClick}
           variant={actionButton.variant || "secondary"}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 h-11 sm:h-12"
         >
           {actionButton.icon && (
             <span className="text-xl">{actionButton.icon}</span>

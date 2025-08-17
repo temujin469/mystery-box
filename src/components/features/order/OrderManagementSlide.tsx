@@ -354,14 +354,14 @@ export default function OrderManagementSlide({
       footer={
         <div className="flex items-center justify-between">
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={currentStep === "review" ? onClose : handlePrevStep}
           >
             {currentStep === "review" ? "Цуцлах" : "Буцах"}
           </Button>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
+            <span className="text-xs text-muted-foreground">
               {selectedCount} зүйл • {formatCurrency(totalAmount)}
             </span>
 
@@ -515,7 +515,7 @@ function ItemSelectionStep({
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-base mb-1 truncate">
+                    <h4 className="font-medium text-base mb-1 truncate pr-10">
                       {item.name}
                     </h4>
                     <p className="text-sm text-muted-foreground mb-2">
@@ -985,6 +985,10 @@ function ConfirmationStep({
           <div className="flex justify-between items-center font-semibold text-base">
             <span>Нийт дүн:</span>
             <span>{formatCurrency(totalAmount)}</span>
+          </div>
+            <div className="flex justify-between items-center font-semibold text-base">
+            <span>Нийт төлөх дүн:</span>
+            <span>{formatCurrency(shippingFee)}</span>
           </div>
         </div>
       </div>

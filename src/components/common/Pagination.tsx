@@ -106,10 +106,10 @@ export function Pagination({
   }
 
   return (
-    <div className={cn("flex items-center justify-between", className)}>
+    <div className={cn("flex items-center justify-center sm:justify-between", className)}>
       {/* Info Section */}
       {showInfo && itemRange && (
-        <div className={cn("text-muted-foreground", config.text)}>
+        <div className={cn("hidden sm:block text-muted-foreground", config.text)}>
           <span>
             {itemRange.start}-{itemRange.end} / {totalItems?.toLocaleString()} үр дүн
           </span>

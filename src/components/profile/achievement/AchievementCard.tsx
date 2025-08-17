@@ -15,6 +15,7 @@ import {
   DrawerDescription,
   DrawerFooter,
 } from "@/components/ui/drawer";
+import { PackageOpen } from "lucide-react";
 
 interface AchievementCardProps {
   userAchievementProgress: UserAchievementProgress;
@@ -76,7 +77,9 @@ const AchievementCard: React.FC<AchievementCardProps> = ({
 
         {/* Achievement Info */}
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold line-clamp-2 text-center">
+          <h3 className={`text-sm font-bold line-clamp-2 text-center ${
+            !achievement.is_unlocked ? "text-gray-600" : "text-yellow-400"
+          }`}>
             {achievement.name}
           </h3>
 
@@ -87,18 +90,18 @@ const AchievementCard: React.FC<AchievementCardProps> = ({
                 e.stopPropagation();
                 window.location.href = `/boxes/${achievement.reward_box_id}?reward=${achievement.id}`;
               }}
-              className="w-full bg-gradient-to-r from-purple-500 to-blue-600 text-white text-xs font-medium py-2 px-3 rounded-lg hover:from-purple-600 hover:to-blue-700 transition-all duration-200"
+              className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 text-white text-xs font-bold py-2 px-3 rounded-full hover:from-purple-600 hover:to-blue-700 transition-all duration-200"
             >
               Шагнал авах
             </button>
           ) : achievement.is_unlocked && achievement.claimed ? (
-            <div className="w-full bg-gray-400/20 text-gray-500 text-xs font-medium py-2 px-3 rounded-lg text-center">
+            <div className="w-full bg-gray-400/10 text-gray-600 text-xs font-bold py-2 px-3 rounded-full text-center">
               Шагнал авсан
             </div>
           ) : (
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-background rounded-full h-4 mt-5">
               <div
-                className="h-2 rounded-full transition-all duration-500 bg-gradient-to-r from-blue-400 to-blue-600"
+                className="h-4 rounded-full transition-all duration-500 bg-gradient-to-r from-yellow-500 to-yellow-400"
                 style={{
                   width: `${Math.min(achievement.progress_percentage, 100)}%`,
                 }}
@@ -209,7 +212,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({
               {/* Modern Progress Bar */}
               <div className="w-full bg-background rounded-full h-2 overflow-hidden">
                 <div
-                  className="h-2 rounded-full transition-all duration-700 ease-out bg-gradient-to-r from-primary/80 to-primary"
+                  className="h-2 rounded-full transition-all duration-700 ease-out bg-gradient-to-r from-yellow-500 to-yellow-400"
                   style={{
                     width: `${Math.min(achievement.progress_percentage, 100)}%`,
                   }}
@@ -217,7 +220,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({
               </div>
 
               <div className="text-center">
-                <span className="text-2xl font-bold text-primary">
+                <span className="text-2xl font-bold text-yellow-500">
                   {achievement.progress_percentage.toFixed(0)}%
                 </span>
               </div>
@@ -262,15 +265,9 @@ const AchievementCard: React.FC<AchievementCardProps> = ({
                 onClick={() => {
                   window.location.href = `/boxes/${achievement.reward_box_id}?reward=${achievement.id}`;
                 }}
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white text-lg font-semibold py-4 px-6 rounded-2xl hover:from-purple-700 hover:to-blue-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
+                className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 text-white text-lg font-semibold py-4 px-6 rounded-2xl hover:from-purple-700 hover:to-blue-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
               >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M10 2L3 7v10l7 3 7-3V7l-7-5z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                <PackageOpen/>
                 Шагналын хайрцаг нээх
               </button>
             ) : (

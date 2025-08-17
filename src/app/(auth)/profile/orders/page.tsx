@@ -50,7 +50,7 @@ const OrdersPage = () => {
   return (
     <div className="space-y-6">
       <HeaderWithIcon
-        icon="🛒"
+        icon="🚚"
         title="Миний захиалга"
         subtitle={`${pagination?.total || orders.length} захиалга`}
       />
@@ -84,7 +84,7 @@ const OrdersPage = () => {
             onPageChange={setCurrentPage}
             showInfo={true}
             showFirstLast={true}
-            size="md"
+            size="lg"
           />
         </div>
       )}

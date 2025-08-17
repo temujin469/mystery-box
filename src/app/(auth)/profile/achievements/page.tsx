@@ -71,10 +71,14 @@ const AchievementsPage = () => {
 
   return (
     <div className="">
-      <HeaderWithIcon icon="🏆" title="Миний амжилтууд" />
+      <HeaderWithIcon
+        icon="🏆"
+        title="Миний амжилтууд"
+        subtitle={`${totalCount}-с ${unlockedCount} амжилт`}
+      />
 
       {/* Progress Overview */}
-      <Paper className="p-6 mb-6">
+      {/* <Paper className="p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-xl font-semibold">Нийт явц</h2>
@@ -89,18 +93,17 @@ const AchievementsPage = () => {
           </div>
         </div>
 
-        {/* Progress Bar */}
         <div className="w-full bg-gray-200 rounded-full h-3">
           <div
             className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-300"
             style={{ width: `${completionPercentage}%` }}
           ></div>
         </div>
-      </Paper>
+      </Paper> */}
 
       {/* Achievements Grid */}
       {response?.progress && response.progress.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {response.progress.map((achievementProgress) => (
             <AchievementCard
               key={achievementProgress.id}

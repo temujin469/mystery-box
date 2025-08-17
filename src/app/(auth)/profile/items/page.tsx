@@ -10,11 +10,11 @@ import {
 } from "@/components/profile/items";
 import { ItemDetailSlide } from "@/components/features/item/ItemDetailSlide";
 import { OrderManagementSlide } from "@/components/features/order";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 
 type Props = {};
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 8;
 
 const InventoryPage = (props: Props) => {
   const {
@@ -79,19 +79,19 @@ const InventoryPage = (props: Props) => {
   return (
     <div>
       <HeaderWithIcon
-        icon="📦"
+        icon="🛍️"
         title="Миний агуулах"
         subtitle={`${totalItems} төрлийн эд зүйл (${totalQuantity} ширхэг)`}
         actionButton={{
           label: "Захиалга үүсгэх",
           onClick: () => setIsOrderSlideOpen(true),
-          icon: <ShoppingCart className="w-4 h-4" />,
+          icon: <ShoppingBag className="w-4 h-4" />,
           variant: "default",
         }}
       />
 
       {/* Items Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-6">
         {paginatedItems.map((inventoryItem: any, index: number) => {
           const item = inventoryItem.item;
           const quantity = inventoryItem.quantity || 1;
@@ -116,8 +116,8 @@ const InventoryPage = (props: Props) => {
           totalItems={totalItems}
           itemsPerPage={ITEMS_PER_PAGE}
           onPageChange={handlePageChange}
+          size="lg"
           showInfo={true}
-          className="mb-6"
         />
       )}
 
