@@ -6,6 +6,12 @@ import {
   UpdateUserData,
   RefreshTokenResponse,
   LoginResponse,
+  ForgotPasswordData,
+  VerifyResetPinData,
+  ResetPasswordData,
+  UpdatePasswordData,
+  InitiateEmailUpdateData,
+  VerifyEmailUpdateData,
 } from "../../types/auth";
 import { ApiResponse, OperationResponse } from "../../types/api-response";
 import { auth } from "../../lib/auth";
@@ -43,26 +49,41 @@ export class AuthService {
     return response.data;
   }
 
+  // /**
+  //  * Register a new user account
+  //  * @param data - Registration data
+  //  * @returns Promise<ApiResponse<LoginResponse>> - Returns full response with success, message, timestamp
+  //  */
+  // async register(data: RegisterData): Promise<ApiResponse<LoginResponse>> {
+  //   const response = await api.post<ApiResponse<LoginResponse>>(
+  //     `${this.baseUrl}/register`,
+  //     data
+  //   );
+
+  //   // Extract login data for token storage
+  //   const loginData = response.data.data;
+
+  //   // Store tokens using auth utility
+  //   auth.setTokens(loginData.access_token, loginData.refresh_token);
+
+  //   // Dispatch custom event to notify token change
+  //   window.dispatchEvent(new Event("auth-token-changed"));
+
+  //   return response.data;
+  // }
+
   /**
    * Register a new user account
    * @param data - Registration data
-   * @returns Promise<ApiResponse<LoginResponse>> - Returns full response with success, message, timestamp
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
-  async register(data: RegisterData): Promise<ApiResponse<LoginResponse>> {
-    const response = await api.post<ApiResponse<LoginResponse>>(
+  async register(data: RegisterData): Promise<OperationResponse> {
+    const response = await api.post<OperationResponse>(
       `${this.baseUrl}/register`,
       data
     );
 
-    // Extract login data for token storage
-    const loginData = response.data.data;
-
-    // Store tokens using auth utility
-    auth.setTokens(loginData.access_token, loginData.refresh_token);
-
-    // Dispatch custom event to notify token change
-    window.dispatchEvent(new Event("auth-token-changed"));
-
+    // No tokens are returned - user must verify email first
     return response.data;
   }
 
@@ -128,25 +149,6 @@ export class AuthService {
     return response.data;
   }
 
-  /**
-   * Change user password
-   * @param currentPassword - Current password
-   * @param newPassword - New password
-   * @returns Promise<OperationResponse> - Returns operation status with backend message
-   */
-  async changePassword(
-    currentPassword: string,
-    newPassword: string
-  ): Promise<OperationResponse> {
-    const response = await api.patch<OperationResponse>(
-      `${this.baseUrl}/change-password`,
-      {
-        current_password: currentPassword,
-        new_password: newPassword,
-      }
-    );
-    return response.data;
-  }
 
   /**
    * Request password reset email
@@ -162,47 +164,129 @@ export class AuthService {
   }
 
   /**
-   * Reset password using reset token
-   * @param token - Reset token from email
+   * Verify password reset PIN
+   * @param email - User email
+   * @param pin - 4-digit reset PIN from email
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
+   */
+  async verifyResetPin(email: string, pin: string): Promise<OperationResponse> {
+    const response = await api.post<OperationResponse>(
+      `${this.baseUrl}/verify-reset-pin`,
+      { email, pin }
+    );
+    return response.data;
+  }
+
+  /**
+   * Reset password using PIN
+   * @param email - User email
+   * @param pin - 4-digit reset PIN from email
    * @param newPassword - New password
    * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
   async resetPassword(
-    token: string,
+    email: string,
+    pin: string,
     newPassword: string
   ): Promise<OperationResponse> {
     const response = await api.post<OperationResponse>(
       `${this.baseUrl}/reset-password`,
       {
-        token,
-        new_password: newPassword,
+        email,
+        pin,
+        newPassword,
       }
     );
     return response.data;
   }
 
   /**
-   * Verify email address
-   * @param token - Verification token from email
+   * Update password for authenticated user
+   * @param data - Object containing old password and new password
    * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
-  async verifyEmail(token: string): Promise<OperationResponse> {
+  async updatePassword(data: UpdatePasswordData): Promise<OperationResponse> {
+    const response = await api.put<OperationResponse>(
+      `${this.baseUrl}/update-password`,
+      data
+    );
+    return response.data;
+  }
+
+  /**
+   * Initiate email update process for authenticated user
+   * @param data - Object containing new email and current password
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
+   */
+  async initiateEmailUpdate(data: InitiateEmailUpdateData): Promise<OperationResponse> {
+    const response = await api.put<OperationResponse>(
+      `${this.baseUrl}/update-email`,
+      data
+    );
+    return response.data;
+  }
+
+  /**
+   * Verify email update using PIN
+   * @param data - Object containing verification PIN
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
+   */
+  async verifyEmailUpdate(data: VerifyEmailUpdateData): Promise<OperationResponse> {
     const response = await api.post<OperationResponse>(
-      `${this.baseUrl}/verify-email`,
-      { token }
+      `${this.baseUrl}/verify-email-update`,
+      data
+    );
+    
+    // If email update is successful, the user's session might be invalidated
+    // We should handle this by clearing tokens and triggering re-authentication
+    if (response.data.success) {
+      // Clear auth data since email change invalidates sessions
+      this.clearAuthData();
+      // Dispatch event to notify components about auth state change
+      window.dispatchEvent(new Event("auth-token-changed"));
+    }
+    
+    return response.data;
+  }
+
+  /**
+   * Verify email address
+   * @param pin - 4-digit verification PIN from email
+   * @returns Promise<OperationResponse> - Returns operation status with backend message
+   */
+  async verifyEmail(pin: string): Promise<OperationResponse> {
+    const response = await api.post<OperationResponse>(
+      `/user/verify-email`,
+      { pin }
     );
     return response.data;
   }
 
   /**
    * Resend email verification
+   * @param email - User email to resend verification to
    * @returns Promise<OperationResponse> - Returns operation status with backend message
    */
-  async resendVerification(): Promise<OperationResponse> {
+  async resendVerification(email: string): Promise<OperationResponse> {
     const response = await api.post<OperationResponse>(
-      `${this.baseUrl}/resend-verification`
+      `/user/resend-verification`,
+      { email }
     );
     return response.data;
+  }
+
+  /**
+   * Check if current user needs email verification
+   * @returns Promise<boolean> - Returns true if user needs to verify email
+   */
+  async needsEmailVerification(): Promise<boolean> {
+    try {
+      const profile = await this.getProfile();
+      return !profile.data.email_verified;
+    } catch (error) {
+      // If we can't get profile, assume verification is not needed
+      return false;
+    }
   }
 
   /**

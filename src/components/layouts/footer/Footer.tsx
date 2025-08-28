@@ -6,12 +6,10 @@ import Link from "next/link";
 import Image from "next/image";
 
 const footerLinks = [
-  { name: "Компани", href: "/about" },
   { name: "Бидний тухай", href: "/about" },
   { name: "Баг", href: "/team" },
-  { name: "Бүтээгдэхүүн", href: "/products" },
-  { name: "Блог", href: "/blog" },
-  { name: "Үнийн санал", href: "/pricing" },
+  { name: "Баг", href: "/team" },
+  { name: "Баг", href: "/team" },
 ];
 
 const socialLinks = [

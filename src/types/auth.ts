@@ -18,6 +18,39 @@ export interface RefreshTokenResponse {
   access_token: string;
 }
 
+// =================== reset password =========================== //
+export interface ForgotPasswordData {
+  email: string;
+}
+
+export interface VerifyResetPinData {
+  email: string;
+  pin: string;
+}
+
+export interface ResetPasswordData {
+  email: string;
+  pin: string;
+  newPassword: string;
+}
+
+export interface UpdatePasswordData {
+  oldPassword: string;
+  newPassword: string;
+}
+// ============================================== //
+
+// =================== email update =========================== //
+export interface InitiateEmailUpdateData {
+  newEmail: string;
+  currentPassword: string;
+}
+
+export interface VerifyEmailUpdateData {
+  verificationPin: string;
+}
+// =========================================================== //
+
 export interface User {
   id: string;
   email: string;
@@ -28,6 +61,7 @@ export interface User {
   level: number;
   experience_points: number;
   role: UserRole;
+  email_verified: boolean;
   created_at: Date; // Should be Date, not string
   // Relations (when included)
   transactions?: any[]; // Transaction[]

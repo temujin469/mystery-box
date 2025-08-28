@@ -8,7 +8,11 @@ import {
   LoginResponse,
   User,
   UpdateUserData,
+  UpdatePasswordData,
+  InitiateEmailUpdateData,
+  VerifyEmailUpdateData,
 } from "../../types/auth";
+import { OperationResponse } from "../../types/api-response";
 
 // Query Keys
 export const authKeys = {
@@ -83,21 +87,10 @@ export const useLogin = () => {
 };
 
 export const useRegister = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (data: RegisterData) => authService.register(data),
-    onSuccess: (response) => {
-      if (response.success) {
-        // Dispatch custom event to notify auth token change
-        window.dispatchEvent(new Event("auth-token-changed"));
-
-        // Invalidate and refetch user profile
-        queryClient.invalidateQueries({ queryKey: authKeys.profile() });
-        // Immediately refetch the profile to get user data
-        queryClient.refetchQueries({ queryKey: authKeys.profile() });
-      }
-    },
+    // Don't auto-login on registration success
+    // User must verify email first
   });
 };
 
@@ -135,6 +128,7 @@ export const useLogout = () => {
   });
 };
 
+
 export const useRefreshToken = () => {
   const queryClient = useQueryClient();
 
@@ -152,36 +146,49 @@ export const useRefreshToken = () => {
   });
 };
 
+
+// ============= Reset Password ================= //
 export const useForgotPassword = () => {
   return useMutation({
     mutationFn: (email: string) => authService.forgotPassword(email),
   });
 };
 
+export const useVerifyResetPin = () => {
+  return useMutation({
+    mutationFn: ({
+      email,
+      pin,
+    }: {
+      email: string;
+      pin: string;
+    }) => authService.verifyResetPin(email, pin),
+  });
+};
+
 export const useResetPassword = () => {
   return useMutation({
     mutationFn: ({
-      token,
+      email,
+      pin,
       newPassword,
     }: {
-      token: string;
+      email: string;
+      pin: string;
       newPassword: string;
-    }) => authService.resetPassword(token, newPassword),
+    }) => authService.resetPassword(email, pin, newPassword),
   });
 };
 
-export const useChangePassword = () => {
+export const useUpdatePassword = () => {
   return useMutation({
-    mutationFn: ({
-      currentPassword,
-      newPassword,
-    }: {
-      currentPassword: string;
-      newPassword: string;
-    }) => authService.changePassword(currentPassword, newPassword),
+    mutationFn: (data: UpdatePasswordData) => authService.updatePassword(data),
   });
 };
 
+
+
+// ============= Email verification ================= //
 export const useVerifyEmail = () => {
   return useMutation({
     mutationFn: (token: string) => authService.verifyEmail(token),
@@ -190,6 +197,42 @@ export const useVerifyEmail = () => {
 
 export const useResendVerification = () => {
   return useMutation({
-    mutationFn: () => authService.resendVerification(),
+    mutationFn: (email: string) => authService.resendVerification(email),
+  });
+};
+
+export const useEmailVerificationStatus = () => {
+  return useQuery({
+    queryKey: [...authKeys.all, "emailVerificationStatus"],
+    queryFn: () => authService.needsEmailVerification(),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+};
+
+// ============= Email Update ================= //
+export const useInitiateEmailUpdate = () => {
+  return useMutation({
+    mutationFn: (data: InitiateEmailUpdateData) => authService.initiateEmailUpdate(data),
+  });
+};
+
+export const useVerifyEmailUpdate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: VerifyEmailUpdateData) => authService.verifyEmailUpdate(data),
+    onSuccess: (response) => {
+      if (response.success) {
+        // Clear all cached data since user session is invalidated after email change
+        queryClient.clear();
+        queryClient.resetQueries();
+        
+        // Invalidate all auth-related queries
+        queryClient.invalidateQueries({ queryKey: authKeys.all });
+        
+        // Dispatch custom event to notify auth token change
+        window.dispatchEvent(new Event("auth-token-changed"));
+      }
+    },
   });
 };

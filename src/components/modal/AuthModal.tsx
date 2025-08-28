@@ -22,6 +22,7 @@ import {
   SignupFormData,
 } from "@/schemas";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useLogin, useRegister } from "@/hooks/api";
 
 function GoogleIcon() {
@@ -54,6 +55,7 @@ export default function AuthModal({
   const [showConfirm, setShowConfirm] = React.useState(false);
   const [submitError, setSubmitError] = React.useState<string | null>(null);
 
+  const router = useRouter();
   const register = useRegister();
   const login = useLogin();
 
@@ -96,23 +98,38 @@ export default function AuthModal({
       });
       onOpenChange(false);
     } catch (error: any) {
-      const message =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Нэвтрэхэд алдаа гарлаа";
-      setSubmitError(message);
+      const errorMessage = error?.response?.data?.message || error?.message || "Нэвтрэхэд алдаа гарлаа";
+      
+      // Check if error is about email verification
+      if (errorMessage.includes('баталгаажуул') || errorMessage.includes('verify')) {
+        setSubmitError(errorMessage);
+        // Navigate directly to email verification page
+        setTimeout(() => {
+          onOpenChange(false);
+          router.push(`/auth/verify-email?email=${encodeURIComponent(data.email)}`);
+        }, 1500);
+      } else {
+        setSubmitError(errorMessage);
+      }
     }
   }
 
   async function onSignup(data: SignupFormData) {
     try {
       setSubmitError(null);
-      await register.mutateAsync({
+      const response = await register.mutateAsync({
         username: data.username,
         email: data.email,
         password: data.password,
       });
-      onOpenChange(false);
+      
+      // Show success message and redirect to verification
+      if (response.success) {
+        // Close modal and redirect to verification page
+        onOpenChange(false);
+        // Redirect to verification page with email
+        router.push(`/auth/verify-email?email=${encodeURIComponent(data.email)}`);
+      }
     } catch (error: any) {
       console.log("error", error);
       const message =
@@ -201,6 +218,23 @@ export default function AuthModal({
                     {submitError || login.error?.message}
                   </p>
                 )}
+
+                {/* Forgot Password Link */}
+                <div className="text-right">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="text-primary hover:text-blue-500 p-0 h-auto font-normal text-sm"
+                    onClick={() => {
+                      onOpenChange(false);
+                      router.push('/auth/reset-password');
+                    }}
+                  >
+                    Нууц үгээ мартсан уу?
+                  </Button>
+                </div>
+
                 <Button
                   type="submit"
                   className="w-full"
@@ -368,7 +402,7 @@ export default function AuthModal({
               </form>
             </TabsContent>
           </Tabs>
-          <div className="text-center text-sm text-muted-foreground my-5">
+          {/* <div className="text-center text-sm text-muted-foreground my-5">
             эсвэл
           </div>
           <div className="gap-2 mt-2 flex">
@@ -400,7 +434,7 @@ export default function AuthModal({
               />
               <p>Facebook</p>
             </Button>
-          </div>
+          </div> */}
         </div>
       </DialogContent>
     </Dialog>

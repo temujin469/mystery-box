@@ -25,6 +25,23 @@ export const signupSchema = z
     path: ["confirm"],
   });
 
+// Password update schema
+export const updatePasswordSchema = z
+  .object({
+    oldPassword: z.string().min(8, "Одоогийн нууц үг оруулна уу"),
+    newPassword: z.string().min(8, "Шинэ нууц үг дор хаяж 8 тэмдэгт байх ёстой"),
+    confirmPassword: z.string().min(1, "Нууц үг давтаж оруулна уу"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Шинэ нууц үг тохирохгүй байна",
+    path: ["confirmPassword"],
+  })
+  .refine((data) => data.oldPassword !== data.newPassword, {
+    message: "Шинэ нууц үг одоогийн нууц үгтэй адил байж болохгүй",
+    path: ["newPassword"],
+  });
+
 // Type exports for form data
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type SignupFormData = z.infer<typeof signupSchema>;
+export type UpdatePasswordFormData = z.infer<typeof updatePasswordSchema>;

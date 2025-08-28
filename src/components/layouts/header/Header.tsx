@@ -59,15 +59,7 @@ export function Header() {
           </Link>
 
           <nav className="hidden md:flex gap-6">
-            <Link href="/boxes">
-              <Button className="bg-primary/10 hover:bg-primary/20 transition-all duration-300 backdrop-blur-sm border border-primary/20 hover:border-primary/30">
-                <div className="flex items-center gap-2">
-                  <Gamepad size={18} />
-                  НУУЦЛАГ ХАЙРЦАГ
-                </div>
-              </Button>
-            </Link>
-            <Link href="/free-boxes" className="hidden xl:block">
+            <Link href="/" className="hidden xl:block">
               <Button className="bg-primary/10 hover:bg-primary/20 transition-all duration-300 backdrop-blur-sm border border-primary/20 hover:border-primary/30">
                 <div className="flex items-center gap-2">
                   <GiftIcon size={18} />

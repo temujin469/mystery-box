@@ -6,35 +6,15 @@ import { useCurrentUser, useUpdateUser } from "@/hooks/api";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Paper, HeaderWithIcon } from "@/components/common";
+import { ChangePasswordCard, ChangeEmailCard } from "@/components/profile/settings";
 
 export default function ProfileSettings() {
   const { data: user, isLoading } = useCurrentUser();
   const updateUser = useUpdateUser();
-  
-  const [email, setEmail] = useState("");
+
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-
-  const handleEmailUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) {
-      toast.error("Имэйл хаяг оруулна уу");
-      return;
-    }
-    if (!user?.id) {
-      toast.error("Хэрэглэгчийн мэдээлэл олдсонгүй");
-      return;
-    }
-
-    try {
-      await updateUser.mutateAsync({ id: user.id, data: { email } });
-      toast.success("Имэйл хаяг амжилттай шинэчлэгдлээ");
-      setEmail("");
-    } catch (error) {
-      toast.error("Имэйл хаяг шинэчлэхэд алдаа гарлаа");
-    }
-  };
 
   const handleUsernameUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,7 +52,10 @@ export default function ProfileSettings() {
     }
 
     try {
-      await updateUser.mutateAsync({ id: user.id, data: { firstname: firstName } });
+      await updateUser.mutateAsync({
+        id: user.id,
+        data: { firstname: firstName },
+      });
       toast.success("Нэр амжилттай шинэчлэгдлээ");
       setFirstName("");
     } catch (error) {
@@ -92,7 +75,10 @@ export default function ProfileSettings() {
     }
 
     try {
-      await updateUser.mutateAsync({ id: user.id, data: { lastname: lastName } });
+      await updateUser.mutateAsync({
+        id: user.id,
+        data: { lastname: lastName },
+      });
       toast.success("Овог амжилттай шинэчлэгдлээ");
       setLastName("");
     } catch (error) {
@@ -105,11 +91,8 @@ export default function ProfileSettings() {
       <div className="min-h-screen bg-background text-foreground py-8">
         <div className="space-y-8">
           {/* Page Title Skeleton */}
-          <HeaderWithIcon
-            icon="⚙️"
-            title="Тохиргоо"
-          />
-          
+          <HeaderWithIcon icon="⚙️" title="Тохиргоо" />
+
           {/* Settings Sections Skeleton */}
           <div className="flex flex-col xl:flex-row gap-10">
             {/* Email Section */}
@@ -197,33 +180,11 @@ export default function ProfileSettings() {
 
   return (
     <div>
-      <HeaderWithIcon
-        icon="⚙️"
-        title="Тохиргоо"
-      />
+      <HeaderWithIcon icon="⚙️" title="Тохиргоо" />
 
       <div className="flex flex-col xl:flex-row gap-5 mb-5">
         {/* Email change */}
-        <Paper className="flex-1">
-          <h2 className="text-lg font-semibold mb-4">Имэйл хаяг солих</h2>
-          <form onSubmit={handleEmailUpdate} className="flex flex-col gap-4">
-            <Input
-              type="email"
-              placeholder={user?.email ? `Одоогийн: ${user.email}` : "Шинэ имэйл хаяг"}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="placeholder:text-muted-foreground"
-              disabled={updateUser.isPending}
-            />
-            <Button 
-              type="submit"
-              className="w-fit bg-primary text-primary-foreground font-semibold"
-              disabled={updateUser.isPending || !email.trim()}
-            >
-              {updateUser.isPending ? "Шинэчилж байна..." : "Имэйл шинэчлэх"}
-            </Button>
-          </form>
-        </Paper>
+        <ChangeEmailCard />
 
         {/* Username change */}
         <Paper className="flex-1">
@@ -231,7 +192,11 @@ export default function ProfileSettings() {
           <form onSubmit={handleUsernameUpdate} className="flex flex-col gap-4">
             <Input
               type="text"
-              placeholder={user?.username ? `Одоогийн: ${user.username}` : "Шинэ хэрэглэгчийн нэр"}
+              placeholder={
+                user?.username
+                  ? `Одоогийн: ${user.username}`
+                  : "Шинэ хэрэглэгчийн нэр"
+              }
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="placeholder:text-muted-foreground"
@@ -242,12 +207,16 @@ export default function ProfileSettings() {
             <div className="text-sm text-muted-foreground">
               Хэрэглэгчийн нэр 3-50 тэмдэгт байх ёстой
             </div>
-            <Button 
+            <Button
               type="submit"
               className="w-fit bg-primary text-primary-foreground font-semibold"
-              disabled={updateUser.isPending || !username.trim() || username.length < 3}
+              disabled={
+                updateUser.isPending || !username.trim() || username.length < 3
+              }
             >
-              {updateUser.isPending ? "Шинэчилж байна..." : "Хэрэглэгчийн нэр шинэчлэх"}
+              {updateUser.isPending
+                ? "Шинэчилж байна..."
+                : "Хэрэглэгчийн нэр шинэчлэх"}
             </Button>
           </form>
         </Paper>
@@ -255,29 +224,7 @@ export default function ProfileSettings() {
 
       <div className="flex flex-col xl:flex-row gap-5 mb-5">
         {/* Password change */}
-        <Paper className="flex-1">
-          <h2 className="text-lg font-semibold mb-4">Нууц үг солих</h2>
-          <form className="flex flex-col gap-4">
-            <Input
-              type="password"
-              placeholder="Одоогийн нууц үг"
-              className="placeholder:text-muted-foreground"
-            />
-            <Input
-              type="password"
-              placeholder="Шинэ нууц үг"
-              className="placeholder:text-muted-foreground"
-            />
-            <Input
-              type="password"
-              placeholder="Шинэ нууц үг давтах"
-              className="placeholder:text-muted-foreground"
-            />
-            <Button className="w-fit bg-primary text-primary-foreground font-semibold">
-              Нууц үг шинэчлэх
-            </Button>
-          </form>
-        </Paper>
+        <ChangePasswordCard />
       </div>
 
       {/* Personal Information */}
@@ -285,17 +232,22 @@ export default function ProfileSettings() {
         {/* First Name */}
         <Paper className="flex-1">
           <h2 className="text-lg font-semibold mb-4">Нэр</h2>
-          <form onSubmit={handleFirstNameUpdate} className="flex flex-col gap-4">
+          <form
+            onSubmit={handleFirstNameUpdate}
+            className="flex flex-col gap-4"
+          >
             <Input
               type="text"
-              placeholder={user?.firstname ? `Одоогийн: ${user.firstname}` : "Нэр"}
+              placeholder={
+                user?.firstname ? `Одоогийн: ${user.firstname}` : "Нэр"
+              }
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               className="placeholder:text-muted-foreground"
               maxLength={50}
               disabled={updateUser.isPending}
             />
-            <Button 
+            <Button
               type="submit"
               className="w-fit bg-primary text-primary-foreground font-semibold"
               disabled={updateUser.isPending || !firstName.trim()}
@@ -311,14 +263,16 @@ export default function ProfileSettings() {
           <form onSubmit={handleLastNameUpdate} className="flex flex-col gap-4">
             <Input
               type="text"
-              placeholder={user?.lastname ? `Одоогийн: ${user.lastname}` : "Овог"}
+              placeholder={
+                user?.lastname ? `Одоогийн: ${user.lastname}` : "Овог"
+              }
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               className="placeholder:text-muted-foreground"
               maxLength={50}
               disabled={updateUser.isPending}
             />
-            <Button 
+            <Button
               type="submit"
               className="w-fit bg-primary text-primary-foreground font-semibold"
               disabled={updateUser.isPending || !lastName.trim()}
@@ -330,7 +284,7 @@ export default function ProfileSettings() {
       </div>
 
       {/* Sessions */}
-      <Paper className="">
+      {/* <Paper className="">
         <h2 className="text-lg font-semibold mb-4">Сессүүд</h2>
         <div className="bg-secondary p-6 rounded-lg">
           <div className="flex flex-col gap-4">
@@ -372,7 +326,7 @@ export default function ProfileSettings() {
         <div className="text-sm text-muted-foreground mt-2">
           Бүх төхөөрөмжүүд дээрх идэвхтэй сессүүд энд харагдана.
         </div>
-      </Paper>
+      </Paper> */}
     </div>
   );
 }
